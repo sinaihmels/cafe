@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CardDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_amvjr"]
+[ext_resource type="Script" path="res://scripts/effects/draw_cards_effect.gd" id="2_yl8i2"]
+
+[sub_resource type="Resource" id="Resource_1x2aq"]
+script = ExtResource("2_yl8i2")
+effect_id = &"draw_cards"
+amount = 1
+
+[resource]
+script = ExtResource("1_amvjr")
+card_id = &"starter_focus"
+display_name = "Focus"
+energy_cost = 1
+tags = PackedStringArray("action", "planning")
+targeting_rules = "none"
+effects = [SubResource("Resource_1x2aq")]
+preview_text = "Draw 1 card."

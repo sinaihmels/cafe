@@ -1,0 +1,113 @@
+[gd_scene load_steps=2 format=3 uid="uid://b0tqecvm0pi5r"]
+
+[ext_resource type="Script" path="res://scripts/ui/gameplay_view.gd" id="1_ht7wh"]
+
+[node name="GameplayView" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ht7wh")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="Root" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Sidebar" type="VBoxContainer" parent="MarginContainer/Root"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="DayLabel" type="Label" parent="MarginContainer/Root/Sidebar"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Day 1"
+
+[node name="PhaseLabel" type="Label" parent="MarginContainer/Root/Sidebar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Phase"
+
+[node name="TurnLabel" type="Label" parent="MarginContainer/Root/Sidebar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Turn"
+
+[node name="EnergyLabel" type="Label" parent="MarginContainer/Root/Sidebar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Energy"
+
+[node name="ReputationLabel" type="Label" parent="MarginContainer/Root/Sidebar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Reputation"
+
+[node name="ChaosLabel" type="Label" parent="MarginContainer/Root/Sidebar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Chaos"
+
+[node name="ZonesLabel" type="RichTextLabel" parent="MarginContainer/Root/Sidebar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 160)
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
+[node name="EndTurnButton" type="Button" parent="MarginContainer/Root/Sidebar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "End Turn"
+
+[node name="MainColumn" type="VBoxContainer" parent="MarginContainer/Root"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="StatusLabel" type="Label" parent="MarginContainer/Root/MainColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+text = "Status"
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/Root/MainColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HandMargin" type="MarginContainer" parent="MarginContainer/Root/MainColumn/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="HandColumn" type="VBoxContainer" parent="MarginContainer/Root/MainColumn/PanelContainer/HandMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HandHeader" type="Label" parent="MarginContainer/Root/MainColumn/PanelContainer/HandMargin/HandColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Hand"
+
+[node name="HandContainer" type="VBoxContainer" parent="MarginContainer/Root/MainColumn/PanelContainer/HandMargin/HandColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8

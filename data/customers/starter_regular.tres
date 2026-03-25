@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CustomerDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/customer_def.gd" id="1_3cfxf"]
+
+[resource]
+script = ExtResource("1_3cfxf")
+customer_id = &"starter_regular"
+display_name = "Morning Regular"
+order_id = &"plain_scone"
+preferences = PackedStringArray("warm", "sweet")
+patience = 3
+reward = 10
+personality_modifiers = {
+"kind": true
+}
