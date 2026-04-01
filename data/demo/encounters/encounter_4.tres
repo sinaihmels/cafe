@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="DemoEncounterDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/demo/data/encounter_def.gd" id="1_encounter"]
+
+[resource]
+script = ExtResource("1_encounter")
+index = 4
+customer_pool = PackedStringArray("customer_chaotic_guest", "customer_impatient_guest")
+difficulty_scalar = 1.45
+shop_after = true

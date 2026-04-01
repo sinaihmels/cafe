@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="DemoCardDef" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/demo/data/card_def.gd" id="1_card"]
+[ext_resource type="Script" path="res://scripts/demo/data/card_effect_def.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_bake_tag"]
+script = ExtResource("2_effect")
+op = 0
+tag = &"baked"
+
+[sub_resource type="Resource" id="Effect_bake_quality"]
+script = ExtResource("2_effect")
+op = 1
+amount = 1
+
+[resource]
+script = ExtResource("1_card")
+id = &"card_bake"
+name = "Bake"
+category = 1
+mana_cost = 1
+target_rule = 0
+effects = [SubResource("Effect_bake_tag"), SubResource("Effect_bake_quality")]
+rarity = 0
+tags = PackedStringArray("process")
+description = "Instantly add Baked and gain +1 quality."

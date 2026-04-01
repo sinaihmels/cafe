@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="DemoCardDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/demo/data/card_def.gd" id="1_card"]
+[ext_resource type="Script" path="res://scripts/demo/data/card_effect_def.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_tell_joke"]
+script = ExtResource("2_effect")
+op = 4
+amount = 2
+
+[resource]
+script = ExtResource("1_card")
+id = &"card_tell_joke"
+name = "Tell Joke"
+category = 2
+mana_cost = 1
+target_rule = 0
+effects = [SubResource("Effect_tell_joke")]
+rarity = 0
+tags = PackedStringArray("interaction")
+description = "Increase customer patience by 2."

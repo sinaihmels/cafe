@@ -1,31 +1,12 @@
-[gd_scene load_steps=6 format=3 uid="uid://dnqpn2p8dnv2m"]
+[gd_scene load_steps=3 format=3 uid="uid://dnqpn2p8dnv2m"]
 
-[ext_resource type="Script" path="res://scripts/app/app_controller.gd" id="1_3p1kd"]
-[ext_resource type="PackedScene" path="res://scenes/ui/gameplay_view.tscn" id="2_qrpn4"]
-[ext_resource type="Script" path="res://scripts/systems/event_bus.gd" id="3_ei8kh"]
-[ext_resource type="Script" path="res://scripts/systems/effect_queue_service.gd" id="4_8ae5s"]
-[ext_resource type="Script" path="res://scripts/systems/session_service.gd" id="5_qxg71"]
-[ext_resource type="Script" path="res://scripts/combat/gameplay_controller.gd" id="6_485vl"]
+[ext_resource type="Script" path="res://scripts/demo/run_director.gd" id="1_sqkpt"]
+[ext_resource type="PackedScene" path="res://scenes/ui/demo_view.tscn" id="2_hfkgv"]
 
 [node name="App" type="Node"]
-script = ExtResource("1_3p1kd")
 
-[node name="Services" type="Node" parent="."]
+[node name="RunDirector" type="Node" parent="."]
+script = ExtResource("1_sqkpt")
+view_path = NodePath("../DemoView")
 
-[node name="EventBus" type="Node" parent="Services"]
-script = ExtResource("3_ei8kh")
-
-[node name="EffectQueueService" type="Node" parent="Services"]
-script = ExtResource("4_8ae5s")
-
-[node name="SessionService" type="Node" parent="Services"]
-script = ExtResource("5_qxg71")
-
-[node name="GameplayController" type="Node" parent="."]
-script = ExtResource("6_485vl")
-session_service_path = NodePath("../Services/SessionService")
-event_bus_path = NodePath("../Services/EventBus")
-effect_queue_path = NodePath("../Services/EffectQueueService")
-gameplay_view_path = NodePath("../GameplayView")
-
-[node name="GameplayView" parent="." instance=ExtResource("2_qrpn4")]
+[node name="DemoView" parent="." instance=ExtResource("2_hfkgv")]

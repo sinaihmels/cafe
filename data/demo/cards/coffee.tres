@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="DemoCardDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/demo/data/card_def.gd" id="1_card"]
+[ext_resource type="Script" path="res://scripts/demo/data/card_effect_def.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_coffee_mana"]
+script = ExtResource("2_effect")
+op = 3
+amount = 2
+
+[resource]
+script = ExtResource("1_card")
+id = &"card_coffee"
+name = "Coffee"
+category = 3
+mana_cost = 0
+target_rule = 0
+effects = [SubResource("Effect_coffee_mana")]
+rarity = 0
+tags = PackedStringArray("utility")
+description = "Gain 2 mana."

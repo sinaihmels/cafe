@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="DemoCardDef" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/demo/data/card_def.gd" id="1_card"]
+[ext_resource type="Script" path="res://scripts/demo/data/card_effect_def.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_apologize_patience"]
+script = ExtResource("2_effect")
+op = 4
+amount = 1
+
+[sub_resource type="Resource" id="Effect_apologize_heal"]
+script = ExtResource("2_effect")
+op = 5
+amount = 1
+
+[resource]
+script = ExtResource("1_card")
+id = &"card_apologize"
+name = "Apologize"
+category = 2
+mana_cost = 0
+target_rule = 0
+effects = [SubResource("Effect_apologize_patience"), SubResource("Effect_apologize_heal")]
+rarity = 0
+tags = PackedStringArray("interaction")
+description = "Gain +1 customer patience and heal 1 stress."

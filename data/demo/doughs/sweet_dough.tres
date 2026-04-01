@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="DemoDoughDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/demo/data/dough_def.gd" id="1_dough"]
+
+[resource]
+script = ExtResource("1_dough")
+id = &"sweet_dough"
+name = "Sweet Dough"
+start_deck = PackedStringArray("card_chocolate", "card_chocolate", "card_chocolate", "card_cinnamon_sugar", "card_cinnamon_sugar", "card_cream", "card_cream", "card_mix", "card_mix", "card_mix", "card_bake", "card_bake", "card_bake", "card_tell_joke", "card_tell_joke", "card_apologize", "card_coffee", "card_focus")
+passive_rules = PackedStringArray("sweet_first_bonus")

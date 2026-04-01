@@ -1,0 +1,61 @@
+class_name DemoEnums
+extends RefCounted
+
+enum RunPhase {
+	BOOT,
+	DOUGH_SELECT,
+	ENCOUNTER,
+	REWARD,
+	SHOP,
+	BOSS,
+	SUMMARY,
+	GAME_OVER,
+}
+
+enum TurnPhase {
+	IDLE,
+	PLAYER,
+	ENEMY,
+	RESOLVING,
+}
+
+enum CardCategory {
+	INGREDIENT,
+	PROCESS,
+	INTERACTION,
+	UTILITY,
+	TECHNIQUE,
+}
+
+enum TargetRule {
+	NONE,
+	CUSTOMER,
+	SELF,
+}
+
+enum EffectOp {
+	ADD_TAG,
+	ADD_QUALITY,
+	DRAW_CARDS,
+	GAIN_MANA,
+	MODIFY_PATIENCE,
+	HEAL_STRESS,
+	ADD_TIPS,
+}
+
+enum CustomerType {
+	PATIENT,
+	IMPATIENT,
+	CRITIC,
+	CHAOTIC,
+	BOSS,
+	REGULAR,
+}
+
+enum RewardType {
+	ADD_CARD,
+	ADD_EQUIPMENT,
+	HEAL_STRESS,
+	UPGRADE,
+	ADD_TIPS,
+}

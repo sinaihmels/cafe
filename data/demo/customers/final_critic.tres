@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="DemoCustomerDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/demo/data/customer_def.gd" id="1_customer"]
+[ext_resource type="Script" path="res://scripts/demo/data/demand_rule.gd" id="2_demand"]
+
+[sub_resource type="Resource" id="Demand_final_critic"]
+script = ExtResource("2_demand")
+required_tags = PackedStringArray("sweet", "baked", "chocolate")
+optional_tags = PackedStringArray("cream", "mixed")
+min_quality = 3
+score_weights = {
+"good_threshold": 10,
+"optional_weight": 1,
+"perfect_threshold": 12,
+"quality_weight": 1,
+"required_weight": 2,
+"success_threshold": 8,
+"tip_basic": 4,
+"tip_good": 6,
+"tip_perfect": 8
+}
+
+[resource]
+script = ExtResource("1_customer")
+id = &"customer_final_critic"
+type = 4
+display_name = "Final Critic"
+patience = 8
+stress_damage = 6
+demands = [SubResource("Demand_final_critic")]
+boss_flags = {
+"final": true
+}
