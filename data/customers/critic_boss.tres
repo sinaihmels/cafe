@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CustomerDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/customer_def.gd" id="1_824s3"]
+
+[resource]
+script = ExtResource("1_824s3")
+customer_id = &"critic_boss"
+display_name = "Critic"
+order_id = &"sweet_decorated_request"
+preferences = PackedStringArray("sweet", "decorated")
+patience = 6
+reward = 3
+personality_modifiers = {
+"boss": true
+}

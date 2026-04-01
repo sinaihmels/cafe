@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RecipeDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/recipe_def.gd" id="1_o2wy5"]
+
+[resource]
+script = ExtResource("1_o2wy5")
+recipe_id = &"dough_chocolate_to_chocolate_dough"
+input_item_ids = PackedStringArray("dough", "chocolate")
+output_item_id = &"chocolate_dough"
+station = &"prep"

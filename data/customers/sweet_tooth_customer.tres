@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CustomerDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/customer_def.gd" id="1_8n0i8"]
+
+[resource]
+script = ExtResource("1_8n0i8")
+customer_id = &"sweet_tooth_customer"
+display_name = "Sweet Tooth"
+order_id = &"sweet_request"
+preferences = PackedStringArray("sweet")
+patience = 5
+reward = 2
+personality_modifiers = {
+"kind": true
+}

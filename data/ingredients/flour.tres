@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ItemDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/item_def.gd" id="1_w7dlr"]
+
+[resource]
+script = ExtResource("1_w7dlr")
+item_id = &"flour"
+display_name = "Flour"
+tags = PackedStringArray("base", "ingredient")

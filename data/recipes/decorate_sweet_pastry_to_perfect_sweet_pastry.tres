@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RecipeDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/recipe_def.gd" id="1_yplqa"]
+
+[resource]
+script = ExtResource("1_yplqa")
+recipe_id = &"decorate_sweet_pastry_to_perfect_sweet_pastry"
+input_item_ids = PackedStringArray("sweet_pastry")
+output_item_id = &"perfect_sweet_pastry"
+station = &"prep"
+added_tags = PackedStringArray("decorated", "quality", "perfect", "sweet")
+quality_delta = 1

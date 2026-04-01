@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CardDef" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_xb0v5"]
+[ext_resource type="Script" path="res://scripts/effects/remove_item_effect.gd" id="2_976nh"]
+[ext_resource type="Script" path="res://scripts/effects/draw_cards_effect.gd" id="3_8a8n7"]
+
+[sub_resource type="Resource" id="Resource_p6ihp"]
+script = ExtResource("2_976nh")
+effect_id = &"remove_item"
+
+[sub_resource type="Resource" id="Resource_2c3jk"]
+script = ExtResource("3_8a8n7")
+effect_id = &"draw_cards"
+amount = 1
+
+[resource]
+script = ExtResource("1_xb0v5")
+card_id = &"reward_clean_up"
+display_name = "Clean Up"
+energy_cost = 1
+tags = PackedStringArray("action", "utility")
+targeting_rules = "select_one_item"
+effects = [SubResource("Resource_p6ihp"), SubResource("Resource_2c3jk")]
+preview_text = "Remove a selected item from Prep or Oven. Draw 1 card."

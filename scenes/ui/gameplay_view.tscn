@@ -25,11 +25,13 @@ theme_override_constants/margin_bottom = 24
 
 [node name="Root" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/separation = 24
 
 [node name="Sidebar" type="VBoxContainer" parent="MarginContainer/Root"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 12
 
 [node name="DayLabel" type="Label" parent="MarginContainer/Root/Sidebar"]
@@ -79,6 +81,7 @@ text = "End Turn"
 [node name="MainColumn" type="VBoxContainer" parent="MarginContainer/Root"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 12
 
 [node name="StatusLabel" type="Label" parent="MarginContainer/Root/MainColumn"]
@@ -87,8 +90,132 @@ layout_mode = 2
 autowrap_mode = 3
 text = "Status"
 
+[node name="CustomersHeader" type="Label" parent="MarginContainer/Root/MainColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Customers"
+
+[node name="CustomersScroll" type="ScrollContainer" parent="MarginContainer/Root/MainColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CustomersContainer" type="VBoxContainer" parent="MarginContainer/Root/MainColumn/CustomersScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ZonesHeader" type="Label" parent="MarginContainer/Root/MainColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Cafe"
+
+[node name="ZonesRow" type="HBoxContainer" parent="MarginContainer/Root/MainColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="PrepPanel" type="PanelContainer" parent="MarginContainer/Root/MainColumn/ZonesRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="PrepMargin" type="MarginContainer" parent="MarginContainer/Root/MainColumn/ZonesRow/PrepPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="PrepColumn" type="VBoxContainer" parent="MarginContainer/Root/MainColumn/ZonesRow/PrepPanel/PrepMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PrepHeader" type="Label" parent="MarginContainer/Root/MainColumn/ZonesRow/PrepPanel/PrepMargin/PrepColumn"]
+layout_mode = 2
+text = "Prep"
+
+[node name="PrepContainer" type="VBoxContainer" parent="MarginContainer/Root/MainColumn/ZonesRow/PrepPanel/PrepMargin/PrepColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="OvenPanel" type="PanelContainer" parent="MarginContainer/Root/MainColumn/ZonesRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="OvenMargin" type="MarginContainer" parent="MarginContainer/Root/MainColumn/ZonesRow/OvenPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="OvenColumn" type="VBoxContainer" parent="MarginContainer/Root/MainColumn/ZonesRow/OvenPanel/OvenMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="OvenHeader" type="Label" parent="MarginContainer/Root/MainColumn/ZonesRow/OvenPanel/OvenMargin/OvenColumn"]
+layout_mode = 2
+text = "Oven"
+
+[node name="OvenContainer" type="VBoxContainer" parent="MarginContainer/Root/MainColumn/ZonesRow/OvenPanel/OvenMargin/OvenColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="TablePanel" type="PanelContainer" parent="MarginContainer/Root/MainColumn/ZonesRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TableMargin" type="MarginContainer" parent="MarginContainer/Root/MainColumn/ZonesRow/TablePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="TableColumn" type="VBoxContainer" parent="MarginContainer/Root/MainColumn/ZonesRow/TablePanel/TableMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TableHeader" type="Label" parent="MarginContainer/Root/MainColumn/ZonesRow/TablePanel/TableMargin/TableColumn"]
+layout_mode = 2
+text = "Table"
+
+[node name="TableContainer" type="VBoxContainer" parent="MarginContainer/Root/MainColumn/ZonesRow/TablePanel/TableMargin/TableColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="RewardHeader" type="Label" parent="MarginContainer/Root/MainColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Reward"
+
+[node name="RewardContainer" type="VBoxContainer" parent="MarginContainer/Root/MainColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EventHeader" type="Label" parent="MarginContainer/Root/MainColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Event"
+
+[node name="EventContainer" type="VBoxContainer" parent="MarginContainer/Root/MainColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
 [node name="PanelContainer" type="PanelContainer" parent="MarginContainer/Root/MainColumn"]
 layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="HandMargin" type="MarginContainer" parent="MarginContainer/Root/MainColumn/PanelContainer"]
@@ -100,6 +227,7 @@ theme_override_constants/margin_bottom = 16
 
 [node name="HandColumn" type="VBoxContainer" parent="MarginContainer/Root/MainColumn/PanelContainer/HandMargin"]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/separation = 8
 
 [node name="HandHeader" type="Label" parent="MarginContainer/Root/MainColumn/PanelContainer/HandMargin/HandColumn"]
@@ -107,7 +235,12 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Hand"
 
-[node name="HandContainer" type="VBoxContainer" parent="MarginContainer/Root/MainColumn/PanelContainer/HandMargin/HandColumn"]
+[node name="HandScroll" type="ScrollContainer" parent="MarginContainer/Root/MainColumn/PanelContainer/HandMargin/HandColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HandContainer" type="VBoxContainer" parent="MarginContainer/Root/MainColumn/PanelContainer/HandMargin/HandColumn/HandScroll"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 8

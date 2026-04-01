@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CustomerDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/customer_def.gd" id="1_wsbcu"]
+
+[resource]
+script = ExtResource("1_wsbcu")
+customer_id = &"quality_customer"
+display_name = "Quality Seeker"
+order_id = &"quality_request"
+preferences = PackedStringArray("quality")
+patience = 5
+reward = 2
+personality_modifiers = {
+"critical": true
+}

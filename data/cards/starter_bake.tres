@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CardDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_xj7el"]
+[ext_resource type="Script" path="res://scripts/effects/bake_item_effect.gd" id="2_n5k2h"]
+
+[sub_resource type="Resource" id="Resource_0v7ir"]
+script = ExtResource("2_n5k2h")
+effect_id = &"bake_item"
+
+[resource]
+script = ExtResource("1_xj7el")
+card_id = &"starter_bake"
+display_name = "Bake"
+energy_cost = 1
+tags = PackedStringArray("action", "oven")
+targeting_rules = "select_one_prep_item"
+effects = [SubResource("Resource_0v7ir")]
+preview_text = "Move a selected Prep item into a free Oven slot for 1 turn."

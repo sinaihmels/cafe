@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CustomerDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/customer_def.gd" id="1_gokf8"]
+
+[resource]
+script = ExtResource("1_gokf8")
+customer_id = &"fast_customer"
+display_name = "In A Hurry"
+order_id = &"fast_request"
+preferences = PackedStringArray("fast")
+patience = 3
+reward = 1
+personality_modifiers = {
+"impatient": true
+}

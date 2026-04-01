@@ -5,5 +5,3 @@ extends BaseEffect
 
 func apply(context: EffectContext) -> void:
 	context.player_state.chaos += amount
-	if context.event_bus != null:
-		context.event_bus.emit_effect_applied(self, context)

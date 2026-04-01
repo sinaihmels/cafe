@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="RecipeDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/recipe_def.gd" id="1_pdqu3"]
+
+[resource]
+script = ExtResource("1_pdqu3")
+recipe_id = &"bake_dough_to_pastry"
+input_item_ids = PackedStringArray("dough")
+output_item_id = &"pastry"
+station = &"oven"
+added_tags = PackedStringArray("baked")

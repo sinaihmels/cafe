@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CardDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_320v4"]
+[ext_resource type="Script" path="res://scripts/effects/conditional_draw_effect.gd" id="2_7wsyi"]
+
+[sub_resource type="Resource" id="Resource_c1m0d"]
+script = ExtResource("2_7wsyi")
+effect_id = &"conditional_draw"
+amount = 1
+prep_empty_bonus = 1
+
+[resource]
+script = ExtResource("1_320v4")
+card_id = &"starter_improvise"
+display_name = "Improvise"
+energy_cost = 0
+tags = PackedStringArray("action", "draw")
+targeting_rules = "none"
+effects = [SubResource("Resource_c1m0d")]
+preview_text = "Draw 1 card. If your Prep area is empty, draw 2 instead."

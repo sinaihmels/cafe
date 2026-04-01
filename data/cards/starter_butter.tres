@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CardDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_07v3e"]
+[ext_resource type="Script" path="res://scripts/effects/spawn_item_effect.gd" id="2_2dho1"]
+
+[sub_resource type="Resource" id="Resource_sp97x"]
+script = ExtResource("2_2dho1")
+effect_id = &"spawn_item"
+item_id = &"butter"
+
+[resource]
+script = ExtResource("1_07v3e")
+card_id = &"starter_butter"
+display_name = "Butter"
+energy_cost = 1
+tags = PackedStringArray("ingredient", "base", "fat")
+targeting_rules = "prep"
+effects = [SubResource("Resource_sp97x")]
+preview_text = "Create 1 Butter in Prep."

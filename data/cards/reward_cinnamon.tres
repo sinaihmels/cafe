@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CardDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_k8f6w"]
+[ext_resource type="Script" path="res://scripts/effects/spawn_item_effect.gd" id="2_iq7kq"]
+
+[sub_resource type="Resource" id="Resource_rg3l5"]
+script = ExtResource("2_iq7kq")
+effect_id = &"spawn_item"
+item_id = &"cinnamon"
+
+[resource]
+script = ExtResource("1_k8f6w")
+card_id = &"reward_cinnamon"
+display_name = "Cinnamon"
+energy_cost = 1
+tags = PackedStringArray("ingredient", "spice")
+targeting_rules = "prep"
+effects = [SubResource("Resource_rg3l5")]
+preview_text = "Create 1 Cinnamon in Prep. Served items with Cinnamon grant +1 extra reputation."

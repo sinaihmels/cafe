@@ -25,7 +25,7 @@ func get_preview_text() -> String:
 	return card_def.preview_text
 
 func get_all_tags() -> PackedStringArray:
-	var merged := PackedStringArray()
+	var merged: PackedStringArray = PackedStringArray()
 	if card_def != null:
 		for tag in card_def.tags:
 			merged.append(tag)
