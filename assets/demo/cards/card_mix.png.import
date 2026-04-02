@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d1sypfwkpmgf1"
-valid=false
+uid="uid://dnl6twbtjyldj"
+path="res://.godot/imported/card_mix.png-ff86cbd9d65300c938330bf78b4abf7f.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/demo/cards/card_mix.png"
+dest_files=["res://.godot/imported/card_mix.png-ff86cbd9d65300c938330bf78b4abf7f.ctex"]
 
 [params]
 

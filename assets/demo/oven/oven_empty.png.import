@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://xbv25082vhye"
-valid=false
+uid="uid://c04c4sg412gs6"
+path="res://.godot/imported/oven_empty.png-90530396e23e64cdd7cca58c258376bb.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/demo/oven/oven_empty.png"
+dest_files=["res://.godot/imported/oven_empty.png-90530396e23e64cdd7cca58c258376bb.ctex"]
 
 [params]
 

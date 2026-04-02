@@ -15,6 +15,8 @@ const DOUGH_PLACEHOLDER_FILE: String = "dough_placeholder.png"
 const DISH_PLACEHOLDER_FILE: String = "dish_placeholder.png"
 const OVEN_PLACEHOLDER_FILE: String = "oven_placeholder.png"
 const UI_BG_FILE: String = "demo_background.png"
+const DISH_BASE_FILE: String = "dough_area_base.png"
+const OVEN_BASE_FILE: String = "oven_base.png"
 
 static func card_path(card_id: StringName) -> String:
 	var id_text: String = String(card_id)
@@ -49,6 +51,15 @@ static func dish_stage_path(stage_key: StringName) -> String:
 		return DISH_DIR + DISH_PLACEHOLDER_FILE
 	return DISH_DIR + key_text + ".png"
 
+static func dish_base_path() -> String:
+	return DISH_DIR + DISH_BASE_FILE
+
+static func dish_overlay_path(overlay_key: StringName) -> String:
+	var key_text: String = String(overlay_key)
+	if key_text == "":
+		return ""
+	return DISH_DIR + key_text + "_overlay.png"
+
 static func dish_placeholder_path() -> String:
 	return DISH_DIR + DISH_PLACEHOLDER_FILE
 
@@ -57,6 +68,15 @@ static func oven_stage_path(stage_key: StringName) -> String:
 	if key_text == "":
 		return OVEN_DIR + OVEN_PLACEHOLDER_FILE
 	return OVEN_DIR + key_text + ".png"
+
+static func oven_base_path() -> String:
+	return OVEN_DIR + OVEN_BASE_FILE
+
+static func oven_overlay_path(overlay_key: StringName) -> String:
+	var key_text: String = String(overlay_key)
+	if key_text == "":
+		return ""
+	return OVEN_DIR + key_text + "_overlay.png"
 
 static func oven_placeholder_path() -> String:
 	return OVEN_DIR + OVEN_PLACEHOLDER_FILE

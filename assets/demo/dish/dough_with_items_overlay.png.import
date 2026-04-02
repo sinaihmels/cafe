@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bry6j0tqfvoyc"
-path="res://.godot/imported/baked_pastry.png-4611b4723e7d63f1870de5bc9b3d87d7.ctex"
+uid="uid://4wgy8hk06a5g"
+path="res://.godot/imported/dough_with_items_overlay.png-b234053423cd9f4751eab0e590d15b74.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/demo/dish/baked_pastry.png"
-dest_files=["res://.godot/imported/baked_pastry.png-4611b4723e7d63f1870de5bc9b3d87d7.ctex"]
+source_file="res://assets/demo/dish/dough_with_items_overlay.png"
+dest_files=["res://.godot/imported/dough_with_items_overlay.png-b234053423cd9f4751eab0e590d15b74.ctex"]
 
 [params]
 

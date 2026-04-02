@@ -11,6 +11,15 @@ signal shop_continue_requested()
 signal advance_phase_requested()
 signal restart_requested()
 
+const CARD_CANVAS_SIZE: Vector2 = Vector2(1024.0, 1434.0)
+const CARD_DISPLAY_SIZE: Vector2 = Vector2(214.0, 300.0)
+const CARD_ASPECT_RATIO: float = 1024.0 / 1434.0
+const CARD_ART_RECT_PX: Rect2 = Rect2(122.0, 286.0, 780.0, 545.0)
+const CARD_MANA_RECT_PX: Rect2 = Rect2(34.0, 34.0, 168.0, 168.0)
+const CARD_TITLE_RECT_PX: Rect2 = Rect2(132.0, 84.0, 760.0, 132.0)
+const CARD_READY_RECT_PX: Rect2 = Rect2(130.0, 830.0, 760.0, 92.0)
+const CARD_DESCRIPTION_RECT_PX: Rect2 = Rect2(118.0, 918.0, 788.0, 438.0)
+
 var _title_label: Label
 var _background_art: TextureRect
 var _phase_label: Label
@@ -20,8 +29,10 @@ var _food_label: Label
 var _oven_label: Label
 var _customer_art: TextureRect
 var _dough_art: TextureRect
-var _dish_art: TextureRect
-var _oven_art: TextureRect
+var _dish_base_art: TextureRect
+var _dish_overlay_art: TextureRect
+var _oven_base_art: TextureRect
+var _oven_overlay_art: TextureRect
 var _status_label: Label
 var _serve_button: Button
 var _end_turn_button: Button
@@ -193,7 +204,7 @@ func _make_info_label(value: String) -> Label:
 func _make_hand_card_entry(entry: Dictionary, index: int) -> Control:
 	var can_play: bool = bool(entry.get("can_play", false))
 	var card_row: PanelContainer = PanelContainer.new()
-	card_row.custom_minimum_size = Vector2(0, 132)
+	card_row.custom_minimum_size = Vector2(0, 286)
 	card_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	card_row.mouse_filter = Control.MOUSE_FILTER_STOP
 	card_row.mouse_default_cursor_shape = (
@@ -206,38 +217,85 @@ func _make_hand_card_entry(entry: Dictionary, index: int) -> Control:
 	row_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row_content.add_theme_constant_override("separation", 10)
 	card_row.add_child(row_content)
-	var card_id: StringName = StringName(entry.get("id", ""))
-	var card_art: TextureRect = TextureRect.new()
-	card_art.custom_minimum_size = Vector2(96, 120)
-	card_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	card_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	card_art.texture = _resolve_texture([
-		DemoArtCatalog.card_path(card_id),
-		DemoArtCatalog.card_base_path(),
-	])
-	row_content.add_child(card_art)
+	var card_visual: Control = _make_composited_card_visual(entry, can_play)
+	row_content.add_child(card_visual)
 	var info_column: VBoxContainer = VBoxContainer.new()
 	info_column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	info_column.add_theme_constant_override("separation", 5)
 	row_content.add_child(info_column)
-	var title_label: Label = Label.new()
-	title_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	title_label.text = "%s (Cost %d)" % [
-		String(entry.get("name", "Card")),
-		int(entry.get("cost", 0)),
-	]
-	info_column.add_child(title_label)
-	var description_label: Label = Label.new()
-	description_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	description_label.text = String(entry.get("description", ""))
-	info_column.add_child(description_label)
+	var name_label: Label = Label.new()
+	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	name_label.text = String(entry.get("name", "Card"))
+	info_column.add_child(name_label)
+	var cost_label: Label = Label.new()
+	cost_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cost_label.text = "Mana Cost: %d" % int(entry.get("cost", 0))
+	info_column.add_child(cost_label)
 	var hint_label: Label = Label.new()
 	hint_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hint_label.text = "Click card to play" if can_play else "Not enough mana"
 	info_column.add_child(hint_label)
 	return card_row
+
+func _make_composited_card_visual(entry: Dictionary, can_play: bool) -> Control:
+	var card_wrapper: AspectRatioContainer = AspectRatioContainer.new()
+	card_wrapper.ratio = CARD_ASPECT_RATIO
+	card_wrapper.custom_minimum_size = CARD_DISPLAY_SIZE
+	card_wrapper.stretch_mode = AspectRatioContainer.STRETCH_WIDTH_CONTROLS_HEIGHT
+	card_wrapper.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var card_canvas: Control = Control.new()
+	card_canvas.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card_canvas.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	card_wrapper.add_child(card_canvas)
+	var base_rect: TextureRect = TextureRect.new()
+	base_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	base_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	base_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	base_rect.stretch_mode = TextureRect.STRETCH_SCALE
+	base_rect.texture = _resolve_texture([DemoArtCatalog.card_base_path()])
+	card_canvas.add_child(base_rect)
+	var card_id: StringName = StringName(entry.get("id", ""))
+	var art_rect: TextureRect = TextureRect.new()
+	_apply_pixel_layout(art_rect, CARD_ART_RECT_PX)
+	art_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	art_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	art_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	art_rect.texture = _load_texture(DemoArtCatalog.card_path(card_id))
+	card_canvas.add_child(art_rect)
+	var mana_plate: PanelContainer = PanelContainer.new()
+	_apply_pixel_layout(mana_plate, CARD_MANA_RECT_PX)
+	mana_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	card_canvas.add_child(mana_plate)
+	var mana_label: Label = Label.new()
+	mana_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	mana_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	mana_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	mana_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	mana_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mana_label.text = str(int(entry.get("cost", 0)))
+	mana_plate.add_child(mana_label)
+	var title_label: Label = Label.new()
+	_apply_pixel_layout(title_label, CARD_TITLE_RECT_PX)
+	title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	title_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	title_label.text = String(entry.get("name", "Card"))
+	card_canvas.add_child(title_label)
+	var ready_label: Label = Label.new()
+	_apply_pixel_layout(ready_label, CARD_READY_RECT_PX)
+	ready_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	ready_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ready_label.text = "Playable" if can_play else "Insufficient mana"
+	card_canvas.add_child(ready_label)
+	var description_label: Label = Label.new()
+	_apply_pixel_layout(description_label, CARD_DESCRIPTION_RECT_PX)
+	description_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	description_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	description_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	description_label.text = String(entry.get("description", ""))
+	card_canvas.add_child(description_label)
+	return card_wrapper
 
 func _join_values(values: Variant) -> String:
 	var output: String = ""
@@ -255,6 +313,16 @@ func _join_values(values: Variant) -> String:
 		return "None"
 	return output
 
+func _apply_pixel_layout(control: Control, rect_px: Rect2) -> void:
+	control.anchor_left = rect_px.position.x / CARD_CANVAS_SIZE.x
+	control.anchor_top = rect_px.position.y / CARD_CANVAS_SIZE.y
+	control.anchor_right = (rect_px.position.x + rect_px.size.x) / CARD_CANVAS_SIZE.x
+	control.anchor_bottom = (rect_px.position.y + rect_px.size.y) / CARD_CANVAS_SIZE.y
+	control.offset_left = 0.0
+	control.offset_top = 0.0
+	control.offset_right = 0.0
+	control.offset_bottom = 0.0
+
 func _on_hand_card_gui_input(event: InputEvent, index: int, can_play: bool) -> void:
 	if not can_play:
 		return
@@ -268,6 +336,8 @@ func _render_visual_art(model: Dictionary) -> void:
 	var dough_id: StringName = StringName(model.get("selected_dough_id", ""))
 	var dish_stage_key: StringName = StringName(model.get("dish_stage_key", ""))
 	var oven_stage_key: StringName = StringName(model.get("oven_stage_key", ""))
+	var dish_overlay_key: StringName = _dish_overlay_key_from_stage(dish_stage_key)
+	var oven_overlay_key: StringName = _oven_overlay_key_from_stage(oven_stage_key)
 	if _background_art != null:
 		_background_art.texture = _load_texture(DemoArtCatalog.background_path())
 	if _customer_art != null:
@@ -280,16 +350,43 @@ func _render_visual_art(model: Dictionary) -> void:
 			DemoArtCatalog.dough_path(dough_id),
 			DemoArtCatalog.dough_placeholder_path(),
 		])
-	if _dish_art != null:
-		_dish_art.texture = _resolve_texture([
-			DemoArtCatalog.dish_stage_path(dish_stage_key),
+	if _dish_base_art != null:
+		_dish_base_art.texture = _resolve_texture([
+			DemoArtCatalog.dish_base_path(),
 			DemoArtCatalog.dish_placeholder_path(),
 		])
-	if _oven_art != null:
-		_oven_art.texture = _resolve_texture([
-			DemoArtCatalog.oven_stage_path(oven_stage_key),
+	if _dish_overlay_art != null:
+		_dish_overlay_art.texture = _load_optional_overlay(DemoArtCatalog.dish_overlay_path(dish_overlay_key))
+	if _oven_base_art != null:
+		_oven_base_art.texture = _resolve_texture([
+			DemoArtCatalog.oven_base_path(),
 			DemoArtCatalog.oven_placeholder_path(),
 		])
+	if _oven_overlay_art != null:
+		_oven_overlay_art.texture = _load_optional_overlay(DemoArtCatalog.oven_overlay_path(oven_overlay_key))
+
+func _dish_overlay_key_from_stage(stage_key: StringName) -> StringName:
+	match stage_key:
+		&"dough_with_items":
+			return &"dough_with_items"
+		&"formed_pastry":
+			return &"formed_pastry"
+		_:
+			return &""
+
+func _oven_overlay_key_from_stage(stage_key: StringName) -> StringName:
+	match stage_key:
+		&"oven_loaded", &"oven_needs_bake":
+			return &"pastry_on_oven_rack"
+		&"oven_ready":
+			return &"baked_pastry_on_oven_rack"
+		_:
+			return &""
+
+func _load_optional_overlay(path: String) -> Texture2D:
+	if path == "":
+		return null
+	return _load_texture(path)
 
 func _resolve_texture(candidate_paths: Array[String]) -> Texture2D:
 	for path_value in candidate_paths:
@@ -358,13 +455,21 @@ func _bind_nodes() -> void:
 		"Margin/Root/VisualsRow/DoughPanel/DoughMargin/DoughColumn/DoughArt",
 		"MarginContainer/Root/VisualsRow/DoughPanel/DoughMargin/DoughColumn/DoughArt",
 	]) as TextureRect
-	_dish_art = _pick_node([
-		"Margin/Root/VisualsRow/DishPanel/DishMargin/DishColumn/DishArt",
-		"MarginContainer/Root/VisualsRow/DishPanel/DishMargin/DishColumn/DishArt",
+	_dish_base_art = _pick_node([
+		"Margin/Root/VisualsRow/DishPanel/DishMargin/DishColumn/DishStack/DishBaseArt",
+		"MarginContainer/Root/VisualsRow/DishPanel/DishMargin/DishColumn/DishStack/DishBaseArt",
 	]) as TextureRect
-	_oven_art = _pick_node([
-		"Margin/Root/VisualsRow/OvenVisualPanel/OvenVisualMargin/OvenVisualColumn/OvenArt",
-		"MarginContainer/Root/VisualsRow/OvenVisualPanel/OvenVisualMargin/OvenVisualColumn/OvenArt",
+	_dish_overlay_art = _pick_node([
+		"Margin/Root/VisualsRow/DishPanel/DishMargin/DishColumn/DishStack/DishOverlayArt",
+		"MarginContainer/Root/VisualsRow/DishPanel/DishMargin/DishColumn/DishStack/DishOverlayArt",
+	]) as TextureRect
+	_oven_base_art = _pick_node([
+		"Margin/Root/VisualsRow/OvenVisualPanel/OvenVisualMargin/OvenVisualColumn/OvenStack/OvenBaseArt",
+		"MarginContainer/Root/VisualsRow/OvenVisualPanel/OvenVisualMargin/OvenVisualColumn/OvenStack/OvenBaseArt",
+	]) as TextureRect
+	_oven_overlay_art = _pick_node([
+		"Margin/Root/VisualsRow/OvenVisualPanel/OvenVisualMargin/OvenVisualColumn/OvenStack/OvenOverlayArt",
+		"MarginContainer/Root/VisualsRow/OvenVisualPanel/OvenVisualMargin/OvenVisualColumn/OvenStack/OvenOverlayArt",
 	]) as TextureRect
 	_oven_label = _pick_node([
 		"Margin/Root/OvenPanel/OvenMargin/OvenLabel",

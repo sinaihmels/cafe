@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://buydb0upimv3o"
-valid=false
+uid="uid://byve622fhnmdj"
+path="res://.godot/imported/dough_area_empty.png-024f4e38df4ddd9645c8314785ff45c3.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/demo/dish/dough_area_empty.png"
+dest_files=["res://.godot/imported/dough_area_empty.png-024f4e38df4ddd9645c8314785ff45c3.ctex"]
 
 [params]
 

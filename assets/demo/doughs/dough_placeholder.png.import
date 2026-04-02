@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b7be0s3g7eskc"
-valid=false
+uid="uid://bsaju2jekqlqr"
+path="res://.godot/imported/dough_placeholder.png-935a9c999be201d549df770923e5ef70.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/demo/doughs/dough_placeholder.png"
+dest_files=["res://.godot/imported/dough_placeholder.png-935a9c999be201d549df770923e5ef70.ctex"]
 
 [params]
 

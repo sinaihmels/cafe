@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dkh2txpgiksp2"
-valid=false
+uid="uid://cqr30kfp4uqx6"
+path="res://.godot/imported/customer_placeholder.png-97e266d8a5e11a8e7437fd44cacf6f6a.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/demo/customers/customer_placeholder.png"
+dest_files=["res://.godot/imported/customer_placeholder.png-97e266d8a5e11a8e7437fd44cacf6f6a.ctex"]
 
 [params]
 

@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dhutcpu6vakfu"
-valid=false
+uid="uid://2xoohs0dycjd"
+path="res://.godot/imported/formed_pastry.png-47971e5a6c9198e877ddca5d05c9c6d4.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/demo/dish/formed_pastry.png"
+dest_files=["res://.godot/imported/formed_pastry.png-47971e5a6c9198e877ddca5d05c9c6d4.ctex"]
 
 [params]
 

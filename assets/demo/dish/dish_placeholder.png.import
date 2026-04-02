@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cy7wf8koin5gb"
-valid=false
+uid="uid://cowx2kofu13fj"
+path="res://.godot/imported/dish_placeholder.png-4e47af472a69faf0884a93dcb8e3f54a.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/demo/dish/dish_placeholder.png"
+dest_files=["res://.godot/imported/dish_placeholder.png-4e47af472a69faf0884a93dcb8e3f54a.ctex"]
 
 [params]
 

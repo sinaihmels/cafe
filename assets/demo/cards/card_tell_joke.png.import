@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c4inr2jskp1ss"
-valid=false
+uid="uid://di0x8cv3ikxkq"
+path="res://.godot/imported/card_tell_joke.png-474c5be27d16e29b1b170e92033d0a88.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/demo/cards/card_tell_joke.png"
+dest_files=["res://.godot/imported/card_tell_joke.png-474c5be27d16e29b1b170e92033d0a88.ctex"]
 
 [params]
 

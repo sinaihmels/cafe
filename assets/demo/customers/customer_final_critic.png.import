@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://uh05rcubfar5"
-valid=false
+uid="uid://bwhu5n8c6lwxd"
+path="res://.godot/imported/customer_final_critic.png-665ccd0a2122419ef93fdef0a36527ab.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/demo/customers/customer_final_critic.png"
+dest_files=["res://.godot/imported/customer_final_critic.png-665ccd0a2122419ef93fdef0a36527ab.ctex"]
 
 [params]
 

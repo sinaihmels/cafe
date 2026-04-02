@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://6kouhiv6ixdd"
-valid=false
+uid="uid://cb0hg02smc4k0"
+path="res://.godot/imported/oven_needs_bake.png-9117e0bf1111dd6e9e41fe370428efae.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/demo/oven/oven_needs_bake.png"
+dest_files=["res://.godot/imported/oven_needs_bake.png-9117e0bf1111dd6e9e41fe370428efae.ctex"]
 
 [params]
 

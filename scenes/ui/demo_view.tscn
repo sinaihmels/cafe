@@ -126,9 +126,29 @@ theme_override_constants/separation = 4
 layout_mode = 2
 text = "Dish Stage"
 
-[node name="DishArt" type="TextureRect" parent="Margin/Root/VisualsRow/DishPanel/DishMargin/DishColumn"]
+[node name="DishStack" type="Control" parent="Margin/Root/VisualsRow/DishPanel/DishMargin/DishColumn"]
 layout_mode = 2
 custom_minimum_size = Vector2(96, 96)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="DishBaseArt" type="TextureRect" parent="Margin/Root/VisualsRow/DishPanel/DishMargin/DishColumn/DishStack"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DishOverlayArt" type="TextureRect" parent="Margin/Root/VisualsRow/DishPanel/DishMargin/DishColumn/DishStack"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 expand_mode = 1
 stretch_mode = 5
 
@@ -151,9 +171,29 @@ theme_override_constants/separation = 4
 layout_mode = 2
 text = "Oven"
 
-[node name="OvenArt" type="TextureRect" parent="Margin/Root/VisualsRow/OvenVisualPanel/OvenVisualMargin/OvenVisualColumn"]
+[node name="OvenStack" type="Control" parent="Margin/Root/VisualsRow/OvenVisualPanel/OvenVisualMargin/OvenVisualColumn"]
 layout_mode = 2
 custom_minimum_size = Vector2(96, 96)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="OvenBaseArt" type="TextureRect" parent="Margin/Root/VisualsRow/OvenVisualPanel/OvenVisualMargin/OvenVisualColumn/OvenStack"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="OvenOverlayArt" type="TextureRect" parent="Margin/Root/VisualsRow/OvenVisualPanel/OvenVisualMargin/OvenVisualColumn/OvenStack"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 expand_mode = 1
 stretch_mode = 5
 

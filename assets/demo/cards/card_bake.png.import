@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bdc6khtfxsnf5"
-valid=false
+uid="uid://bg4uqdj8tj41s"
+path="res://.godot/imported/card_bake.png-3e36980331add3bd6499ba849c2f70d9.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/demo/cards/card_bake.png"
+dest_files=["res://.godot/imported/card_bake.png-3e36980331add3bd6499ba849c2f70d9.ctex"]
 
 [params]
 

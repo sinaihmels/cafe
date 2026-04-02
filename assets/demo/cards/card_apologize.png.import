@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://6usrlsvkulnh"
-valid=false
+uid="uid://cjhxyrl30x6wt"
+path="res://.godot/imported/card_apologize.png-de51dcbe2d8ff18c330962db46f42b96.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/demo/cards/card_apologize.png"
+dest_files=["res://.godot/imported/card_apologize.png-de51dcbe2d8ff18c330962db46f42b96.ctex"]
 
 [params]
 

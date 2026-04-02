@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://h80ewscrkba4"
-valid=false
+uid="uid://dhk010xm7kn0c"
+path="res://.godot/imported/card_chocolate.png-7495cd556dfe4147de07d929f69d112b.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/demo/cards/card_chocolate.png"
+dest_files=["res://.godot/imported/card_chocolate.png-7495cd556dfe4147de07d929f69d112b.ctex"]
 
 [params]
 

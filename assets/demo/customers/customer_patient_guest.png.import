@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dv5l4hkemkv61"
-valid=false
+uid="uid://i6l05jeil6mk"
+path="res://.godot/imported/customer_patient_guest.png-b7bf70e8bf9c4265a5ca61650ae29562.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/demo/customers/customer_patient_guest.png"
+dest_files=["res://.godot/imported/customer_patient_guest.png-b7bf70e8bf9c4265a5ca61650ae29562.ctex"]
 
 [params]
 

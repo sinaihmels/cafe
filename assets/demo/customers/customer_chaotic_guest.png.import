@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c76hcu0r8ye55"
-valid=false
+uid="uid://depxbcpe4pb0y"
+path="res://.godot/imported/customer_chaotic_guest.png-c45a54b7a3a218dd45a5274afe2555d9.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/demo/customers/customer_chaotic_guest.png"
+dest_files=["res://.godot/imported/customer_chaotic_guest.png-c45a54b7a3a218dd45a5274afe2555d9.ctex"]
 
 [params]
 
