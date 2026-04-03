@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="StatusDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/modifiers/status_def.gd" id="1_warmstatus"]
+
+[resource]
+script = ExtResource("1_warmstatus")
+modifier_id = &"warm_status"
+display_name = "Warm"
+description = "Status. A freshly baked item or guest is especially ready to serve."
+default_duration_turns = 1
+max_stacks = 1
+stackable = false
+stat_modifiers = {}

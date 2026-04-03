@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EquipmentDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/progression/equipment_def.gd" id="1_coffeeeq"]
+
+[resource]
+script = ExtResource("1_coffeeeq")
+equipment_id = &"coffee_machine"
+display_name = "Coffee Machine"
+description = "Installed cafe equipment. Start each turn with a little extra momentum."
+cost = 5
+passive_modifier_ids = PackedStringArray("barista_rhythm_buff")
+unlocked_by_default = true

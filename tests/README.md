@@ -1,24 +1,25 @@
 # Tests
 
-Put gameplay-focused tests here as systems stabilize.
+Canonical gameplay smoke tests live under `res://tests/game/`.
 
-Recommended early targets:
+Current smoke targets:
 
-- effect queue ordering
-- card validation and play flow
-- customer patience changes
-- end-of-turn transitions
-- save/load reconstruction of state resources
+- `test_meta_profile_service.gd`
+- `test_run_flow.gd`
+- `test_modifier_flow.gd`
+- `test_serve_flow.gd`
+- `test_tag_demand_flow.gd`
 
-## Demo v0 Tests
+These scripts cover the single-project runtime foundation:
 
-The clean-slate demo rewrite includes script-driven smoke tests in `res://tests/demo/`:
-
-- `test_demand_matcher.gd`
-- `test_card_engine.gd`
-- `test_customer_ai.gd`
-- `test_integration_flow.gd`
+- profile creation, purchases, and decoration placement
+- screen routing from encounter to reward, shop, boss intro, and summary
+- run buffs plus persistent upgrade ownership
+- card play from dough modification through bake and serve
+- tag-based customer demand scoring
 
 Run each with a headless Godot command, for example:
 
-`godot --headless --script res://tests/demo/test_demand_matcher.gd`
+`godot --headless --script res://tests/game/test_run_flow.gd`
+
+This workspace does not currently have a `godot` executable on PATH, so these tests were added but not executed in this session.

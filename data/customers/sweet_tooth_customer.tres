@@ -1,15 +1,25 @@
 [gd_resource type="Resource" script_class="CustomerDef" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/entities/customer_def.gd" id="1_8n0i8"]
+[ext_resource type="Script" path="res://scripts/entities/customer_def.gd" id="1_sweettooth"]
 
 [resource]
-script = ExtResource("1_8n0i8")
+script = ExtResource("1_sweettooth")
 customer_id = &"sweet_tooth_customer"
 display_name = "Sweet Tooth"
 order_id = &"sweet_request"
 preferences = PackedStringArray("sweet")
+required_tags = PackedStringArray("sweet")
+bonus_tags = PackedStringArray("chocolate", "cinnamon", "decorated")
+forbidden_tags = PackedStringArray("failed")
+minimum_quality = 0
+base_reputation = 1
+bonus_reputation_per_match = 1
+bonus_tips_per_match = 1
 patience = 5
 reward = 2
+stress_damage = 2
+customer_type = 1
 personality_modifiers = {
 "kind": true
 }
+starting_status_ids = PackedStringArray()

@@ -1,6 +1,6 @@
-# Demo Drawing Checklist (Layered Setup)
+# Placeholder Art Checklist (Layered Setup)
 
-This checklist matches the current demo renderer exactly.  
+This checklist matches the current placeholder-art renderer exactly.  
 All files are PNG.
 
 ## 1) Card Layering (Slay the Spire style)

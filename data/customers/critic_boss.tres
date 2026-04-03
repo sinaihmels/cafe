@@ -1,15 +1,25 @@
 [gd_resource type="Resource" script_class="CustomerDef" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/entities/customer_def.gd" id="1_824s3"]
+[ext_resource type="Script" path="res://scripts/entities/customer_def.gd" id="1_criticboss"]
 
 [resource]
-script = ExtResource("1_824s3")
+script = ExtResource("1_criticboss")
 customer_id = &"critic_boss"
-display_name = "Critic"
+display_name = "The Final Critic"
 order_id = &"sweet_decorated_request"
 preferences = PackedStringArray("sweet", "decorated")
+required_tags = PackedStringArray("sweet", "decorated")
+bonus_tags = PackedStringArray("quality", "chocolate", "warm")
+forbidden_tags = PackedStringArray("failed")
+minimum_quality = 1
+base_reputation = 3
+bonus_reputation_per_match = 1
+bonus_tips_per_match = 1
 patience = 6
-reward = 3
+reward = 4
+stress_damage = 4
+customer_type = 5
 personality_modifiers = {
 "boss": true
 }
+starting_status_ids = PackedStringArray("critic_status")

@@ -1,37 +1,142 @@
-# Cozy Deckbuilder Architecture
+# Canonical Architecture
 
-This scaffold follows the project's non-negotiable rules:
+## Goal
 
-- Data is separate from runtime instances and UI.
-- Gameplay changes flow through an effect queue.
-- Systems communicate through an event bus.
-- Turn flow is state-machine based.
-- State lives in dedicated resource objects.
+The repo now contains one project only.
 
-## Current Boot Flow
+The current playable content is still a small demo slice, but it runs on the same canonical systems that are meant to support the eventual larger game.
 
-`App` scene creates:
+## Core Runtime
 
-- `SessionService` for authoritative state
-- `EventBus` for cross-system signals
-- `EffectQueueService` for sequential resolution
-- `GameplayController` for orchestration
-- `GameplayView` for rendering and input only
+### App Layer
 
-## Naming Rules
+`AppController` orchestrates user input and screen transitions.
 
-- `*_def`: immutable authored content
-- `*_instance`: mutable runtime objects
-- `*_state`: source-of-truth state resources
-- `*_controller`: orchestration
-- `*_service`: shared systems
-- `*_view`: rendering and user input
-- `*_effect`: atomic state changes
+`AppView` renders all routed screens:
 
-## Suggested Next Steps
+- Title
+- Cafe Hub
+- Decoration
+- Dough Select
+- Encounter
+- Reward
+- Run Shop
+- Boss Intro
+- Summary
 
-1. Add item and recipe definitions under `res://data/`.
-2. Expand `BaseEffect` subclasses for board movement, baking, and serving.
-3. Introduce customer spawning and patience resolution in `GameplayController`.
-4. Move sample starter deck setup into a proper run-generation pipeline.
-5. Add automated tests around effect ordering and state transitions.
+### Runtime Authority
+
+`SessionService` is the main gameplay authority.
+It owns and mutates:
+
+- `RunState`
+- `CombatState`
+- `PlayerState`
+- `CafeState`
+- `DeckState`
+
+It also owns the canonical content loader and exposes the screen/routing API used by the controller and view.
+
+### Persistence
+
+`SaveService` stores permanent progression in `user://meta_profile.json`.
+
+Persistent state includes:
+
+- meta currency
+- unlocked doughs
+- unlocked cards
+- unlocked customers
+- owned equipment
+- equipped equipment
+- owned decorations
+- decoration layout
+- purchased shop upgrades
+- unlocked buffs and statuses
+- run count and best run day
+
+Run-only state is intentionally separate and rebuilt when a run starts.
+
+### Effect And Modifier Systems
+
+Cards remain data-authored and effect-driven.
+Card effects resolve through `EffectQueueService`.
+
+The generic modifier layer supports:
+
+- player buffs
+- customer statuses
+- item statuses
+- equipment passives
+- shop-upgrade passives
+- dough passives
+
+Supported modifier hooks currently include:
+
+- on apply
+- turn start
+- turn end
+- card played
+- customer served
+- item baked
+- on expire
+
+### Encounter Model
+
+The encounter model now uses final-game-capable kitchen state instead of the old shared dish abstraction.
+
+Canonical encounter zones:
+
+- prep area
+- oven slots with timers
+- serving table
+
+Canonical runtime actors:
+
+- multiple active customers
+- mutable item instances
+- mutable customer instances
+- mutable modifier instances
+
+## Content Organization
+
+### Authored Definitions
+
+Immutable authored content is stored in resource defs:
+
+- `CardDef`
+- `CustomerDef`
+- `ItemDef`
+- `RecipeDef`
+- `DoughDef`
+- `EquipmentDef`
+- `DecorationDef`
+- `ShopUpgradeDef`
+- `RewardDef`
+- `CardOfferDef`
+- `BuffDef`
+- `StatusDef`
+
+### Runtime Instances And State
+
+Mutable runtime data is stored in:
+
+- `CardInstance`
+- `CustomerInstance`
+- `ItemInstance`
+- `ModifierInstance`
+- state resources under `scripts/core/`
+
+## Screen Flow
+
+Current canonical flow:
+
+`Title -> Cafe Hub -> Dough Select -> Encounter -> Reward -> Encounter -> Run Shop -> Encounter -> Boss Intro -> Encounter -> Summary -> Cafe Hub`
+
+The cafe hub remains outside encounters and is where permanent management happens.
+
+## Assets
+
+The build keeps using placeholder art from `res://assets/demo/`.
+No new screen depends on custom final art to function.
+The placeholder policy is deliberate for this phase.

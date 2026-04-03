@@ -6,4 +6,4 @@
 script = ExtResource("1_tn7ou")
 item_id = &"chocolate_dough"
 display_name = "Chocolate Dough"
-tags = PackedStringArray("intermediate", "dough", "sweet", "premium")
+tags = PackedStringArray("intermediate", "dough", "sweet", "premium", "chocolate")

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="DoughDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/progression/dough_def.gd" id="1_sweetdough"]
+
+[resource]
+script = ExtResource("1_sweetdough")
+dough_id = &"sweet_dough"
+prep_item_id = &"sweet_dough"
+display_name = "Sweet Dough"
+description = "A cozy sweet dough that begins each day already prepped and ready for toppings, baking, and finishing."
+starting_deck_ids = PackedStringArray("reward_chocolate", "reward_chocolate", "reward_cinnamon", "reward_cinnamon", "starter_bake", "starter_bake", "starter_serve", "starter_serve", "starter_decorate", "starter_decorate")
+passive_modifier_ids = PackedStringArray("oven_mastery_buff")
+unlocked_by_default = true

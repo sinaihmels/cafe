@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BuffDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/modifiers/buff_def.gd" id="1_focusbuff"]
+[ext_resource type="Script" path="res://scripts/effects/draw_cards_effect.gd" id="2_draw"]
+
+[sub_resource type="Resource" id="Resource_draw"]
+script = ExtResource("2_draw")
+effect_id = &"draw_cards"
+amount = 1
+
+[resource]
+script = ExtResource("1_focusbuff")
+modifier_id = &"focused_service_buff"
+display_name = "Focused Service"
+description = "Temporary buff. Draw 1 extra card at the start of each turn."
+default_duration_turns = 2
+max_stacks = 1
+stackable = false
+stat_modifiers = {}
+on_turn_start_effects = [SubResource("Resource_draw")]

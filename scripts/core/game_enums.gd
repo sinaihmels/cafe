@@ -1,6 +1,29 @@
 class_name GameEnums
 extends RefCounted
 
+enum Screen {
+	TITLE,
+	CAFE_HUB,
+	DECORATION,
+	DOUGH_SELECT,
+	ENCOUNTER,
+	REWARD,
+	RUN_SHOP,
+	BOSS_INTRO,
+	SUMMARY,
+}
+
+enum RunPhase {
+	IDLE,
+	PREPARE_RUN,
+	ENCOUNTER,
+	REWARD,
+	RUN_SHOP,
+	BOSS_INTRO,
+	COMPLETE,
+	FAILED,
+}
+
 enum TurnState {
 	IDLE,
 	PLAYER_TURN,
@@ -9,11 +32,42 @@ enum TurnState {
 	CHECK_END,
 }
 
-enum RunPhase {
-	PREP_PHASE,
-	GAMEPLAY,
-	REWARD,
-	EVENT,
-	DAY_END,
-	RUN_END,
+enum RewardType {
+	ADD_CARD_TO_RUN_DECK,
+	ADD_RUN_BUFF,
+	ADD_META_UNLOCK,
+	ADD_META_CURRENCY,
+	ADD_EQUIPMENT_OWNERSHIP,
+	ADD_SHOP_UPGRADE_OWNERSHIP,
+	HEAL_STRESS,
+	INCREASE_MAX_STRESS,
+	INCREASE_MAX_ENERGY,
+}
+
+enum OfferType {
+	RUN_CARD,
+	RUN_BUFF,
+}
+
+enum ModifierTarget {
+	PLAYER,
+	CUSTOMER,
+	ITEM,
+}
+
+enum CustomerType {
+	REGULAR,
+	PATIENT,
+	IMPATIENT,
+	CRITIC,
+	CHAOTIC,
+	BOSS,
+}
+
+enum DecorationSlot {
+	WALL,
+	COUNTER,
+	FLOOR,
+	SHELF,
+	EXTERIOR,
 }

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CardDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_starterserve"]
+[ext_resource type="Script" path="res://scripts/effects/serve_item_effect.gd" id="2_serveeffect"]
+
+[sub_resource type="Resource" id="Resource_serve"]
+script = ExtResource("2_serveeffect")
+effect_id = &"serve_item"
+
+[resource]
+script = ExtResource("1_starterserve")
+card_id = &"starter_serve"
+display_name = "Serve"
+energy_cost = 1
+tags = PackedStringArray("action", "service")
+targeting_rules = "select_one_customer_and_one_table_item"
+effects = [SubResource("Resource_serve")]
+preview_text = "Serve 1 item from the table to 1 customer."

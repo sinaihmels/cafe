@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="StatusDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/modifiers/status_def.gd" id="1_criticstatus"]
+
+[resource]
+script = ExtResource("1_criticstatus")
+modifier_id = &"critic_status"
+display_name = "Critic"
+description = "Status. This customer expects polished service and punishes slow play."
+default_duration_turns = -1
+max_stacks = 1
+stackable = false
+stat_modifiers = {}

@@ -1,15 +1,25 @@
 [gd_resource type="Resource" script_class="CustomerDef" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/entities/customer_def.gd" id="1_wsbcu"]
+[ext_resource type="Script" path="res://scripts/entities/customer_def.gd" id="1_quality"]
 
 [resource]
-script = ExtResource("1_wsbcu")
+script = ExtResource("1_quality")
 customer_id = &"quality_customer"
 display_name = "Quality Seeker"
 order_id = &"quality_request"
-preferences = PackedStringArray("quality")
+preferences = PackedStringArray("decorated")
+required_tags = PackedStringArray("decorated")
+bonus_tags = PackedStringArray("quality", "sweet")
+forbidden_tags = PackedStringArray("failed")
+minimum_quality = 1
+base_reputation = 2
+bonus_reputation_per_match = 1
+bonus_tips_per_match = 1
 patience = 5
-reward = 2
+reward = 3
+stress_damage = 3
+customer_type = 3
 personality_modifiers = {
 "critical": true
 }
+starting_status_ids = PackedStringArray("critic_status")

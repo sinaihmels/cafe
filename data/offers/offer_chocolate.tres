@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CardOfferDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/progression/card_offer_def.gd" id="1_offerchoc"]
+
+[resource]
+script = ExtResource("1_offerchoc")
+offer_id = &"offer_chocolate"
+display_name = "Chocolate"
+description = "Buy Chocolate for this run."
+offer_type = 0
+payload_id = &"reward_chocolate"
+cost = 3

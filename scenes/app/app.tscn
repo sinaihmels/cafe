@@ -1,12 +1,32 @@
-[gd_scene load_steps=3 format=3 uid="uid://dnqpn2p8dnv2m"]
+[gd_scene load_steps=7 format=3]
 
-[ext_resource type="Script" path="res://scripts/demo/run_director.gd" id="1_sqkpt"]
-[ext_resource type="PackedScene" path="res://scenes/ui/demo_view.tscn" id="2_hfkgv"]
+[ext_resource type="Script" path="res://scripts/app/app_controller.gd" id="1_appcontroller"]
+[ext_resource type="Script" path="res://scripts/systems/save_service.gd" id="2_profileservice"]
+[ext_resource type="Script" path="res://scripts/systems/event_bus.gd" id="3_eventbus"]
+[ext_resource type="Script" path="res://scripts/systems/effect_queue_service.gd" id="4_effectqueue"]
+[ext_resource type="Script" path="res://scripts/systems/session_service.gd" id="5_sessionservice"]
+[ext_resource type="PackedScene" path="res://scenes/ui/app_view.tscn" id="6_appview"]
 
 [node name="App" type="Node"]
 
-[node name="RunDirector" type="Node" parent="."]
-script = ExtResource("1_sqkpt")
-view_path = NodePath("../DemoView")
+[node name="EventBus" type="Node" parent="."]
+script = ExtResource("3_eventbus")
 
-[node name="DemoView" parent="." instance=ExtResource("2_hfkgv")]
+[node name="EffectQueueService" type="Node" parent="."]
+script = ExtResource("4_effectqueue")
+
+[node name="SaveService" type="Node" parent="."]
+script = ExtResource("2_profileservice")
+
+[node name="SessionService" type="Node" parent="."]
+script = ExtResource("5_sessionservice")
+
+[node name="AppController" type="Node" parent="."]
+script = ExtResource("1_appcontroller")
+session_service_path = NodePath("../SessionService")
+meta_profile_service_path = NodePath("../SaveService")
+event_bus_path = NodePath("../EventBus")
+effect_queue_path = NodePath("../EffectQueueService")
+app_view_path = NodePath("../AppView")
+
+[node name="AppView" parent="." instance=ExtResource("6_appview")]

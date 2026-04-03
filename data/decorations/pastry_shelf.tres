@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="DecorationDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/progression/decoration_def.gd" id="1_shelf"]
+
+[resource]
+script = ExtResource("1_shelf")
+decoration_id = &"pastry_shelf"
+display_name = "Pastry Shelf"
+description = "A decorative shelf for house specials. Cosmetic only."
+slot = 3
+cost = 4
+unlocked_by_default = true

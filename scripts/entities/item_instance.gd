@@ -8,6 +8,7 @@ extends Resource
 @export var zone: StringName = &"prep"
 @export var created_turn: int = 0
 @export var steps_used: int = 0
+@export var active_statuses: Array[ModifierInstance] = []
 
 func get_item_id() -> StringName:
 	if item_def == null:

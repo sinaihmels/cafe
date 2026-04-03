@@ -10,6 +10,7 @@ func reset_from_cards(cards: Array[CardInstance]) -> void:
 	for card in cards:
 		if card != null:
 			draw_pile.append(card.duplicate(true) as CardInstance)
+	draw_pile.shuffle()
 	discard_pile.clear()
 	hand.clear()
 
@@ -47,4 +48,5 @@ func reshuffle_discard_into_draw() -> void:
 	if discard_pile.is_empty():
 		return
 	draw_pile.append_array(discard_pile)
+	draw_pile.shuffle()
 	discard_pile.clear()

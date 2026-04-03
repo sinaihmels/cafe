@@ -1,19 +1,20 @@
 [gd_resource type="Resource" script_class="CardDef" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_v0xf4"]
-[ext_resource type="Script" path="res://scripts/effects/spawn_item_effect.gd" id="2_ntyxb"]
+[ext_resource type="Script" path="res://scripts/effects/modify_item_effect.gd" id="2_ntyxb"]
 
 [sub_resource type="Resource" id="Resource_fff6m"]
 script = ExtResource("2_ntyxb")
-effect_id = &"spawn_item"
-item_id = &"chocolate"
+effect_id = &"modify_item"
+replacement_item_id = &"chocolate_dough"
+required_source_tags = PackedStringArray("dough")
 
 [resource]
 script = ExtResource("1_v0xf4")
 card_id = &"reward_chocolate"
 display_name = "Chocolate"
 energy_cost = 1
-tags = PackedStringArray("ingredient", "sweet", "premium")
-targeting_rules = "prep"
+tags = PackedStringArray("modifier", "dough", "sweet", "premium")
+targeting_rules = "select_one_prep_item"
 effects = [SubResource("Resource_fff6m")]
-preview_text = "Create 1 Chocolate in Prep. Mixing it with Dough makes Chocolate Dough."
+preview_text = "Turn a selected dough into Chocolate Dough."

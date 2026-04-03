@@ -1,15 +1,25 @@
 [gd_resource type="Resource" script_class="CustomerDef" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/entities/customer_def.gd" id="1_3cfxf"]
+[ext_resource type="Script" path="res://scripts/entities/customer_def.gd" id="1_regular"]
 
 [resource]
-script = ExtResource("1_3cfxf")
+script = ExtResource("1_regular")
 customer_id = &"starter_regular"
 display_name = "Morning Regular"
 order_id = &"plain_scone"
-preferences = PackedStringArray("warm", "sweet")
-patience = 3
-reward = 10
+preferences = PackedStringArray("sweet")
+required_tags = PackedStringArray("sweet")
+bonus_tags = PackedStringArray("warm")
+forbidden_tags = PackedStringArray("failed")
+minimum_quality = 0
+base_reputation = 1
+bonus_reputation_per_match = 1
+bonus_tips_per_match = 1
+patience = 4
+reward = 2
+stress_damage = 2
+customer_type = 0
 personality_modifiers = {
 "kind": true
 }
+starting_status_ids = PackedStringArray()
