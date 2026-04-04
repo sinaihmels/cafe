@@ -15,6 +15,7 @@ extends Node
 
 var _pending_card_index: int = -1
 var _pending_targets: Array[Dictionary] = []
+var _focused_customer_index: int = 0
 
 func _ready() -> void:
 	_effect_queue.configure(_event_bus)
@@ -42,6 +43,7 @@ func _connect_view() -> void:
 	_app_view.start_boss_requested.connect(_on_start_boss_requested)
 	_app_view.end_turn_requested.connect(_on_end_turn_requested)
 	_app_view.play_card_requested.connect(_on_play_card_requested)
+	_app_view.focus_customer_requested.connect(_on_focus_customer_requested)
 	_app_view.customer_item_requested.connect(_on_customer_item_requested)
 	_app_view.prep_item_requested.connect(_on_prep_item_requested)
 	_app_view.oven_item_requested.connect(_on_oven_item_requested)
@@ -70,6 +72,7 @@ func _on_close_decoration_requested() -> void:
 
 func _on_start_run_requested(dough_id: StringName) -> void:
 	_clear_pending_selection()
+	_focused_customer_index = 0
 	_session_service.start_new_run_with_dough(dough_id)
 	_refresh_view()
 
@@ -98,15 +101,18 @@ func _on_buy_offer_requested(offer_id: StringName) -> void:
 	_refresh_view()
 
 func _on_continue_after_shop_requested() -> void:
+	_focused_customer_index = 0
 	_session_service.continue_after_shop()
 	_refresh_view()
 
 func _on_return_to_hub_requested() -> void:
 	_clear_pending_selection()
+	_focused_customer_index = 0
 	_session_service.return_to_hub()
 	_refresh_view()
 
 func _on_start_boss_requested() -> void:
+	_focused_customer_index = 0
 	_session_service.start_boss_encounter()
 	_refresh_view()
 
@@ -145,7 +151,19 @@ func _on_prep_item_requested(item_index: int) -> void:
 	_handle_target_click(&"prep", item_index)
 
 func _on_customer_item_requested(customer_index: int) -> void:
+	_focused_customer_index = customer_index
 	_handle_target_click(&"customer", customer_index)
+
+func _on_focus_customer_requested(customer_index: int) -> void:
+	if _session_service.run_state.screen != GameEnums.Screen.ENCOUNTER:
+		return
+	_focused_customer_index = customer_index
+	if _pending_card_index != -1 and _pending_card_index < _session_service.deck_state.hand.size():
+		var card: CardInstance = _session_service.deck_state.hand[_pending_card_index]
+		if _session_service.is_valid_target(card, &"customer", customer_index):
+			_handle_target_click(&"customer", customer_index)
+			return
+	_refresh_view()
 
 func _on_oven_item_requested(slot_index: int) -> void:
 	if _pending_card_index == -1:
@@ -198,14 +216,19 @@ func _resolve_card_play(card_index: int, targets: Array[Dictionary]) -> void:
 func _build_interaction_state() -> Dictionary:
 	var pending_rule: String = ""
 	var pending_prompt: String = ""
+	var focused_customer_index: int = -1
 	if _pending_card_index != -1 and _pending_card_index < _session_service.deck_state.hand.size():
 		var pending_card: CardInstance = _session_service.deck_state.hand[_pending_card_index]
 		pending_rule = pending_card.card_def.targeting_rules
 		pending_prompt = _session_service.get_target_prompt(pending_card)
+	if not _session_service.combat_state.active_customers.is_empty():
+		_focused_customer_index = clampi(_focused_customer_index, 0, _session_service.combat_state.active_customers.size() - 1)
+		focused_customer_index = _focused_customer_index
 	return {
 		"pending_card_index": _pending_card_index,
 		"pending_rule": pending_rule,
 		"pending_prompt": pending_prompt,
+		"focused_customer_index": focused_customer_index,
 		"selected_indices": _selected_target_indices(),
 		"selected_targets": _selected_targets_copy(),
 	}
