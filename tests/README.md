@@ -7,6 +7,8 @@ Current smoke targets:
 - `test_meta_profile_service.gd`
 - `test_run_flow.gd`
 - `test_modifier_flow.gd`
+- `test_pastry_refactor.gd`
+- `test_proofing_flow.gd`
 - `test_serve_flow.gd`
 - `test_tag_demand_flow.gd`
 
@@ -15,8 +17,9 @@ These scripts cover the single-project runtime foundation:
 - profile creation, purchases, and decoration placement
 - screen routing from encounter to reward, shop, boss intro, and summary
 - run buffs plus persistent upgrade ownership
-- card play from dough modification through bake and serve
-- tag-based customer demand scoring
+- pastry-seed encounter flow, proofing, baking, plating, and serving
+- card taxonomy migration plus interaction/technique smoke coverage
+- state-aware customer demand scoring
 
 Run each with a headless Godot command, for example:
 

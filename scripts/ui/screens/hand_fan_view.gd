@@ -27,7 +27,7 @@ func render(session_service: SessionService, interaction_state: EncounterInterac
 		hand_card.configure(
 			card,
 			UiTextureLibrary.card_texture(card.card_def),
-			card.get_cost() <= session_service.player_state.energy,
+			session_service.can_play_card(card),
 			card_index == _selected_card_index
 		)
 		var hand_index: int = card_index

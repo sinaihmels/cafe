@@ -11,16 +11,16 @@ signal table_item_requested(item_index: int)
 
 func render(session_service: SessionService, interaction_state: EncounterInteractionState) -> void:
 	UiSceneUtils.clear_children(_row)
-	_subtitle.text = "%d / %d items" % [session_service.cafe_state.table_items.size(), session_service.cafe_state.serving_table_capacity]
-	_empty_label.visible = session_service.cafe_state.table_items.is_empty()
-	for table_index in range(session_service.cafe_state.table_items.size()):
-		var table_item: ItemInstance = session_service.cafe_state.table_items[table_index]
+	_subtitle.text = "%d / %d plated" % [session_service.cafe_state.plated_pastries.size(), session_service.cafe_state.serving_table_capacity]
+	_empty_label.visible = session_service.cafe_state.plated_pastries.is_empty()
+	for table_index in range(session_service.cafe_state.plated_pastries.size()):
+		var pastry: PastryInstance = session_service.cafe_state.plated_pastries[table_index]
 		var interactable: bool = interaction_state.is_zone_targetable(&"table", table_index) or interaction_state.is_target_selected(&"table", table_index)
 		var card: ZoneItemCardView = _instantiate_item_card()
 		card.configure(
-			UiTextureLibrary.item_texture(table_item.item_def),
-			table_item.get_display_name(),
-			"Q%d | %s" % [table_item.quality, UiTextFormatter.join_packed(table_item.get_all_tags())],
+			UiTextureLibrary.pastry_texture(pastry),
+			pastry.get_display_name(),
+			UiTextFormatter.describe_pastry(pastry),
 			interactable,
 			interaction_state.is_target_selected(&"table", table_index),
 			interaction_state.is_zone_targetable(&"table", table_index)

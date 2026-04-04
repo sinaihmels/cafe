@@ -10,13 +10,15 @@
 - luxurious 
 - pretty 
 - sticky
+- fruity
+- tangy
+- airy
 
 
-# Tags for status
-- burnt
+# Status for pastry not tags!
+- burned
 - decorated
 - proofed
 - baked
 - warm (pastry is warm in the turn where it was taken from the oven)
 - unproofed
-- 

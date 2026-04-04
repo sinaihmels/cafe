@@ -6,9 +6,9 @@
 [resource]
 script = ExtResource("1_offercinnamon")
 offer_id = &"offer_cinnamon"
-display_name = "Cinnamon"
+display_name = "Cinnamon Sugar"
 icon = ExtResource("2_icon")
-description = "Buy Cinnamon for this run."
+description = "Buy Cinnamon Sugar for this run."
 offer_type = 0
 payload_id = &"reward_cinnamon"
 cost = 2

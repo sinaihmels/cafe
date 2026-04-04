@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/title_screen_view.tscn" id="4_title"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/hub_screen_view.tscn" id="5_hub"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/decoration_screen_view.tscn" id="6_decoration"]
-[ext_resource type="PackedScene" path="res://scenes/ui/screens/dough_select_screen_view.tscn" id="7_dough"]
+[ext_resource type="PackedScene" uid="uid://bf80id8fspyi7" path="res://scenes/ui/screens/dough_select_screen_view.tscn" id="7_dough"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/reward_screen_view.tscn" id="8_reward"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/shop_screen_view.tscn" id="9_shop"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/boss_intro_screen_view.tscn" id="10_boss"]

@@ -8,7 +8,7 @@ func apply(context: EffectContext) -> void:
 	if context.deck_state == null or context.cafe_state == null:
 		return
 	var draw_amount: int = amount
-	if context.cafe_state.prep_items.is_empty():
+	if context.cafe_state.active_pastry == null:
 		draw_amount += prep_empty_bonus
 	for _i: int in range(draw_amount):
 		context.deck_state.draw_one()

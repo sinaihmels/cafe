@@ -10,43 +10,42 @@ signal oven_item_requested(slot_index: int)
 
 func render(session_service: SessionService, interaction_state: EncounterInteractionState) -> void:
 	UiSceneUtils.clear_children(_row)
-	_subtitle.text = "%d slots" % session_service.cafe_state.oven_slots.size()
-	for slot_index in range(session_service.cafe_state.oven_slots.size()):
-		var slot: OvenSlotState = session_service.cafe_state.oven_slots[slot_index]
-		var card: ZoneItemCardView = _instantiate_item_card()
-		if slot.item == null:
-			card.configure(UiTextureLibrary.item_texture(null), "Slot %d" % (slot_index + 1), "Empty", false, false, false)
-			_row.add_child(card)
-			continue
-		var ready: bool = slot.stage == &"ready" or (slot.stage == &"" and slot.remaining_turns <= 0)
-		var interactable: bool = interaction_state.is_zone_targetable(&"oven", slot_index) or ready or interaction_state.is_target_selected(&"oven", slot_index)
-		card.configure(
-			UiTextureLibrary.item_texture(slot.item.item_def),
-			slot.item.get_display_name(),
-			_status_text(slot),
-			interactable,
-			interaction_state.is_target_selected(&"oven", slot_index),
-			interaction_state.is_zone_targetable(&"oven", slot_index) or ready
-		)
-		var oven_index: int = slot_index
-		card.action_requested.connect(func() -> void:
-			oven_item_requested.emit(oven_index)
-		)
+	_subtitle.text = "1 oven lane"
+	var card: ZoneItemCardView = _instantiate_item_card()
+	var pastry: PastryInstance = session_service.cafe_state.oven_pastry
+	if pastry == null:
+		card.configure(UiTextureLibrary.pastry_texture(null), "Oven", "Empty", false, false, false)
 		_row.add_child(card)
+		return
+	var ready: bool = session_service.cafe_state.oven_mode == &"ready"
+	var interactable: bool = interaction_state.is_zone_targetable(&"oven", 0) or ready or interaction_state.is_target_selected(&"oven", 0)
+	card.configure(
+		UiTextureLibrary.pastry_texture(pastry),
+		pastry.get_display_name(),
+		_status_text(session_service),
+		interactable,
+		interaction_state.is_target_selected(&"oven", 0),
+		interaction_state.is_zone_targetable(&"oven", 0) or ready
+	)
+	card.action_requested.connect(func() -> void:
+		oven_item_requested.emit(0)
+	)
+	_row.add_child(card)
 
-func _status_text(slot: OvenSlotState) -> String:
-	var ready: bool = slot.stage == &"ready" or (slot.stage == &"" and slot.remaining_turns <= 0)
-	if slot.stage == &"proofing":
-		return "Proofing (%d turn left)" % max(1, slot.remaining_turns)
-	if slot.stage == &"proofed":
-		return "Proofed"
-	if slot.stage == &"baking":
-		return "Baking (%d turn left)" % max(1, slot.remaining_turns)
-	if ready:
-		return "Ready"
-	if slot.remaining_turns > 0:
-		return "%d turn left" % slot.remaining_turns
-	return "In Oven"
+func _status_text(session_service: SessionService) -> String:
+	if session_service.cafe_state.oven_pastry == null:
+		return "Empty"
+	match session_service.cafe_state.oven_mode:
+		&"proofing":
+			return "Proofing (%d turn left)" % max(1, session_service.cafe_state.oven_turns_remaining)
+		&"baking":
+			return "Baking (%d turn left)" % max(1, session_service.cafe_state.oven_turns_remaining)
+		&"ready":
+			return "Ready to plate"
+		_:
+			if session_service.cafe_state.oven_pastry.has_pastry_state(&"proofed"):
+				return "Proofed and waiting"
+			return UiTextFormatter.describe_pastry(session_service.cafe_state.oven_pastry)
 
 func _instantiate_item_card() -> ZoneItemCardView:
 	var node: Node = UiSceneUtils.instantiate_required(item_card_scene, "OvenZoneView.item_card_scene")

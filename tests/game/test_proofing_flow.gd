@@ -10,39 +10,35 @@ func _init() -> void:
 	meta.reset_profile(session.content_library)
 
 	assert(session.start_new_run_with_dough(&"laminated_dough"), "Laminated Dough should start a run.")
-	assert(session.cafe_state.prep_items.size() == 1, "The morning-prepped laminated dough should start in Prep.")
-	assert(session.cafe_state.prep_items[0].get_item_id() == &"laminated_dough", "Laminated Dough should be the prepped item.")
+	assert(session.cafe_state.active_pastry != null, "The day should open with one active laminated pastry.")
+	assert(session.cafe_state.active_pastry.dough_id == &"laminated_dough", "The active pastry should come from Laminated Dough.")
 
 	session.deck_state.draw_pile.clear()
 	session.deck_state.discard_pile.clear()
 	session.deck_state.hand.clear()
-	session.deck_state.hand.append(session.content_library.build_card_instance(&"starter_bake"))
 	session.deck_state.hand.append(session.content_library.build_card_instance(&"starter_proof"))
+	session.deck_state.hand.append(session.content_library.build_card_instance(&"starter_bake"))
 	session.deck_state.hand.append(session.content_library.build_card_instance(&"starter_serve"))
 
-	var prep_target: Array[Dictionary] = [{
-		"zone": &"prep",
-		"index": 0,
-	}]
-	assert(session.get_valid_targets(session.deck_state.hand[0]).is_empty(), "Bake should have no target before a laminated dough is proofed.")
-	assert(session.play_card_from_hand(1, prep_target, effect_queue), "Proof should move the laminated dough into the oven.")
-	assert(session.cafe_state.prep_items.is_empty(), "Proofing should remove the dough from Prep.")
-	assert(session.cafe_state.oven_slots[0].item != null, "Proofing should place the dough in the oven.")
-	assert(session.cafe_state.oven_slots[0].stage == &"proofing", "The oven slot should enter the proofing stage.")
+	assert(not session.can_play_card(session.deck_state.hand[1]), "Bake should be blocked until the laminated pastry is proofed.")
+	assert(session.play_card_from_hand(0, [], effect_queue), "Proof should move the laminated pastry into the oven.")
+	assert(session.cafe_state.active_pastry == null, "Proofing should remove the pastry from prep.")
+	assert(session.cafe_state.oven_pastry != null, "Proofing should place the pastry in the oven.")
+	assert(session.cafe_state.oven_mode == &"proofing", "The oven should enter the proofing stage.")
 
 	session.advance_oven()
-	assert(session.cafe_state.oven_slots[0].stage == &"proofed", "Advancing the oven should finish proofing.")
+	assert(session.cafe_state.oven_pastry != null and session.cafe_state.oven_pastry.has_pastry_state(&"proofed"), "Advancing the oven should finish proofing.")
+	assert(session.cafe_state.oven_pastry.has_pastry_tag(&"airy"), "Proofing should add the airy pastry tag.")
+	assert(session.cafe_state.oven_mode == &"", "A proofed pastry should wait in the oven for Bake.")
 
-	var bake_target: Array[Dictionary] = [{
-		"zone": &"oven",
-		"index": 0,
-	}]
-	assert(session.play_card_from_hand(0, bake_target, effect_queue), "Bake should finish a proofed dough in the oven.")
-	assert(session.cafe_state.oven_slots[0].stage == &"baking", "The slot should switch from proofed to baking.")
+	assert(session.play_card_from_hand(0, [], effect_queue), "Bake should start baking the proofed pastry.")
+	assert(session.cafe_state.oven_mode == &"baking", "The oven should switch from proofed to baking.")
 
 	session.advance_oven()
-	assert(session.cafe_state.oven_slots[0].stage == &"ready", "Advancing the oven again should finish the bake.")
-	assert(session.cafe_state.oven_slots[0].item != null and session.cafe_state.oven_slots[0].item.has_tag(&"baked"), "The proofed dough should become a baked item.")
+	assert(session.cafe_state.oven_mode == &"ready", "Advancing the oven again should finish the bake.")
+	assert(session.cafe_state.oven_pastry != null and session.cafe_state.oven_pastry.has_pastry_state(&"baked"), "The proofed pastry should become baked.")
 	assert(session.collect_oven_item(0), "A finished laminated pastry should be collectible from the oven.")
-	assert(session.cafe_state.table_items.size() == 1, "Collecting should move the pastry to the table.")
+	assert(session.cafe_state.plated_pastries.size() == 1, "Collecting should move the pastry to the table.")
+	assert(session.cafe_state.plated_pastries[0].has_pastry_state(&"warm"), "Collecting from the oven should make the pastry warm.")
+	assert(session.cafe_state.active_pastry != null, "Plating the pastry should spawn the next pastry in prep.")
 	quit()

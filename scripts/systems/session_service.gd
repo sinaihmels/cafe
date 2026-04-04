@@ -121,7 +121,8 @@ func get_available_decorations() -> Array:
 func get_available_shop_upgrades() -> Array:
 	var output: Array = []
 	for upgrade in content_library.shop_upgrades.values():
-		output.append(upgrade)
+		if upgrade != null and upgrade.upgrade_id != &"oven_slot_upgrade" and upgrade.upgrade_id != &"prep_counter_upgrade":
+			output.append(upgrade)
 	return output
 
 func get_pending_rewards() -> Array:
@@ -172,10 +173,10 @@ func _initialize_run_from_dough(dough: DoughDef, profile: MetaProfileState) -> v
 	player_state.tips = 2
 	player_state.master_deck_ids = dough.starting_deck_ids.duplicate()
 	player_state.equipped_equipment_ids = profile.equipped_equipment_ids.duplicate()
-	cafe_state.prep_space_capacity = BASE_PREP_CAPACITY
 	cafe_state.serving_table_capacity = BASE_TABLE_CAPACITY
-	cafe_state.oven_capacity = BASE_OVEN_CAPACITY
-	_rebuild_oven_slots()
+	cafe_state.prep_space_capacity = 1
+	cafe_state.oven_capacity = 1
+	_reset_cafe_pastry_state()
 	_apply_profile_passives(profile)
 
 func _apply_profile_passives(profile: MetaProfileState) -> void:
@@ -187,13 +188,17 @@ func _apply_profile_passives(profile: MetaProfileState) -> void:
 			add_passive_modifier(modifier_id, &"equipment", equipment.equipment_id)
 	for upgrade_id in profile.purchased_shop_upgrade_ids:
 		var upgrade: ShopUpgradeDef = content_library.get_shop_upgrade(StringName(upgrade_id))
-		if upgrade == null:
+		if upgrade == null or upgrade.upgrade_id == &"oven_slot_upgrade" or upgrade.upgrade_id == &"prep_counter_upgrade":
 			continue
 		for modifier_id in upgrade.passive_modifier_ids:
+			if modifier_id == &"oven_mastery_buff" or modifier_id == &"prep_station_buff":
+				continue
 			add_passive_modifier(modifier_id, &"shop_upgrade", upgrade.upgrade_id)
 
 func _apply_dough_passives(dough: DoughDef) -> void:
 	for modifier_id in dough.passive_modifier_ids:
+		if modifier_id == &"oven_mastery_buff" or modifier_id == &"prep_station_buff":
+			continue
 		add_passive_modifier(modifier_id, &"dough", dough.dough_id)
 
 func _replace_dough_passives(dough: DoughDef) -> void:
@@ -235,18 +240,59 @@ func _enter_day(day_number: int) -> void:
 	run_state.run_phase = GameEnums.RunPhase.ENCOUNTER
 	combat_state.turn_number = 1
 	combat_state.turn_state = GameEnums.TurnState.IDLE
-	cafe_state.prep_items.clear()
-	cafe_state.table_items.clear()
-	_rebuild_oven_slots()
+	combat_state.next_plated_pastry_duplications = 0
+	combat_state.skip_next_customer_patience_loss = false
+	combat_state.next_warm_serve_bonus = false
+	_reset_cafe_pastry_state()
 	_rebuild_deck_from_master_ids()
-	if not _create_prepped_day_dough(dough):
+	if not _spawn_fresh_active_pastry():
 		return
 	combat_state.active_customers = _create_customers(run_state.current_customer_ids)
 	begin_player_turn(true)
-	var opening_message: String = "Day %d begins with %s prepped from the morning. Customize it, bake it, then serve before patience runs out." % [day_number, dough.display_name]
-	if _has_prepped_item_that_needs_proofing():
-		opening_message = "Day %d begins with %s prepped from the morning. Customize it, proof it in the oven, then bake and serve before patience runs out." % [day_number, dough.display_name]
+	var opening_message: String = "Day %d begins with %s ready to shape. Build one pastry at a time and serve each customer before patience runs out." % [day_number, dough.display_name]
+	if dough.requires_proofing:
+		opening_message = "Day %d begins with %s ready to shape. Proof it, bake it, plate it, and keep the line moving one pastry at a time." % [day_number, dough.display_name]
 	_set_status_message(opening_message)
+
+func _reset_cafe_pastry_state() -> void:
+	cafe_state.active_pastry = null
+	cafe_state.oven_pastry = null
+	cafe_state.plated_pastries.clear()
+	cafe_state.oven_mode = &""
+	cafe_state.oven_turns_remaining = 0
+	cafe_state.prep_items.clear()
+	cafe_state.table_items.clear()
+	cafe_state.oven_slots.clear()
+	_rebuild_oven_slots()
+
+func _spawn_fresh_active_pastry() -> bool:
+	if run_state.selected_dough_id == &"":
+		return false
+	if cafe_state.active_pastry != null:
+		return true
+	var pastry: PastryInstance = _create_pastry_from_dough(run_state.selected_dough_id)
+	if pastry == null:
+		_set_status_message("Could not prepare the next pastry.")
+		return false
+	pastry.zone = &"prep"
+	cafe_state.active_pastry = pastry
+	return true
+
+func _current_dough_def() -> DoughDef:
+	return content_library.get_dough(run_state.selected_dough_id)
+
+func _create_pastry_from_dough(dough_id: StringName) -> PastryInstance:
+	var dough: DoughDef = content_library.get_dough(dough_id)
+	if dough == null:
+		return null
+	var pastry: PastryInstance = PastryInstance.new()
+	pastry.dough_id = dough.dough_id
+	pastry.display_name = dough.pastry_display_name if dough.pastry_display_name != "" else dough.display_name
+	pastry.art = dough.art
+	pastry.pastry_tags = dough.starting_pastry_tags.duplicate()
+	if dough.requires_proofing:
+		pastry.internal_flags[&"requires_proofing"] = true
+	return pastry
 
 func _rebuild_deck_from_master_ids() -> void:
 	var cards: Array[CardInstance] = []
@@ -281,10 +327,10 @@ func begin_player_turn(is_new_day: bool = false) -> void:
 		return
 	combat_state.turn_state = GameEnums.TurnState.PLAYER_TURN
 	player_state.reset_turn_energy()
+	_tick_pastry_states_turn_start()
 	if not is_new_day:
 		advance_oven()
 	_trigger_player_modifier_hooks(&"turn_start")
-	_tick_item_statuses_turn_start()
 	deck_state.draw_to_hand_size(player_state.starting_hand_size)
 	if event_bus != null:
 		event_bus.emit_turn_started(combat_state.turn_number)
@@ -297,6 +343,7 @@ func end_player_turn() -> void:
 	combat_state.turn_state = GameEnums.TurnState.CUSTOMER_TURN
 	deck_state.discard_all_hand()
 	_trigger_player_modifier_hooks(&"turn_end")
+	combat_state.next_plated_pastry_duplications = 0
 	_process_customer_turn()
 	_tick_all_temporary_modifiers()
 	if event_bus != null:
@@ -316,7 +363,49 @@ func can_play_card(card: CardInstance) -> bool:
 		return false
 	if combat_state.turn_state != GameEnums.TurnState.PLAYER_TURN:
 		return false
-	return player_state.energy >= card.get_cost()
+	if player_state.energy < card.get_cost():
+		return false
+	return _card_has_required_context(card)
+
+func _card_has_required_context(card: CardInstance) -> bool:
+	if card == null or card.card_def == null:
+		return false
+	match String(card.card_def.card_id):
+		"starter_fold":
+			return cafe_state.active_pastry != null and not _active_pastry_is_locked_in_oven() and (
+				_pastry_matches_token(cafe_state.active_pastry, "laminated_dough")
+				or _pastry_matches_token(cafe_state.active_pastry, "butter_applied")
+			)
+		"reward_chocolate", "reward_cinnamon", "starter_cheese", "starter_culture", "starter_herbs", "starter_tomato_sauce", "starter_vanilla", "starter_strawberry", "starter_lemon", "starter_butter":
+			return cafe_state.active_pastry != null and not _active_pastry_is_locked_in_oven()
+		"starter_proof":
+			return cafe_state.active_pastry != null and _pastry_requires_proofing(cafe_state.active_pastry) and cafe_state.oven_pastry == null
+		"starter_bake":
+			return _can_bake_current_pastry()
+		"reward_flash_bake":
+			return _can_flash_bake_current_pastry()
+		"starter_decorate", "starter_sugar_glaze", "starter_egg_wash":
+			return not cafe_state.plated_pastries.is_empty()
+		"starter_serve":
+			return not cafe_state.plated_pastries.is_empty() and not combat_state.active_customers.is_empty()
+		_:
+			return true
+
+func _active_pastry_is_locked_in_oven() -> bool:
+	return cafe_state.active_pastry == null or cafe_state.active_pastry.zone != &"prep"
+
+func _pastry_requires_proofing(pastry: PastryInstance) -> bool:
+	return pastry != null and bool(pastry.internal_flags.get(&"requires_proofing", false)) and not pastry.has_pastry_state(&"proofed")
+
+func _can_bake_current_pastry() -> bool:
+	if cafe_state.active_pastry != null:
+		return not _pastry_requires_proofing(cafe_state.active_pastry) and cafe_state.oven_pastry == null
+	return cafe_state.oven_pastry != null and cafe_state.oven_mode == &"" and cafe_state.oven_pastry.has_pastry_state(&"proofed")
+
+func _can_flash_bake_current_pastry() -> bool:
+	if cafe_state.active_pastry != null:
+		return not _pastry_requires_proofing(cafe_state.active_pastry)
+	return cafe_state.oven_pastry != null and cafe_state.oven_mode == &"" and cafe_state.oven_pastry.has_pastry_state(&"proofed")
 
 func spend_energy(amount: int) -> void:
 	player_state.energy = maxi(0, player_state.energy - amount)
@@ -348,11 +437,9 @@ func get_required_target_count(card: CardInstance) -> int:
 	if card == null or card.card_def == null:
 		return 0
 	match card.card_def.targeting_rules:
-		"select_two_prep_items":
+		"select_one_customer_and_one_plated_pastry":
 			return 2
-		"select_one_customer_and_one_table_item":
-			return 2
-		"select_one_prep_item", "select_one_baked_item", "select_one_item", "select_one_customer", "select_one_bake_target", "select_one_proof_target":
+		"select_one_plated_pastry", "select_one_customer":
 			return 1
 		_:
 			return 0
@@ -361,22 +448,12 @@ func get_target_prompt(card: CardInstance) -> String:
 	if card == null or card.card_def == null:
 		return ""
 	match card.card_def.targeting_rules:
-		"select_two_prep_items":
-			return "Select 2 prep items."
-		"select_one_customer_and_one_table_item":
-			return "Select 1 customer and 1 table item."
-		"select_one_prep_item":
-			return "Select 1 prep item."
-		"select_one_bake_target":
-			return "Select 1 prep item to bake, or a proofed oven item to finish baking."
-		"select_one_baked_item":
-			return "Select 1 baked item on the table."
-		"select_one_item":
-			return "Select 1 item from prep or oven."
+		"select_one_customer_and_one_plated_pastry":
+			return "Select 1 customer and 1 plated pastry."
+		"select_one_plated_pastry":
+			return "Select 1 plated pastry."
 		"select_one_customer":
 			return "Select 1 customer."
-		"select_one_proof_target":
-			return "Select 1 proof-required dough in prep."
 		_:
 			return ""
 
@@ -384,33 +461,16 @@ func is_valid_target(card: CardInstance, zone: StringName, index: int) -> bool:
 	if card == null or card.card_def == null:
 		return false
 	match card.card_def.targeting_rules:
-		"select_two_prep_items":
-			return zone == &"prep" and index >= 0 and index < cafe_state.prep_items.size()
-		"select_one_customer_and_one_table_item":
+		"select_one_customer_and_one_plated_pastry":
 			if zone == &"customer":
 				return index >= 0 and index < combat_state.active_customers.size()
 			if zone == &"table":
-				return index >= 0 and index < cafe_state.table_items.size()
+				return index >= 0 and index < cafe_state.plated_pastries.size()
 			return false
-		"select_one_prep_item":
-			return zone == &"prep" and index >= 0 and index < cafe_state.prep_items.size()
-		"select_one_bake_target":
-			return _can_bake_target(zone, index)
-		"select_one_baked_item":
-			if zone != &"table" or index < 0 or index >= cafe_state.table_items.size():
-				return false
-			var table_item: ItemInstance = cafe_state.table_items[index]
-			return table_item != null and table_item.has_tag(&"baked")
-		"select_one_item":
-			if zone == &"prep":
-				return index >= 0 and index < cafe_state.prep_items.size()
-			if zone == &"oven":
-				return index >= 0 and index < cafe_state.oven_slots.size() and cafe_state.oven_slots[index].item != null
-			return false
+		"select_one_plated_pastry":
+			return zone == &"table" and index >= 0 and index < cafe_state.plated_pastries.size()
 		"select_one_customer":
 			return zone == &"customer" and index >= 0 and index < combat_state.active_customers.size()
-		"select_one_proof_target":
-			return _can_proof_target(zone, index)
 		_:
 			return false
 
@@ -419,58 +479,25 @@ func get_valid_targets(card: CardInstance) -> Array[Dictionary]:
 	if card == null or card.card_def == null:
 		return targets
 	match card.card_def.targeting_rules:
-		"select_two_prep_items", "select_one_prep_item":
-			for prep_index in range(cafe_state.prep_items.size()):
-				if is_valid_target(card, &"prep", prep_index):
-					targets.append({
-						"zone": &"prep",
-						"index": prep_index,
-					})
-		"select_one_bake_target":
-			for prep_index in range(cafe_state.prep_items.size()):
-				if is_valid_target(card, &"prep", prep_index):
-					targets.append({
-						"zone": &"prep",
-						"index": prep_index,
-					})
-			for oven_index in range(cafe_state.oven_slots.size()):
-				if is_valid_target(card, &"oven", oven_index):
-					targets.append({
-						"zone": &"oven",
-						"index": oven_index,
-					})
-		"select_one_customer_and_one_table_item":
+		"select_one_customer_and_one_plated_pastry":
 			for customer_index in range(combat_state.active_customers.size()):
 				if is_valid_target(card, &"customer", customer_index):
 					targets.append({
 						"zone": &"customer",
 						"index": customer_index,
 					})
-			for table_index in range(cafe_state.table_items.size()):
+			for table_index in range(cafe_state.plated_pastries.size()):
 				if is_valid_target(card, &"table", table_index):
 					targets.append({
 						"zone": &"table",
 						"index": table_index,
 					})
-		"select_one_baked_item":
-			for table_index in range(cafe_state.table_items.size()):
+		"select_one_plated_pastry":
+			for table_index in range(cafe_state.plated_pastries.size()):
 				if is_valid_target(card, &"table", table_index):
 					targets.append({
 						"zone": &"table",
 						"index": table_index,
-					})
-		"select_one_item":
-			for prep_index in range(cafe_state.prep_items.size()):
-				if is_valid_target(card, &"prep", prep_index):
-					targets.append({
-						"zone": &"prep",
-						"index": prep_index,
-					})
-			for oven_index in range(cafe_state.oven_slots.size()):
-				if is_valid_target(card, &"oven", oven_index):
-					targets.append({
-						"zone": &"oven",
-						"index": oven_index,
 					})
 		"select_one_customer":
 			for customer_index in range(combat_state.active_customers.size()):
@@ -479,33 +506,12 @@ func get_valid_targets(card: CardInstance) -> Array[Dictionary]:
 						"zone": &"customer",
 						"index": customer_index,
 					})
-		"select_one_proof_target":
-			for prep_index in range(cafe_state.prep_items.size()):
-				if is_valid_target(card, &"prep", prep_index):
-					targets.append({
-						"zone": &"prep",
-						"index": prep_index,
-					})
 	return targets
 
 func notify_no_valid_targets_for_card(card: CardInstance) -> void:
 	if card == null or card.card_def == null:
 		return
-	match card.card_def.targeting_rules:
-		"select_one_bake_target":
-			if _first_empty_oven_slot() == null and not cafe_state.prep_items.is_empty():
-				_set_status_message("The oven is full.")
-			elif _has_prepped_item_that_needs_proofing():
-				_set_status_message("That dough needs to be proofed in the oven before it can be baked.")
-			else:
-				_set_status_message("There is nothing ready to bake.")
-		"select_one_proof_target":
-			if _first_empty_oven_slot() == null and _has_prepped_item_that_needs_proofing():
-				_set_status_message("The oven is full.")
-			else:
-				_set_status_message("Only doughs that require proofing can use Proof.")
-		_:
-			_set_status_message("No valid targets for %s right now." % card.get_display_name())
+	_set_status_message("No valid targets for %s right now." % card.get_display_name())
 
 func play_card_from_hand(card_index: int, targets: Array[Dictionary], effect_queue: EffectQueueService) -> bool:
 	if effect_queue == null:
@@ -535,267 +541,246 @@ func play_card_from_hand(card_index: int, targets: Array[Dictionary], effect_que
 	after_card_played(card)
 	return true
 
-func spawn_item_in_prep(item_id: StringName) -> bool:
-	if cafe_state.prep_items.size() >= cafe_state.prep_space_capacity:
-		_set_status_message("Prep is full.")
+func add_tags_to_pastry(
+	targets: Array,
+	tags_to_add: PackedStringArray,
+	required_pastry_tags: PackedStringArray = [],
+	required_pastry_states: PackedStringArray = [],
+	forbidden_pastry_states: PackedStringArray = []
+) -> bool:
+	var pastry: PastryInstance = _resolve_pastry_target(targets)
+	if pastry == null:
+		_set_status_message("There is no pastry to season right now.")
 		return false
-	var item: ItemInstance = create_item_instance(item_id)
-	if item == null:
-		_set_status_message("Could not create %s." % String(item_id))
+	if not _pastry_meets_conditions(pastry, required_pastry_tags, required_pastry_states, forbidden_pastry_states):
+		_set_status_message("%s is not in the right state for that card." % pastry.get_display_name())
 		return false
-	item.zone = &"prep"
-	cafe_state.prep_items.append(item)
-	_set_status_message("Created %s in prep." % item.get_display_name())
+	var changed: bool = false
+	for raw_tag in tags_to_add:
+		var tag_name: StringName = StringName(raw_tag)
+		if tag_name == &"" or pastry.has_pastry_tag(tag_name):
+			continue
+		pastry.add_pastry_tag(tag_name)
+		changed = true
+	if not changed:
+		_set_status_message("%s already has those traits." % pastry.get_display_name())
+		return false
+	pastry.steps_used += 1
+	_set_status_message("%s gained %s." % [pastry.get_display_name(), UiTextFormatter.join_packed(tags_to_add)])
 	return true
 
-func mix_selected_prep_items(targets: Array) -> bool:
-	if targets.size() != 2:
-		_set_status_message("Mix needs exactly 2 prep items.")
+func add_states_to_pastry(targets: Array, states_to_add: PackedStringArray, duration: int = -1, quality_delta: int = 0) -> bool:
+	var pastry: PastryInstance = _resolve_pastry_target(targets)
+	if pastry == null:
+		_set_status_message("There is no pastry to update.")
 		return false
-	var first_index: int = int(targets[0].get("index", -1))
-	var second_index: int = int(targets[1].get("index", -1))
-	if first_index == second_index:
-		_set_status_message("Select 2 different prep items.")
+	var changed: bool = false
+	for raw_state in states_to_add:
+		var state_name: StringName = StringName(raw_state)
+		if state_name == &"":
+			continue
+		pastry.add_pastry_state(state_name, duration)
+		changed = true
+	if quality_delta != 0:
+		pastry.quality = maxi(0, pastry.quality + quality_delta)
+		changed = true
+	if not changed:
 		return false
-	if first_index < 0 or second_index < 0:
-		return false
-	if first_index >= cafe_state.prep_items.size() or second_index >= cafe_state.prep_items.size():
-		return false
-	var first_item: ItemInstance = cafe_state.prep_items[first_index]
-	var second_item: ItemInstance = cafe_state.prep_items[second_index]
-	var recipe: RecipeDef = _find_recipe(
-		PackedStringArray([String(first_item.get_item_id()), String(second_item.get_item_id())]),
-		&"prep"
-	)
-	if recipe == null:
-		_set_status_message("Those items do not combine into a valid recipe.")
-		return false
-	var max_index: int = maxi(first_index, second_index)
-	var min_index: int = mini(first_index, second_index)
-	cafe_state.prep_items.remove_at(max_index)
-	cafe_state.prep_items.remove_at(min_index)
-	var output: ItemInstance = create_item_instance(recipe.output_item_id)
-	if output == null:
-		return false
-	output.zone = &"prep"
-	output.steps_used = maxi(first_item.steps_used, second_item.steps_used) + 1
-	output.quality = maxi(first_item.quality, second_item.quality) + recipe.quality_delta
-	for tag in recipe.added_tags:
-		output.add_tag(StringName(tag))
-	if first_item.has_tag(&"cinnamon") or second_item.has_tag(&"cinnamon"):
-		output.add_tag(&"cinnamon")
-	if first_item.has_tag(&"cream") or second_item.has_tag(&"cream"):
-		output.add_tag(&"cream")
-	cafe_state.prep_items.append(output)
-	_set_status_message("Mixed into %s." % output.get_display_name())
+	pastry.steps_used += 1
+	_set_status_message("%s was updated." % pastry.get_display_name())
 	return true
 
-func proof_selected_prep_item(targets: Array) -> bool:
-	if targets.size() != 1:
-		_set_status_message("Proof needs 1 prep item.")
+func selected_pastry_meets_conditions(
+	targets: Array,
+	required_pastry_tags: PackedStringArray = [],
+	required_pastry_states: PackedStringArray = [],
+	forbidden_pastry_states: PackedStringArray = []
+) -> bool:
+	var pastry: PastryInstance = _resolve_pastry_target(targets)
+	return _pastry_meets_conditions(pastry, required_pastry_tags, required_pastry_states, forbidden_pastry_states)
+
+func change_selected_pastry_quality(targets: Array, amount: int) -> void:
+	var pastry: PastryInstance = _resolve_pastry_target(targets)
+	if pastry == null:
+		return
+	pastry.quality = maxi(0, pastry.quality + amount)
+	_set_status_message("%s quality is now %d." % [pastry.get_display_name(), pastry.quality])
+
+func set_selected_pastry_flag(targets: Array, flag_name: StringName, flag_value: bool) -> void:
+	var pastry: PastryInstance = _resolve_pastry_target(targets)
+	if pastry == null or flag_name == &"":
+		return
+	pastry.internal_flags[flag_name] = flag_value
+
+func set_encounter_flag(flag_name: StringName, amount: int) -> void:
+	match flag_name:
+		&"next_plated_pastry_duplications":
+			combat_state.next_plated_pastry_duplications = maxi(0, combat_state.next_plated_pastry_duplications + amount)
+			_set_status_message("The next plated pastry will be duplicated.")
+		&"skip_next_customer_patience_loss":
+			combat_state.skip_next_customer_patience_loss = amount > 0
+			_set_status_message("The next customer turn will not reduce patience.")
+		&"next_warm_serve_bonus":
+			combat_state.next_warm_serve_bonus = amount > 0
+			_set_status_message("Your next warm serve will impress extra.")
+
+func modify_all_customers_patience(amount: int) -> void:
+	for customer in combat_state.active_customers:
+		if customer != null:
+			customer.current_patience = maxi(0, customer.current_patience + amount)
+	if amount != 0:
+		_set_status_message("Customer patience changed by %d." % amount)
+
+func proof_active_pastry() -> bool:
+	var pastry: PastryInstance = cafe_state.active_pastry
+	if pastry == null:
+		_set_status_message("There is no pastry ready to proof.")
 		return false
-	var index: int = int(targets[0].get("index", -1))
-	if index < 0 or index >= cafe_state.prep_items.size():
+	if not _pastry_requires_proofing(pastry):
+		_set_status_message("%s does not need proofing." % pastry.get_display_name())
 		return false
-	var slot: OvenSlotState = _first_empty_oven_slot()
-	if slot == null:
-		_set_status_message("No free oven slot.")
+	if cafe_state.oven_pastry != null:
+		_set_status_message("The oven is already occupied.")
 		return false
-	var item: ItemInstance = cafe_state.prep_items[index]
-	if not item_needs_proofing(item):
-		_set_status_message("%s does not need proofing." % item.get_display_name())
-		return false
-	cafe_state.prep_items.remove_at(index)
-	item.zone = &"oven"
-	slot.item = item
-	slot.stage = &"proofing"
-	slot.remaining_turns = 1
-	_set_status_message("%s is proofing in the oven." % item.get_display_name())
+	pastry.zone = &"oven"
+	pastry.turns_in_oven = 0
+	pastry.steps_used += 1
+	cafe_state.oven_pastry = pastry
+	cafe_state.active_pastry = null
+	cafe_state.oven_mode = &"proofing"
+	cafe_state.oven_turns_remaining = 1
+	_set_status_message("%s is proofing in the oven." % pastry.get_display_name())
 	return true
 
-func bake_selected_item(targets: Array) -> bool:
-	if targets.size() != 1:
-		_set_status_message("Bake needs 1 item.")
-		return false
-	var zone: StringName = StringName(targets[0].get("zone", ""))
-	var index: int = int(targets[0].get("index", -1))
-	if zone == &"prep":
-		if index < 0 or index >= cafe_state.prep_items.size():
+func bake_active_pastry() -> bool:
+	if cafe_state.active_pastry != null:
+		var pastry: PastryInstance = cafe_state.active_pastry
+		if _pastry_requires_proofing(pastry):
+			_set_status_message("%s needs proofing before baking." % pastry.get_display_name())
 			return false
-		var slot: OvenSlotState = _first_empty_oven_slot()
-		if slot == null:
-			_set_status_message("No free oven slot.")
+		if cafe_state.oven_pastry != null:
+			_set_status_message("The oven is already occupied.")
 			return false
-		var prep_item: ItemInstance = cafe_state.prep_items[index]
-		if item_needs_proofing(prep_item):
-			_set_status_message("%s needs proofing before it can be baked." % prep_item.get_display_name())
-			return false
-		cafe_state.prep_items.remove_at(index)
-		prep_item.zone = &"oven"
-		slot.item = prep_item
-		slot.stage = &"baking"
-		slot.remaining_turns = 1
-		_set_status_message("%s is baking." % prep_item.get_display_name())
+		pastry.zone = &"oven"
+		pastry.turns_in_oven = 0
+		pastry.steps_used += 1
+		cafe_state.oven_pastry = pastry
+		cafe_state.active_pastry = null
+		cafe_state.oven_mode = &"baking"
+		cafe_state.oven_turns_remaining = 1
+		_set_status_message("%s is baking." % pastry.get_display_name())
 		return true
-	if zone == &"oven":
-		if index < 0 or index >= cafe_state.oven_slots.size():
-			return false
-		var oven_slot: OvenSlotState = cafe_state.oven_slots[index]
-		if oven_slot == null or oven_slot.item == null:
-			return false
-		if oven_slot.stage != &"proofed":
-			_set_status_message("%s is not ready to bake yet." % oven_slot.item.get_display_name())
-			return false
-		oven_slot.stage = &"baking"
-		oven_slot.remaining_turns = 1
-		_set_status_message("%s is now baking." % oven_slot.item.get_display_name())
+	if cafe_state.oven_pastry != null and cafe_state.oven_mode == &"" and cafe_state.oven_pastry.has_pastry_state(&"proofed"):
+		cafe_state.oven_pastry.steps_used += 1
+		cafe_state.oven_mode = &"baking"
+		cafe_state.oven_turns_remaining = 1
+		_set_status_message("%s is now baking." % cafe_state.oven_pastry.get_display_name())
 		return true
+	_set_status_message("There is nothing ready to bake.")
 	return false
 
-func flash_bake_selected_item(targets: Array, burn_chance: float) -> bool:
-	if targets.size() != 1:
-		_set_status_message("Flash Bake needs 1 bake target.")
-		return false
-	var zone: StringName = StringName(targets[0].get("zone", ""))
-	var index: int = int(targets[0].get("index", -1))
-	var item: ItemInstance = null
-	if zone == &"prep":
-		if index < 0 or index >= cafe_state.prep_items.size():
-			return false
-		item = cafe_state.prep_items[index]
-		if item_needs_proofing(item):
-			_set_status_message("%s needs proofing before it can be flash baked." % item.get_display_name())
-			return false
-		cafe_state.prep_items.remove_at(index)
-	elif zone == &"oven":
-		if index < 0 or index >= cafe_state.oven_slots.size():
-			return false
-		var oven_slot: OvenSlotState = cafe_state.oven_slots[index]
-		if oven_slot == null or oven_slot.item == null or oven_slot.stage != &"proofed":
-			return false
-		item = oven_slot.item
-		oven_slot.item = null
-		oven_slot.remaining_turns = 0
-		oven_slot.stage = &""
-	else:
-		return false
-	if cafe_state.table_items.size() >= cafe_state.serving_table_capacity:
-		if zone == &"prep":
-			cafe_state.prep_items.insert(index, item)
-		elif zone == &"oven":
-			var blocked_slot: OvenSlotState = cafe_state.oven_slots[index]
-			blocked_slot.item = item
-			blocked_slot.remaining_turns = 0
-			blocked_slot.stage = &"proofed"
+func flash_bake_pastry(burn_chance: float) -> bool:
+	if cafe_state.plated_pastries.size() >= cafe_state.serving_table_capacity:
 		_set_status_message("Table is full.")
 		return false
-	var result_item: ItemInstance = null
-	if randf() < burn_chance:
-		result_item = create_item_instance(&"burned")
-		if result_item != null:
-			result_item.steps_used = item.steps_used + 1
-		_set_status_message("Flash Bake burned the item.")
-	else:
-		result_item = _create_baked_result(item)
-		if result_item == null:
-			if zone == &"prep":
-				cafe_state.prep_items.insert(index, item)
-			elif zone == &"oven":
-				var restored_slot: OvenSlotState = cafe_state.oven_slots[index]
-				restored_slot.item = item
-				restored_slot.remaining_turns = 0
-				restored_slot.stage = &"proofed"
-			_set_status_message("That item cannot be baked.")
+	var pastry: PastryInstance = null
+	if cafe_state.active_pastry != null:
+		if _pastry_requires_proofing(cafe_state.active_pastry):
+			_set_status_message("%s needs proofing before flash baking." % cafe_state.active_pastry.get_display_name())
 			return false
-		_set_status_message("%s was flash baked." % result_item.get_display_name())
-	if result_item == null:
+		pastry = cafe_state.active_pastry
+		cafe_state.active_pastry = null
+	elif cafe_state.oven_pastry != null and cafe_state.oven_mode == &"" and cafe_state.oven_pastry.has_pastry_state(&"proofed"):
+		pastry = cafe_state.oven_pastry
+		_clear_oven_pastry()
+	else:
+		_set_status_message("There is no pastry ready for Flash Bake.")
 		return false
-	result_item.zone = &"table"
-	cafe_state.table_items.append(result_item)
-	_notify_item_baked(result_item, [{"zone": &"table", "index": cafe_state.table_items.size() - 1}])
+	pastry.steps_used += 1
+	if randf() < burn_chance:
+		pastry.remove_pastry_state(&"warm")
+		pastry.add_pastry_state(&"burned")
+		_plate_pastry(pastry, false)
+		_set_status_message("%s was flash baked too hard and burned." % pastry.get_display_name())
+		return true
+	pastry.add_pastry_state(&"baked")
+	_plate_pastry(pastry, true)
+	_notify_item_baked(pastry, [{"zone": &"table", "index": maxi(0, cafe_state.plated_pastries.size() - 1)}])
+	_set_status_message("%s was flash baked onto the table." % pastry.get_display_name())
 	return true
+
+func spawn_item_in_prep(_item_id: StringName) -> bool:
+	_set_status_message("This run now uses pastry cards instead of spawning prep items.")
+	return false
+
+func mix_selected_prep_items(_targets: Array) -> bool:
+	_set_status_message("Mixing prep items is no longer part of the pastry flow.")
+	return false
+
+func proof_selected_prep_item(_targets: Array) -> bool:
+	return proof_active_pastry()
+
+func bake_selected_item(_targets: Array) -> bool:
+	return bake_active_pastry()
+
+func flash_bake_selected_item(_targets: Array, burn_chance: float) -> bool:
+	return flash_bake_pastry(burn_chance)
+
 func decorate_selected_table_item(targets: Array) -> bool:
-	if targets.size() != 1:
-		_set_status_message("Decorate needs 1 baked item.")
-		return false
-	var index: int = int(targets[0].get("index", -1))
-	if index < 0 or index >= cafe_state.table_items.size():
-		return false
-	var item: ItemInstance = cafe_state.table_items[index]
-	var recipe: RecipeDef = _find_recipe(PackedStringArray([String(item.get_item_id())]), &"prep")
-	if recipe == null:
-		_set_status_message("That item cannot be decorated.")
-		return false
-	var output: ItemInstance = create_item_instance(recipe.output_item_id)
-	if output == null:
-		return false
-	output.zone = &"table"
-	output.steps_used = item.steps_used + 1
-	output.quality = item.quality + recipe.quality_delta
-	output.custom_tags = item.custom_tags.duplicate()
-	for tag in recipe.added_tags:
-		output.add_tag(StringName(tag))
-	cafe_state.table_items[index] = output
-	_set_status_message("Decorated into %s." % output.get_display_name())
-	return true
+	return add_states_to_pastry(targets, PackedStringArray(["decorated"]), -1, 1)
 
 func remove_selected_item(targets: Array) -> bool:
 	if targets.size() != 1:
 		return false
 	var zone: StringName = StringName(targets[0].get("zone", ""))
 	var index: int = int(targets[0].get("index", -1))
-	if zone == &"prep" and index >= 0 and index < cafe_state.prep_items.size():
-		var prep_item: ItemInstance = cafe_state.prep_items[index]
-		cafe_state.prep_items.remove_at(index)
-		_set_status_message("Removed %s from prep." % prep_item.get_display_name())
+	if zone == &"prep" and cafe_state.active_pastry != null and index == 0:
+		_set_status_message("%s was discarded from prep." % cafe_state.active_pastry.get_display_name())
+		cafe_state.active_pastry = null
+		_spawn_fresh_active_pastry()
 		return true
-	if zone == &"oven" and index >= 0 and index < cafe_state.oven_slots.size():
-		var slot: OvenSlotState = cafe_state.oven_slots[index]
-		if slot.item == null:
-			return false
-		var removed_name: String = slot.item.get_display_name()
-		slot.item = null
-		slot.remaining_turns = 0
-		slot.stage = &""
-		_set_status_message("Removed %s from the oven." % removed_name)
+	if zone == &"oven" and cafe_state.oven_pastry != null and index == 0:
+		_set_status_message("%s was removed from the oven." % cafe_state.oven_pastry.get_display_name())
+		_clear_oven_pastry()
+		_spawn_fresh_active_pastry()
+		return true
+	if zone == &"table" and index >= 0 and index < cafe_state.plated_pastries.size():
+		var removed_pastry: PastryInstance = cafe_state.plated_pastries[index]
+		cafe_state.plated_pastries.remove_at(index)
+		_set_status_message("%s was cleared from the table." % removed_pastry.get_display_name())
 		return true
 	return false
 
 func can_collect_oven_item(slot_index: int) -> bool:
-	if slot_index < 0 or slot_index >= cafe_state.oven_slots.size():
-		return false
-	var slot: OvenSlotState = cafe_state.oven_slots[slot_index]
-	return _is_slot_collect_ready(slot)
+	return slot_index == 0 and cafe_state.oven_pastry != null and cafe_state.oven_mode == &"ready"
 
 func collect_oven_item(slot_index: int) -> bool:
 	if not can_collect_oven_item(slot_index):
 		return false
-	if cafe_state.table_items.size() >= cafe_state.serving_table_capacity:
-		_set_status_message("Table is full.")
+	var pastry: PastryInstance = cafe_state.oven_pastry
+	_clear_oven_pastry()
+	var should_add_warm: bool = not pastry.has_pastry_state(&"burned")
+	if not _plate_pastry(pastry, should_add_warm):
+		cafe_state.oven_pastry = pastry
+		cafe_state.oven_mode = &"ready"
+		cafe_state.oven_turns_remaining = 0
 		return false
-	var slot: OvenSlotState = cafe_state.oven_slots[slot_index]
-	var item: ItemInstance = slot.item
-	item.zone = &"table"
-	cafe_state.table_items.append(item)
-	slot.item = null
-	slot.remaining_turns = 0
-	slot.stage = &""
-	_set_status_message("%s moved from the oven to the table." % item.get_display_name())
+	_set_status_message("%s moved from the oven to the table." % pastry.get_display_name())
 	return true
 
 func serve_item_to_customer(customer_index: int, item_index: int) -> bool:
 	if customer_index < 0 or customer_index >= combat_state.active_customers.size():
 		return false
-	if item_index < 0 or item_index >= cafe_state.table_items.size():
+	if item_index < 0 or item_index >= cafe_state.plated_pastries.size():
 		return false
 	var customer: CustomerInstance = combat_state.active_customers[customer_index]
-	var item: ItemInstance = cafe_state.table_items[item_index]
-	var outcome: Dictionary = _score_item_for_customer(item, customer)
+	var pastry: PastryInstance = cafe_state.plated_pastries[item_index]
+	var outcome: Dictionary = _score_pastry_for_customer(pastry, customer)
 	apply_reputation_delta(int(outcome.get("reputation_delta", 0)))
 	player_state.gain_tips(int(outcome.get("tips", 0)))
-	cafe_state.table_items.remove_at(item_index)
+	cafe_state.plated_pastries.remove_at(item_index)
 	combat_state.active_customers.remove_at(customer_index)
-	_notify_customer_served(customer, item)
+	_notify_customer_served(customer, pastry)
 	_set_status_message(String(outcome.get("message", "Served a customer.")))
 	if combat_state.active_customers.is_empty():
 		_advance_after_encounter_clear()
@@ -803,18 +788,89 @@ func serve_item_to_customer(customer_index: int, item_index: int) -> bool:
 
 func serve_targets(targets: Array[Dictionary]) -> bool:
 	var customer_index: int = -1
-	var item_index: int = -1
+	var pastry_index: int = -1
 	for target in targets:
 		var zone: StringName = StringName(target.get("zone", ""))
 		var index: int = int(target.get("index", -1))
 		if zone == &"customer":
 			customer_index = index
 		elif zone == &"table":
-			item_index = index
-	if customer_index == -1 or item_index == -1:
-		_set_status_message("Serve needs 1 customer and 1 table item.")
+			pastry_index = index
+	if customer_index == -1 or pastry_index == -1:
+		_set_status_message("Serve needs 1 customer and 1 plated pastry.")
 		return false
-	return serve_item_to_customer(customer_index, item_index)
+	return serve_item_to_customer(customer_index, pastry_index)
+
+func _resolve_pastry_target(targets: Array) -> PastryInstance:
+	for target_value in targets:
+		var target: Dictionary = target_value
+		var pastry_from_target: PastryInstance = _get_pastry_from_target(target)
+		if pastry_from_target != null:
+			return pastry_from_target
+	if cafe_state.active_pastry != null:
+		return cafe_state.active_pastry
+	if cafe_state.oven_pastry != null:
+		return cafe_state.oven_pastry
+	if not cafe_state.plated_pastries.is_empty():
+		return cafe_state.plated_pastries[0]
+	return null
+
+func _get_pastry_from_target(target: Dictionary) -> PastryInstance:
+	var zone: StringName = StringName(target.get("zone", ""))
+	var index: int = int(target.get("index", -1))
+	if zone == &"prep" and cafe_state.active_pastry != null and index == 0:
+		return cafe_state.active_pastry
+	if zone == &"oven" and cafe_state.oven_pastry != null and index == 0:
+		return cafe_state.oven_pastry
+	if zone == &"table" and index >= 0 and index < cafe_state.plated_pastries.size():
+		return cafe_state.plated_pastries[index]
+	return null
+
+func _pastry_meets_conditions(
+	pastry: PastryInstance,
+	required_pastry_tags: PackedStringArray = [],
+	required_pastry_states: PackedStringArray = [],
+	forbidden_pastry_states: PackedStringArray = []
+) -> bool:
+	if pastry == null:
+		return false
+	for required_tag in required_pastry_tags:
+		if not _pastry_matches_token(pastry, String(required_tag)):
+			return false
+	for required_state in required_pastry_states:
+		if not _pastry_matches_token(pastry, String(required_state)):
+			return false
+	for forbidden_state in forbidden_pastry_states:
+		if _pastry_matches_token(pastry, String(forbidden_state)):
+			return false
+	return true
+
+func _clear_oven_pastry() -> void:
+	cafe_state.oven_pastry = null
+	cafe_state.oven_mode = &""
+	cafe_state.oven_turns_remaining = 0
+
+func _plate_pastry(pastry: PastryInstance, add_warm: bool) -> bool:
+	if pastry == null:
+		return false
+	if cafe_state.plated_pastries.size() >= cafe_state.serving_table_capacity:
+		_set_status_message("Table is full.")
+		return false
+	pastry.zone = &"table"
+	if add_warm:
+		pastry.add_pastry_state(&"warm", 1)
+	cafe_state.plated_pastries.append(pastry)
+	var duplicate_count: int = combat_state.next_plated_pastry_duplications
+	combat_state.next_plated_pastry_duplications = 0
+	for _dup_index in range(duplicate_count):
+		if cafe_state.plated_pastries.size() >= cafe_state.serving_table_capacity:
+			break
+		var pastry_copy: PastryInstance = pastry.duplicate_pastry()
+		pastry_copy.zone = &"table"
+		cafe_state.plated_pastries.append(pastry_copy)
+	if cafe_state.active_pastry == null and cafe_state.oven_pastry == null:
+		_spawn_fresh_active_pastry()
+	return true
 
 func choose_reward(reward_id: StringName) -> bool:
 	if run_state.screen != GameEnums.Screen.REWARD:
@@ -974,6 +1030,8 @@ func modify_target_customer_patience(targets: Array, amount: int) -> void:
 	for customer_index in customer_indices:
 		if customer_index < 0 or customer_index >= combat_state.active_customers.size():
 			continue
+		if amount < 0 and combat_state.turn_state == GameEnums.TurnState.CUSTOMER_TURN and combat_state.skip_next_customer_patience_loss:
+			continue
 		var customer: CustomerInstance = combat_state.active_customers[customer_index]
 		customer.current_patience = maxi(0, customer.current_patience + amount)
 
@@ -1069,43 +1127,40 @@ func _create_modified_item(
 	return modified_item
 
 func advance_oven() -> void:
-	for slot_index in range(cafe_state.oven_slots.size()):
-		var slot: OvenSlotState = cafe_state.oven_slots[slot_index]
-		if slot == null or slot.item == null:
-			continue
-		if slot.remaining_turns > 0:
-			slot.remaining_turns -= 1
-		if slot.remaining_turns > 0:
-			continue
-		match slot.stage:
-			&"proofing":
-				slot.stage = &"proofed"
-				slot.remaining_turns = 0
-				_set_status_message("%s is proofed and ready to bake." % slot.item.get_display_name())
-			&"baking", &"":
-				if slot.item.has_tag(&"baked"):
-					slot.stage = &"ready"
-					continue
-				var result_item: ItemInstance = _create_baked_result(slot.item)
-				if result_item == null:
-					continue
-				result_item.zone = &"oven"
-				result_item.active_statuses = slot.item.active_statuses.duplicate(true)
-				slot.item = result_item
-				slot.remaining_turns = 0
-				slot.stage = &"ready"
-				_add_modifier_to_collection(
-					result_item.active_statuses,
-					GameEnums.ModifierTarget.ITEM,
-					&"warm_status",
-					&"oven",
-					result_item.get_item_id(),
-					1
-				)
-				_notify_item_baked(result_item, [{"zone": &"oven", "index": slot_index}])
-				_set_status_message("%s is ready in the oven." % result_item.get_display_name())
-			_:
-				slot.stage = &"ready" if slot.item.has_tag(&"baked") else slot.stage
+	if cafe_state.oven_pastry == null:
+		return
+	if cafe_state.oven_turns_remaining > 0:
+		cafe_state.oven_turns_remaining -= 1
+	cafe_state.oven_pastry.turns_in_oven += 1
+	if cafe_state.oven_turns_remaining > 0:
+		return
+	match cafe_state.oven_mode:
+		&"proofing":
+			cafe_state.oven_pastry.add_pastry_state(&"proofed")
+			cafe_state.oven_pastry.add_pastry_tag(&"airy")
+			cafe_state.oven_mode = &""
+			_set_status_message("%s is proofed and ready to bake." % cafe_state.oven_pastry.get_display_name())
+		&"baking":
+			cafe_state.oven_pastry.add_pastry_state(&"baked")
+			cafe_state.oven_pastry.remove_pastry_state(&"burned")
+			cafe_state.oven_mode = &"ready"
+			_notify_item_baked(cafe_state.oven_pastry, [{"zone": &"oven", "index": 0}])
+			_set_status_message("%s is ready in the oven." % cafe_state.oven_pastry.get_display_name())
+		&"ready":
+			if not cafe_state.oven_pastry.has_pastry_state(&"burned"):
+				cafe_state.oven_pastry.add_pastry_state(&"burned")
+				_set_status_message("%s was left in the oven and burned." % cafe_state.oven_pastry.get_display_name())
+		_:
+			pass
+
+func _tick_pastry_states_turn_start() -> void:
+	if cafe_state.active_pastry != null:
+		cafe_state.active_pastry.tick_temporary_states()
+	if cafe_state.oven_pastry != null:
+		cafe_state.oven_pastry.tick_temporary_states()
+	for pastry in cafe_state.plated_pastries:
+		if pastry != null:
+			pastry.tick_temporary_states()
 
 func pop_status_message() -> String:
 	var message: String = _last_status_message
@@ -1118,13 +1173,15 @@ func _process_customer_turn() -> void:
 	var remaining_customers: Array[CustomerInstance] = []
 	var unhappy_departures: int = 0
 	var total_stress_loss: int = 0
+	var patience_loss_prevented: bool = combat_state.skip_next_customer_patience_loss
 	for customer_index in range(combat_state.active_customers.size()):
 		var customer: CustomerInstance = combat_state.active_customers[customer_index]
 		if customer == null:
 			continue
 		_trigger_customer_modifier_hooks(customer_index, &"turn_end")
 		customer.turns_waited += 1
-		customer.current_patience -= 1
+		if not patience_loss_prevented:
+			customer.current_patience -= 1
 		if customer.current_patience <= 0:
 			var stress_damage: int = customer.customer_def.stress_damage if customer.customer_def != null else 2
 			player_state.lose_stress(stress_damage)
@@ -1133,6 +1190,9 @@ func _process_customer_turn() -> void:
 			continue
 		remaining_customers.append(customer)
 	combat_state.active_customers = remaining_customers
+	combat_state.skip_next_customer_patience_loss = false
+	if patience_loss_prevented:
+		_set_status_message("Small Talk kept the whole line patient for a turn.")
 	if unhappy_departures > 0:
 		_set_status_message("%d customer(s) left upset. Stress -%d." % [unhappy_departures, total_stress_loss])
 	if player_state.stress <= 0:
@@ -1212,14 +1272,14 @@ func _add_card_to_run_deck(card_id: StringName) -> void:
 	if meta_profile_service != null:
 		meta_profile_service.unlock_card(card_id)
 
-func _notify_customer_served(customer: CustomerInstance, item: ItemInstance) -> void:
+func _notify_customer_served(customer: CustomerInstance, _pastry: PastryInstance) -> void:
 	if event_bus != null and customer != null and customer.customer_def != null:
 		event_bus.emit_customer_served(customer.customer_def.customer_id)
 	_trigger_player_modifier_hooks(&"customer_served")
 
-func _notify_item_baked(item: ItemInstance, targets: Array) -> void:
-	if event_bus != null and item != null:
-		event_bus.emit_item_baked(item.get_item_id())
+func _notify_item_baked(pastry: PastryInstance, targets: Array) -> void:
+	if event_bus != null and pastry != null:
+		event_bus.emit_item_baked(pastry.dough_id)
 	_run_modifier_effects_from_collection(player_state.passive_modifiers, &"item_baked", targets)
 	_run_modifier_effects_from_collection(player_state.active_buffs, &"item_baked", targets)
 
@@ -1441,6 +1501,103 @@ func _create_baked_result(item: ItemInstance) -> ItemInstance:
 		result_item.add_tag(StringName(tag))
 	result_item.add_tag(&"warm")
 	return result_item
+
+func _score_pastry_for_customer(pastry: PastryInstance, customer: CustomerInstance) -> Dictionary:
+	var customer_name: String = customer.get_display_name() if customer != null else "The customer"
+	var result: Dictionary = {
+		"success": false,
+		"reputation_delta": -1,
+		"tips": 0,
+		"message": "%s left disappointed." % customer_name,
+	}
+	if pastry == null or customer == null:
+		return result
+	if pastry.has_pastry_state(&"burned"):
+		result["message"] = "%s refused the burned pastry." % customer.get_display_name()
+		return result
+	if not pastry.has_pastry_state(&"baked"):
+		result["message"] = "%s expected the pastry to be fully baked." % customer.get_display_name()
+		return result
+	var required_tokens: PackedStringArray = customer.get_preferences()
+	if not _pastry_matches_required_tokens(pastry, required_tokens):
+		result["message"] = "%s did not get the pastry they asked for." % customer.get_display_name()
+		return result
+	if _pastry_matches_forbidden_tokens(pastry, customer.get_forbidden_tags()):
+		result["message"] = "%s rejected the pastry outright." % customer.get_display_name()
+		return result
+	if pastry.quality < customer.get_minimum_quality():
+		result["message"] = "%s expected a higher-quality pastry." % customer.get_display_name()
+		return result
+	var matched_bonus_tags: int = _count_matching_pastry_tokens(pastry, customer.get_bonus_tags())
+	var reputation_delta: int = customer.get_base_reputation() + (matched_bonus_tags * customer.get_bonus_reputation_per_match())
+	var tips_delta: int = customer.get_base_tips() + (matched_bonus_tags * customer.get_bonus_tips_per_match())
+	var message: String = _build_pastry_success_message(customer, required_tokens, customer.get_bonus_tags(), matched_bonus_tags)
+	if customer.get_customer_type() == GameEnums.CustomerType.IMPATIENT and pastry.steps_used <= 2 and customer.turns_waited <= 1:
+		reputation_delta += 1
+		tips_delta += 1
+		message = "%s was served quickly and got exactly what they wanted." % customer.get_display_name()
+	if _customer_has_status(customer, &"critic_status") and not pastry.has_pastry_state(&"decorated"):
+		reputation_delta = mini(reputation_delta, 0)
+		tips_delta = mini(tips_delta, 0)
+		message = "%s expected a more polished pastry." % customer.get_display_name()
+	if combat_state.next_warm_serve_bonus and pastry.has_pastry_state(&"warm") and reputation_delta > 0:
+		reputation_delta += 1
+		tips_delta += 1
+		combat_state.next_warm_serve_bonus = false
+		message = "%s caught the pastry at the perfect moment." % customer.get_display_name()
+	result["success"] = reputation_delta > 0 or tips_delta > 0
+	result["reputation_delta"] = reputation_delta
+	result["tips"] = tips_delta
+	result["message"] = message
+	return result
+
+func _pastry_matches_required_tokens(pastry: PastryInstance, required_tokens: PackedStringArray) -> bool:
+	for required_token in required_tokens:
+		if not _pastry_matches_token(pastry, String(required_token)):
+			return false
+	return true
+
+func _pastry_matches_forbidden_tokens(pastry: PastryInstance, forbidden_tokens: PackedStringArray) -> bool:
+	for forbidden_token in forbidden_tokens:
+		if _pastry_matches_token(pastry, String(forbidden_token)):
+			return true
+	return false
+
+func _count_matching_pastry_tokens(pastry: PastryInstance, tokens_to_match: PackedStringArray) -> int:
+	var match_count: int = 0
+	for token_to_match in tokens_to_match:
+		if _pastry_matches_token(pastry, String(token_to_match)):
+			match_count += 1
+	return match_count
+
+func _build_pastry_success_message(
+	customer: CustomerInstance,
+	required_tokens: PackedStringArray,
+	bonus_tokens: PackedStringArray,
+	matched_bonus_tags: int
+) -> String:
+	var customer_name: String = customer.get_display_name()
+	if required_tokens.is_empty():
+		return "%s was satisfied." % customer_name
+	if matched_bonus_tags > 0 and not bonus_tokens.is_empty():
+		return "%s got exactly what they wanted plus %d bonus flourish tag(s)." % [customer_name, matched_bonus_tags]
+	return "%s got the pastry they asked for." % customer_name
+
+func _pastry_matches_token(pastry: PastryInstance, token: String) -> bool:
+	if pastry == null:
+		return false
+	var token_name: StringName = StringName(token)
+	if token_name == &"":
+		return false
+	if token_name == &"quality":
+		return pastry.quality > 0
+	if token_name == &"unproofed":
+		return bool(pastry.internal_flags.get(&"requires_proofing", false)) and not pastry.has_pastry_state(&"proofed")
+	if pastry.dough_id == token_name:
+		return true
+	if bool(pastry.internal_flags.get(token_name, false)):
+		return true
+	return pastry.has_pastry_tag(token_name) or pastry.has_pastry_state(token_name)
 
 func _score_item_for_customer(item: ItemInstance, customer: CustomerInstance) -> Dictionary:
 	var result: Dictionary = {

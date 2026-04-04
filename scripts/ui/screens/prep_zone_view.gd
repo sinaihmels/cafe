@@ -12,26 +12,25 @@ signal prep_item_requested(item_index: int)
 
 func render(session_service: SessionService, interaction_state: EncounterInteractionState) -> void:
 	UiSceneUtils.clear_children(_grid)
-	_subtitle.text = "%d / %d items" % [session_service.cafe_state.prep_items.size(), session_service.cafe_state.prep_space_capacity]
-	_empty_label.visible = session_service.cafe_state.prep_items.is_empty()
+	_subtitle.text = "1 active pastry"
+	_empty_label.visible = session_service.cafe_state.active_pastry == null
 	_energy_value.text = str(session_service.player_state.energy)
-	for prep_index in range(session_service.cafe_state.prep_items.size()):
-		var prep_item: ItemInstance = session_service.cafe_state.prep_items[prep_index]
-		var interactable: bool = interaction_state.is_zone_targetable(&"prep", prep_index) or interaction_state.is_target_selected(&"prep", prep_index)
-		var selected: bool = interaction_state.is_target_selected(&"prep", prep_index)
-		var targetable: bool = interaction_state.is_zone_targetable(&"prep", prep_index)
+	if session_service.cafe_state.active_pastry != null:
+		var pastry: PastryInstance = session_service.cafe_state.active_pastry
+		var interactable: bool = interaction_state.is_zone_targetable(&"prep", 0) or interaction_state.is_target_selected(&"prep", 0)
+		var selected: bool = interaction_state.is_target_selected(&"prep", 0)
+		var targetable: bool = interaction_state.is_zone_targetable(&"prep", 0)
 		var card: ZoneItemCardView = _instantiate_item_card()
 		card.configure(
-			UiTextureLibrary.item_texture(prep_item.item_def),
-			prep_item.get_display_name(),
-			"Q%d | %s" % [prep_item.quality, UiTextFormatter.join_packed(prep_item.get_all_tags())],
+			UiTextureLibrary.pastry_texture(pastry),
+			pastry.get_display_name(),
+			UiTextFormatter.describe_pastry(pastry),
 			interactable,
 			selected,
 			targetable
 		)
-		var item_index: int = prep_index
 		card.action_requested.connect(func() -> void:
-			prep_item_requested.emit(item_index)
+			prep_item_requested.emit(0)
 		)
 		_grid.add_child(card)
 

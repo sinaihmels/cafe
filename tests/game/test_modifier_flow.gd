@@ -14,24 +14,18 @@ func _init() -> void:
 	session.deck_state.hand.clear()
 	session.deck_state.hand.append(session.content_library.build_card_instance(&"reward_cinnamon"))
 	session.deck_state.hand.append(session.content_library.build_card_instance(&"starter_bake"))
-	var dough_targets: Array[Dictionary] = [{
-		"zone": &"prep",
-		"index": 0,
-	}]
-	assert(session.cafe_state.prep_items.size() == 1, "The chosen dough should already be prepped at the start of the day.")
-	var valid_targets: Array[Dictionary] = session.get_valid_targets(session.deck_state.hand[0])
-	assert(valid_targets.size() == 1, "Cinnamon should have exactly one legal target when the day starts with one dough in prep.")
+	assert(session.cafe_state.active_pastry != null, "The chosen dough should seed an active pastry at the start of the day.")
 	var energy_before_play: int = session.player_state.energy
-	assert(session.play_card_from_hand(0, dough_targets, effect_queue), "Cinnamon should play successfully from hand onto the prepped dough.")
+	assert(session.play_card_from_hand(0, [], effect_queue), "Cinnamon Sugar should play successfully from hand onto the active pastry.")
 	assert(session.player_state.energy == energy_before_play - 1, "Playing Cinnamon should spend its energy cost.")
 	assert(session.deck_state.hand.size() == 1, "Played cards should leave the hand.")
-	assert(session.cafe_state.prep_items[0].has_tag(&"cinnamon"), "Cinnamon should modify the existing dough instead of spawning a loose ingredient.")
-	assert(session.play_card_from_hand(0, dough_targets, effect_queue), "Bake should play successfully on the modified dough.")
-	assert(session.cafe_state.oven_slots[0].item != null, "Baking should move the dough into the oven.")
-	assert(session.cafe_state.oven_slots[0].remaining_turns == 1, "Normal baking should take one full turn before the item is ready.")
-	assert(not session.cafe_state.oven_slots[0].item.has_tag(&"baked"), "Items should not be baked immediately when they enter the oven.")
+	assert(session.cafe_state.active_pastry.has_pastry_tag(&"sticky"), "Cinnamon Sugar should update the active pastry instead of spawning a loose ingredient.")
+	assert(session.play_card_from_hand(0, [], effect_queue), "Bake should play successfully on the modified pastry.")
+	assert(session.cafe_state.oven_pastry != null, "Baking should move the pastry into the oven.")
+	assert(session.cafe_state.oven_turns_remaining == 1, "Normal baking should take one full turn before the pastry is ready.")
+	assert(not session.cafe_state.oven_pastry.has_pastry_state(&"baked"), "Pastries should not be baked immediately when they enter the oven.")
 	session.advance_oven()
-	assert(session.cafe_state.oven_slots[0].item != null and session.cafe_state.oven_slots[0].item.has_tag(&"baked"), "Advancing the oven should finish the bake on the next turn.")
+	assert(session.cafe_state.oven_pastry != null and session.cafe_state.oven_pastry.has_pastry_state(&"baked"), "Advancing the oven should finish the bake on the next turn.")
 	assert(session.add_player_buff(&"second_wind_buff", &"test", &"second_wind"), "Should be able to add a temporary run buff.")
 	var base_energy: int = session.player_state.max_energy
 	session.begin_player_turn()

@@ -72,11 +72,21 @@ static func describe_customer_request(customer: CustomerInstance) -> String:
 	if customer.get_minimum_quality() > 0:
 		details.append("Q>=%d" % customer.get_minimum_quality())
 	if details.is_empty():
-		return "Request: any servable pastry"
+		return "Request: any plated pastry"
 	return "Request: %s" % join_strings(details)
 
 static func describe_item(item: ItemInstance) -> String:
 	return "%s | Q%d | %s" % [item.get_display_name(), item.quality, join_packed(item.get_all_tags())]
+
+static func describe_pastry(pastry: PastryInstance) -> String:
+	if pastry == null:
+		return "No pastry"
+	return "%s | Q%d | Tags: %s | States: %s" % [
+		pastry.get_display_name(),
+		pastry.quality,
+		join_packed(pastry.get_pastry_tags()),
+		join_packed(pastry.get_pastry_states()),
+	]
 
 static func join_strings(values: Array[String]) -> String:
 	var output: String = ""

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="CardDef" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_card"]
+[ext_resource type="Script" path="res://scripts/effects/change_all_customers_patience_effect.gd" id="2_patience"]
+[ext_resource type="Texture2D" path="res://assets/demo/cards/card_tell_joke.png" id="3_art"]
+
+[sub_resource type="Resource" id="Resource_mini_cookies"]
+script = ExtResource("2_patience")
+amount = 1
+
+[resource]
+script = ExtResource("1_card")
+card_id = &"starter_mini_cookies"
+display_name = "Mini Cookies"
+art = ExtResource("3_art")
+energy_cost = 0
+tags = PackedStringArray("interaction")
+targeting_rules = "none"
+effects = [SubResource("Resource_mini_cookies")]
+preview_text = "Give out mini cookies. Increase all customer patience by 1."

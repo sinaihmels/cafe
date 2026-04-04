@@ -191,7 +191,7 @@ func _handle_target_click(zone: StringName, index: int) -> void:
 	var card: CardInstance = _session_service.deck_state.hand[_pending_card_index]
 	if not _session_service.is_valid_target(card, zone, index):
 		return
-	if card.card_def != null and card.card_def.targeting_rules == "select_one_customer_and_one_table_item":
+	if card.card_def != null and card.card_def.targeting_rules == "select_one_customer_and_one_plated_pastry":
 		for pending_index in range(_pending_targets.size()):
 			var pending_zone: StringName = _pending_targets[pending_index].zone
 			if pending_zone == zone:
@@ -246,7 +246,7 @@ func _can_auto_resolve_targets(card: CardInstance, target_count: int, valid_targ
 		return false
 	if target_count == 1:
 		return valid_targets.size() == 1
-	if card.card_def.targeting_rules == "select_one_customer_and_one_table_item":
+	if card.card_def.targeting_rules == "select_one_customer_and_one_plated_pastry":
 		var has_customer_target: bool = false
 		var has_table_target: bool = false
 		for target in valid_targets:

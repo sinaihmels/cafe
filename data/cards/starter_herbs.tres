@@ -1,22 +1,20 @@
 [gd_resource type="Resource" script_class="CardDef" load_steps=4 format=3]
 
-[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_herbcard"]
-[ext_resource type="Script" path="res://scripts/effects/modify_item_effect.gd" id="2_herbeffect"]
+[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_card"]
+[ext_resource type="Script" path="res://scripts/effects/add_pastry_tags_effect.gd" id="2_tags"]
 [ext_resource type="Texture2D" path="res://assets/demo/cards/card_cinnamon_sugar.png" id="3_art"]
 
-[sub_resource type="Resource" id="Resource_herb"]
-script = ExtResource("2_herbeffect")
-effect_id = &"modify_item"
-required_source_tags = PackedStringArray("dough")
-added_tags = PackedStringArray("herbed")
+[sub_resource type="Resource" id="Resource_herbs"]
+script = ExtResource("2_tags")
+tags_to_add = PackedStringArray("savory", "pretty")
 
 [resource]
-script = ExtResource("1_herbcard")
+script = ExtResource("1_card")
 card_id = &"starter_herbs"
 display_name = "Herbs"
 art = ExtResource("3_art")
 energy_cost = 1
-tags = PackedStringArray("modifier", "savory", "fresh")
-targeting_rules = "select_one_prep_item"
-effects = [SubResource("Resource_herb")]
-preview_text = "Season a dough with herbs."
+tags = PackedStringArray("ingredient")
+targeting_rules = "none"
+effects = [SubResource("Resource_herbs")]
+preview_text = "Season the active pastry with herbs."

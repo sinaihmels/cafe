@@ -27,6 +27,11 @@ static func dough_texture(dough_def: DoughDef) -> Texture2D:
 		return dough_def.art
 	return DOUGH_PLACEHOLDER
 
+static func pastry_texture(pastry: PastryInstance) -> Texture2D:
+	if pastry != null and pastry.art != null:
+		return pastry.art
+	return DOUGH_PLACEHOLDER
+
 static func item_texture(item_def: ItemDef) -> Texture2D:
 	if item_def != null and item_def.art != null:
 		return item_def.art

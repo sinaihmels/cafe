@@ -1,20 +1,21 @@
 [gd_resource type="Resource" script_class="CardDef" load_steps=4 format=3]
 
-[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_pjgi4"]
-[ext_resource type="Script" path="res://scripts/effects/decorate_item_effect.gd" id="2_utlry"]
+[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_card"]
+[ext_resource type="Script" path="res://scripts/effects/add_pastry_states_effect.gd" id="2_states"]
 [ext_resource type="Texture2D" path="res://assets/demo/cards/base_card.png" id="3_art"]
 
-[sub_resource type="Resource" id="Resource_wkqpf"]
-script = ExtResource("2_utlry")
-effect_id = &"decorate_item"
+[sub_resource type="Resource" id="Resource_decorate"]
+script = ExtResource("2_states")
+states_to_add = PackedStringArray("decorated")
+quality_delta = 1
 
 [resource]
-script = ExtResource("1_pjgi4")
+script = ExtResource("1_card")
 card_id = &"starter_decorate"
 display_name = "Decorate"
 art = ExtResource("3_art")
-energy_cost = 1
-tags = PackedStringArray("action", "quality")
-targeting_rules = "select_one_baked_item"
-effects = [SubResource("Resource_wkqpf")]
-preview_text = "Upgrade a baked item and give it +1 quality."
+energy_cost = 2
+tags = PackedStringArray("process")
+targeting_rules = "select_one_plated_pastry"
+effects = [SubResource("Resource_decorate")]
+preview_text = "Decorate a plated pastry and give it +1 quality."

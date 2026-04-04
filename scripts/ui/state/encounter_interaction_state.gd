@@ -29,21 +29,13 @@ func is_zone_targetable(zone: StringName, index: int) -> bool:
 				return true
 		return false
 	match pending_rule:
-		"select_two_prep_items":
-			if zone != &"prep":
-				return false
-			return not selected_indices().has(index)
-		"select_one_prep_item", "select_one_proof_target":
-			return zone == &"prep"
-		"select_one_baked_item":
+		"select_one_plated_pastry":
 			return zone == &"table"
-		"select_one_customer_and_one_table_item":
+		"select_one_customer_and_one_plated_pastry":
 			for selected_target in selected_targets:
 				if selected_target.zone == zone:
 					return selected_target.index == index
 			return zone == &"customer" or zone == &"table"
-		"select_one_item", "select_one_bake_target":
-			return zone == &"prep" or zone == &"oven"
 		"select_one_customer":
 			return zone == &"customer"
 		_:
