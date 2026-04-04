@@ -24,7 +24,6 @@ const CARD_ART_MAP: Dictionary = {
 	&"reward_cinnamon": "card_cinnamon_sugar.png",
 	&"reward_flash_bake": "card_flash_bake.png",
 	&"starter_focus": "card_focus.png",
-	&"starter_mix": "card_mix.png",
 	&"starter_bake": "card_bake.png",
 	&"starter_second_wind": "card_coffee.png",
 	&"starter_cheese": "card_cream.png",
