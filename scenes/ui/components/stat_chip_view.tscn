@@ -1,0 +1,78 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/components/stat_chip_view.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_paper"]
+bg_color = Color(0.95, 0.89, 0.78, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.34, 0.23, 0.15, 0.96)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_accent"]
+bg_color = Color(0.82, 0.45, 0.27, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.83, 0.74, 0.98)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gold"]
+bg_color = Color(0.87, 0.7, 0.35, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.91, 0.72, 0.98)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_danger"]
+bg_color = Color(0.67, 0.29, 0.24, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.96, 0.75, 0.7, 0.98)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[node name="StatChipView" type="PanelContainer"]
+theme_override_styles/panel = SubResource("StyleBoxFlat_paper")
+script = ExtResource("1_script")
+paper_style = SubResource("StyleBoxFlat_paper")
+accent_style = SubResource("StyleBoxFlat_accent")
+gold_style = SubResource("StyleBoxFlat_gold")
+danger_style = SubResource("StyleBoxFlat_danger")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Body" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="Margin/Body"]
+layout_mode = 2
+text = "TITLE"
+
+[node name="ValueLabel" type="Label" parent="Margin/Body"]
+layout_mode = 2
+text = "0"

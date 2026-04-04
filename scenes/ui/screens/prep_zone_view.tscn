@@ -1,0 +1,91 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/screens/prep_zone_view.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/zone_item_card_view.tscn" id="2_item_card"]
+
+[node name="PrepView" type="PanelContainer"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_script")
+item_card_scene = ExtResource("2_item_card")
+
+[node name="PrepMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="PrepBody" type="VBoxContainer" parent="PrepMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PrepTitle" type="Label" parent="PrepMargin/PrepBody"]
+layout_mode = 2
+text = "Prep"
+
+[node name="PrepSubtitle" type="Label" parent="PrepMargin/PrepBody"]
+layout_mode = 2
+text = "0 / 0 items"
+
+[node name="PrepArea" type="Control" parent="PrepMargin/PrepBody"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="PrepGrid" type="GridContainer" parent="PrepMargin/PrepBody/PrepArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -88.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 3
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+
+[node name="PrepEmptyLabel" type="Label" parent="PrepMargin/PrepBody/PrepArea"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -80.0
+offset_top = -12.0
+offset_right = 80.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Prep is empty."
+
+[node name="PrepEnergyCoin" type="PanelContainer" parent="PrepMargin/PrepBody/PrepArea"]
+layout_mode = 1
+anchors_preset = 3
+anchor_top = 1.0
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -88.0
+offset_right = 88.0
+offset_bottom = -16.0
+grow_vertical = 0
+
+[node name="PrepEnergyMargin" type="MarginContainer" parent="PrepMargin/PrepBody/PrepArea/PrepEnergyCoin"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="PrepEnergyBody" type="VBoxContainer" parent="PrepMargin/PrepBody/PrepArea/PrepEnergyCoin/PrepEnergyMargin"]
+layout_mode = 2
+
+[node name="PrepEnergyLabel" type="Label" parent="PrepMargin/PrepBody/PrepArea/PrepEnergyCoin/PrepEnergyMargin/PrepEnergyBody"]
+layout_mode = 2
+text = "Mana"
+
+[node name="PrepEnergyValue" type="Label" parent="PrepMargin/PrepBody/PrepArea/PrepEnergyCoin/PrepEnergyMargin/PrepEnergyBody"]
+layout_mode = 2
+text = "0"

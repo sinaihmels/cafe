@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="EquipmentDef" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="EquipmentDef" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/progression/equipment_def.gd" id="1_displayeq"]
+[ext_resource type="Texture2D" path="res://assets/demo/cards/base_card.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_displayeq")
 equipment_id = &"display_case"
 display_name = "Display Case"
+icon = ExtResource("2_icon")
 description = "Installed cafe equipment. Happy customers leave better tips."
 cost = 7
 passive_modifier_ids = PackedStringArray("display_case_buff")

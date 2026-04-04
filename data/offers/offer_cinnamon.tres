@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="CardOfferDef" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="CardOfferDef" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/progression/card_offer_def.gd" id="1_offercinnamon"]
+[ext_resource type="Texture2D" path="res://assets/demo/cards/card_cinnamon_sugar.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_offercinnamon")
 offer_id = &"offer_cinnamon"
 display_name = "Cinnamon"
+icon = ExtResource("2_icon")
 description = "Buy Cinnamon for this run."
 offer_type = 0
 payload_id = &"reward_cinnamon"

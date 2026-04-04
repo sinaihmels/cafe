@@ -62,7 +62,6 @@ Examples:
 - `godot --headless --script res://tests/game/test_run_flow.gd`
 - `godot --headless --script res://tests/game/test_modifier_flow.gd`
 
-A `godot` executable was not available on PATH in this session, so the tests were added but not executed here.
 
 ## Design Docs
 

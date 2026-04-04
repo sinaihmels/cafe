@@ -1,0 +1,83 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/screens/customer_focus_view.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/stat_chip_view.tscn" id="2_chip"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/customer_selector_view.tscn" id="3_selector"]
+[ext_resource type="Texture2D" path="res://assets/demo/customers/customer_placeholder.png" id="4_placeholder"]
+
+[node name="CustomerView" type="PanelContainer"]
+custom_minimum_size = Vector2(364, 0)
+script = ExtResource("1_script")
+stat_chip_scene = ExtResource("2_chip")
+selector_scene = ExtResource("3_selector")
+fallback_portrait = ExtResource("4_placeholder")
+
+[node name="CustomerMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="CustomerBody" type="VBoxContainer" parent="CustomerMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CustomerTitle" type="Label" parent="CustomerMargin/CustomerBody"]
+layout_mode = 2
+text = "Customer"
+
+[node name="CustomerEmptyLabel" type="Label" parent="CustomerMargin/CustomerBody"]
+layout_mode = 2
+text = "No active customers."
+
+[node name="CustomerHeroRow" type="HBoxContainer" parent="CustomerMargin/CustomerBody"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PortraitShell" type="PanelContainer" parent="CustomerMargin/CustomerBody/CustomerHeroRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(130, 130)
+
+[node name="PortraitMargin" type="MarginContainer" parent="CustomerMargin/CustomerBody/CustomerHeroRow/PortraitShell"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="PortraitBody" type="VBoxContainer" parent="CustomerMargin/CustomerBody/CustomerHeroRow/PortraitShell/PortraitMargin"]
+layout_mode = 2
+
+[node name="CustomerPortrait" type="TextureRect" parent="CustomerMargin/CustomerBody/CustomerHeroRow/PortraitShell/PortraitMargin/PortraitBody"]
+layout_mode = 2
+custom_minimum_size = Vector2(98, 98)
+expand_mode = 1
+stretch_mode = 5
+texture = ExtResource("4_placeholder")
+
+[node name="CustomerInfo" type="VBoxContainer" parent="CustomerMargin/CustomerBody/CustomerHeroRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="CustomerNameLabel" type="Label" parent="CustomerMargin/CustomerBody/CustomerHeroRow/CustomerInfo"]
+layout_mode = 2
+text = "Customer"
+
+[node name="CustomerPatienceSlot" type="VBoxContainer" parent="CustomerMargin/CustomerBody/CustomerHeroRow/CustomerInfo"]
+layout_mode = 2
+
+[node name="CustomerRequestLabel" type="Label" parent="CustomerMargin/CustomerBody/CustomerHeroRow/CustomerInfo"]
+layout_mode = 2
+autowrap_mode = 3
+text = "Request"
+
+[node name="SelectCustomerButton" type="Button" parent="CustomerMargin/CustomerBody"]
+layout_mode = 2
+text = "Select Customer"
+
+[node name="CustomerSelectors" type="HFlowContainer" parent="CustomerMargin/CustomerBody"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8

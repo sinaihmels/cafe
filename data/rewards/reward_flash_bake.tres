@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="RewardDef" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="RewardDef" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/progression/reward_def.gd" id="1_rewardflash"]
+[ext_resource type="Texture2D" path="res://assets/demo/cards/card_flash_bake.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_rewardflash")
 reward_id = &"reward_flash_bake"
 display_name = "Flash Bake"
+icon = ExtResource("2_icon")
 description = "Add Flash Bake to this run's deck."
 reward_type = 0
 payload_id = &"reward_flash_bake"

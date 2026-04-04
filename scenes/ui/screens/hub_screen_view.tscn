@@ -1,0 +1,62 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/screens/hub_screen_view.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/choice_entry_view.tscn" id="2_choice_entry"]
+
+[node name="HubScreenView" type="VBoxContainer"]
+theme_override_constants/separation = 12
+script = ExtResource("1_script")
+choice_entry_scene = ExtResource("2_choice_entry")
+
+[node name="HubSectionLabel" type="Label" parent="."]
+layout_mode = 2
+text = "Cafe Management"
+
+[node name="HubIntroLabel" type="Label" parent="."]
+layout_mode = 2
+autowrap_mode = 3
+text = "Permanent upgrades and decorations live here. Run-only cards and buffs stay inside the run."
+
+[node name="StartRunButton" type="Button" parent="."]
+layout_mode = 2
+text = "Start New Run"
+
+[node name="DecorateButton" type="Button" parent="."]
+layout_mode = 2
+text = "Decorate Cafe"
+
+[node name="HubResetButton" type="Button" parent="."]
+layout_mode = 2
+text = "Reset Profile"
+
+[node name="EquipmentSectionLabel" type="Label" parent="."]
+layout_mode = 2
+text = "Equipment"
+
+[node name="EquipmentList" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="UpgradesSectionLabel" type="Label" parent="."]
+layout_mode = 2
+text = "Permanent Shop Upgrades"
+
+[node name="UpgradeList" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DecorationsSectionLabel" type="Label" parent="."]
+layout_mode = 2
+text = "Decorations"
+
+[node name="DecorationShopList" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CurrentLayoutSectionLabel" type="Label" parent="."]
+layout_mode = 2
+text = "Current Layout"
+
+[node name="CurrentLayoutList" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8

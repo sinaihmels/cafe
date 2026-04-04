@@ -3,6 +3,7 @@ extends Resource
 
 @export var upgrade_id: StringName = &""
 @export var display_name: String = ""
+@export var icon: Texture2D
 @export_multiline var description: String = ""
 @export var cost: int = 0
 @export var passive_modifier_ids: PackedStringArray = []

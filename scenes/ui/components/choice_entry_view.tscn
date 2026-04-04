@@ -1,0 +1,105 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/components/choice_entry_view.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/demo/cards/base_card.png" id="2_placeholder"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.95, 0.89, 0.78, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.34, 0.23, 0.15, 0.96)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0.2, 0.13, 0.08, 0.88)
+shadow_size = 6
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button"]
+bg_color = Color(0.98, 0.84, 0.72, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.34, 0.23, 0.15, 0.96)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_disabled"]
+bg_color = Color(0.84, 0.8, 0.74, 0.6)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.54, 0.49, 0.43, 0.55)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[node name="ChoiceEntryView" type="PanelContainer"]
+custom_minimum_size = Vector2(0, 220)
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+script = ExtResource("1_script")
+placeholder_texture = ExtResource("2_placeholder")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Body" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Icon" type="TextureRect" parent="Margin/Body"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 92)
+expand_mode = 1
+stretch_mode = 5
+texture = ExtResource("2_placeholder")
+
+[node name="TitleLabel" type="Label" parent="Margin/Body"]
+layout_mode = 2
+text = "Title"
+
+[node name="DescriptionLabel" type="Label" parent="Margin/Body"]
+layout_mode = 2
+autowrap_mode = 3
+text = "Description"
+
+[node name="StatusLabel" type="Label" parent="Margin/Body"]
+visible = false
+layout_mode = 2
+autowrap_mode = 3
+text = "Status"
+
+[node name="ActionsRow" type="HBoxContainer" parent="Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PrimaryButton" type="Button" parent="Margin/Body/ActionsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_button_disabled")
+text = "Primary"
+
+[node name="SecondaryButton" type="Button" parent="Margin/Body/ActionsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_button_disabled")
+text = "Secondary"

@@ -1,0 +1,135 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/screens/encounter_screen_view.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_hud_view.tscn" id="2_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_prompt_view.tscn" id="3_prompt"]
+[ext_resource type="PackedScene" path="res://scenes/ui/screens/customer_focus_view.tscn" id="4_customer"]
+[ext_resource type="PackedScene" path="res://scenes/ui/screens/prep_zone_view.tscn" id="5_prep"]
+[ext_resource type="PackedScene" path="res://scenes/ui/screens/oven_zone_view.tscn" id="6_oven"]
+[ext_resource type="PackedScene" path="res://scenes/ui/screens/table_zone_view.tscn" id="7_table"]
+[ext_resource type="PackedScene" path="res://scenes/ui/screens/hand_fan_view.tscn" id="8_hand"]
+
+[node name="EncounterScreenView" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="EncounterRoot" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 14
+
+[node name="HeaderRow" type="HBoxContainer" parent="EncounterRoot"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 170)
+theme_override_constants/separation = 14
+
+[node name="HudView" parent="EncounterRoot/HeaderRow" instance=ExtResource("2_hud")]
+
+[node name="PromptView" parent="EncounterRoot/HeaderRow" instance=ExtResource("3_prompt")]
+size_flags_horizontal = 3
+
+[node name="CustomerView" parent="EncounterRoot/HeaderRow" instance=ExtResource("4_customer")]
+
+[node name="BoardArea" type="Control" parent="EncounterRoot"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ZonesRow" type="HBoxContainer" parent="EncounterRoot/BoardArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -68.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 14
+
+[node name="PrepView" parent="EncounterRoot/BoardArea/ZonesRow" instance=ExtResource("5_prep")]
+
+[node name="OvenView" parent="EncounterRoot/BoardArea/ZonesRow" instance=ExtResource("6_oven")]
+
+[node name="TableView" parent="EncounterRoot/BoardArea/ZonesRow" instance=ExtResource("7_table")]
+
+[node name="DeckPile" type="PanelContainer" parent="EncounterRoot/BoardArea"]
+layout_mode = 1
+anchors_preset = 1
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -136.0
+offset_right = 106.0
+offset_bottom = -16.0
+
+[node name="DeckPileMargin" type="MarginContainer" parent="EncounterRoot/BoardArea/DeckPile"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="DeckPileBody" type="VBoxContainer" parent="EncounterRoot/BoardArea/DeckPile/DeckPileMargin"]
+layout_mode = 2
+
+[node name="DeckPileTitle" type="Label" parent="EncounterRoot/BoardArea/DeckPile/DeckPileMargin/DeckPileBody"]
+layout_mode = 2
+text = "Deck"
+
+[node name="DeckPileCount" type="Label" parent="EncounterRoot/BoardArea/DeckPile/DeckPileMargin/DeckPileBody"]
+layout_mode = 2
+text = "0"
+
+[node name="DiscardPile" type="PanelContainer" parent="EncounterRoot/BoardArea"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -106.0
+offset_top = -136.0
+offset_right = -12.0
+offset_bottom = -16.0
+
+[node name="DiscardPileMargin" type="MarginContainer" parent="EncounterRoot/BoardArea/DiscardPile"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="DiscardPileBody" type="VBoxContainer" parent="EncounterRoot/BoardArea/DiscardPile/DiscardPileMargin"]
+layout_mode = 2
+
+[node name="DiscardPileTitle" type="Label" parent="EncounterRoot/BoardArea/DiscardPile/DiscardPileMargin/DiscardPileBody"]
+layout_mode = 2
+text = "Discard"
+
+[node name="DiscardPileCount" type="Label" parent="EncounterRoot/BoardArea/DiscardPile/DiscardPileMargin/DiscardPileBody"]
+layout_mode = 2
+text = "0"
+
+[node name="HandShell" type="Control" parent="EncounterRoot"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 232)
+size_flags_horizontal = 3
+
+[node name="HandFanView" parent="EncounterRoot/HandShell" instance=ExtResource("8_hand")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = 6.0
+offset_right = -18.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2

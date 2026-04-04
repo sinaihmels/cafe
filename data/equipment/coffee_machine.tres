@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="EquipmentDef" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="EquipmentDef" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/progression/equipment_def.gd" id="1_coffeeeq"]
+[ext_resource type="Texture2D" path="res://assets/demo/cards/card_coffee.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_coffeeeq")
 equipment_id = &"coffee_machine"
 display_name = "Coffee Machine"
+icon = ExtResource("2_icon")
 description = "Installed cafe equipment. Start each turn with a little extra momentum."
 cost = 5
 passive_modifier_ids = PackedStringArray("barista_rhythm_buff")

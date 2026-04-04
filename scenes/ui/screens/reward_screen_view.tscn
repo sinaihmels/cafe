@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/screens/reward_screen_view.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/choice_entry_view.tscn" id="2_choice_entry"]
+
+[node name="RewardScreenView" type="VBoxContainer"]
+theme_override_constants/separation = 12
+script = ExtResource("1_script")
+choice_entry_scene = ExtResource("2_choice_entry")
+
+[node name="RewardList" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 12

@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/screens/decoration_screen_view.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/decoration_slot_view.tscn" id="2_slot"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/choice_entry_view.tscn" id="3_choice_entry"]
+
+[node name="DecorationScreenView" type="VBoxContainer"]
+theme_override_constants/separation = 12
+script = ExtResource("1_script")
+decoration_slot_scene = ExtResource("2_slot")
+choice_entry_scene = ExtResource("3_choice_entry")
+
+[node name="BackToHubButton" type="Button" parent="."]
+layout_mode = 2
+text = "Back To Hub"
+
+[node name="DecorationSlots" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 12

@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="ShopUpgradeDef" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ShopUpgradeDef" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/progression/shop_upgrade_def.gd" id="1_prepup"]
+[ext_resource type="Texture2D" path="res://assets/demo/cards/card_mix.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_prepup")
 upgrade_id = &"prep_counter_upgrade"
 display_name = "Prep Counter Upgrade"
+icon = ExtResource("2_icon")
 description = "Permanent cafe upgrade. Future runs begin with more prep space."
 cost = 6
 passive_modifier_ids = PackedStringArray("prep_station_buff")

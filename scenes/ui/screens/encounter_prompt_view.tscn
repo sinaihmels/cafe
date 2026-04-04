@@ -1,0 +1,61 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/screens/encounter_prompt_view.gd" id="1_script"]
+
+[node name="PromptView" type="PanelContainer"]
+size_flags_horizontal = 3
+script = ExtResource("1_script")
+
+[node name="CenterMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="CenterBody" type="VBoxContainer" parent="CenterMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CenterHeader" type="HBoxContainer" parent="CenterMargin/CenterBody"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="CenterTitleCol" type="VBoxContainer" parent="CenterMargin/CenterBody/CenterHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="CenterTitle" type="Label" parent="CenterMargin/CenterBody/CenterHeader/CenterTitleCol"]
+layout_mode = 2
+text = "Kitchen Rush"
+
+[node name="CenterSubtitle" type="Label" parent="CenterMargin/CenterBody/CenterHeader/CenterTitleCol"]
+layout_mode = 2
+autowrap_mode = 3
+text = "Prep the dough, bake it, collect it, and serve before patience runs out."
+
+[node name="EndTurnButton" type="Button" parent="CenterMargin/CenterBody/CenterHeader"]
+layout_mode = 2
+custom_minimum_size = Vector2(148, 52)
+text = "End Turn"
+
+[node name="PromptPanel" type="PanelContainer" parent="CenterMargin/CenterBody"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PromptMargin" type="MarginContainer" parent="CenterMargin/CenterBody/PromptPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="PromptBody" type="VBoxContainer" parent="CenterMargin/CenterBody/PromptPanel/PromptMargin"]
+layout_mode = 2
+
+[node name="PromptLabel" type="Label" parent="CenterMargin/CenterBody/PromptPanel/PromptMargin/PromptBody"]
+layout_mode = 2
+autowrap_mode = 3
+text = "Choose a card below, then click the required spaces on the board."

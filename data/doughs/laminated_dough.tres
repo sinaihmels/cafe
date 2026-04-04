@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DoughDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/progression/dough_def.gd" id="1_laminateddough"]
+[ext_resource type="Texture2D" path="res://assets/demo/doughs/dough_placeholder.png" id="2_art"]
+
+[resource]
+script = ExtResource("1_laminateddough")
+dough_id = &"laminated_dough"
+prep_item_id = &"laminated_dough"
+display_name = "Laminated Dough"
+art = ExtResource("2_art")
+description = "Prep a layered dough in the morning, fold it during service, proof it in the oven, then bake it into something flaky."
+starting_deck_ids = PackedStringArray("starter_fold", "starter_fold", "starter_proof", "starter_proof", "starter_bake", "starter_bake", "starter_serve", "starter_serve", "starter_decorate", "starter_decorate")
+passive_modifier_ids = PackedStringArray()
+unlocked_by_default = true

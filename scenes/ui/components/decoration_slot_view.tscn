@@ -1,0 +1,54 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/components/decoration_slot_view.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.95, 0.89, 0.78, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.34, 0.23, 0.15, 0.96)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0.2, 0.13, 0.08, 0.88)
+shadow_size = 6
+shadow_offset = Vector2(0, 2)
+
+[node name="DecorationSlotView" type="PanelContainer"]
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+script = ExtResource("1_script")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Body" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderRow" type="HBoxContainer" parent="Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="Margin/Body/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Wall"
+
+[node name="ClearButton" type="Button" parent="Margin/Body/HeaderRow"]
+layout_mode = 2
+text = "Clear Slot"
+
+[node name="CurrentLabel" type="Label" parent="Margin/Body"]
+layout_mode = 2
+text = "Current: Empty"
+
+[node name="OptionsContainer" type="VBoxContainer" parent="Margin/Body"]
+layout_mode = 2
+theme_override_constants/separation = 10

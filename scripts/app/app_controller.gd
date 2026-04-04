@@ -14,7 +14,7 @@ extends Node
 @onready var _app_view: AppView = get_node(app_view_path)
 
 var _pending_card_index: int = -1
-var _pending_targets: Array[Dictionary] = []
+var _pending_targets: Array[EncounterTargetRef] = []
 var _focused_customer_index: int = 0
 
 func _ready() -> void:
@@ -23,6 +23,9 @@ func _ready() -> void:
 	_effect_queue.resolution_finished.connect(_on_resolution_finished)
 	_connect_view()
 	_session_service.initialize(_meta_profile_service, _event_bus)
+	# AppView is a sibling scene, so its @onready node bindings are only valid after its own ready signal.
+	if not _app_view.is_node_ready():
+		await _app_view.ready
 	_refresh_view()
 
 func _connect_view() -> void:
@@ -136,10 +139,14 @@ func _on_play_card_requested(card_index: int) -> void:
 		return
 	var target_count: int = _session_service.get_required_target_count(card)
 	if target_count == 0:
-		var no_targets: Array[Dictionary] = []
+		var no_targets: Array[EncounterTargetRef] = []
 		_resolve_card_play(card_index, no_targets)
 		return
-	var valid_targets: Array[Dictionary] = _session_service.get_valid_targets(card)
+	var valid_targets: Array[EncounterTargetRef] = _valid_targets_for_card(card)
+	if valid_targets.is_empty():
+		_session_service.notify_no_valid_targets_for_card(card)
+		_refresh_view()
+		return
 	if _can_auto_resolve_targets(card, target_count, valid_targets):
 		_resolve_card_play(card_index, valid_targets)
 		return
@@ -186,71 +193,55 @@ func _handle_target_click(zone: StringName, index: int) -> void:
 		return
 	if card.card_def != null and card.card_def.targeting_rules == "select_one_customer_and_one_table_item":
 		for pending_index in range(_pending_targets.size()):
-			var pending_zone: StringName = StringName(_pending_targets[pending_index].get("zone", ""))
+			var pending_zone: StringName = _pending_targets[pending_index].zone
 			if pending_zone == zone:
-				var replacement_target: Dictionary = {
-					"zone": zone,
-					"index": index,
-				}
-				_pending_targets[pending_index] = replacement_target
+				_pending_targets[pending_index] = EncounterTargetRef.new(zone, index)
 				_refresh_view()
 				return
-	_pending_targets.append({
-		"zone": zone,
-		"index": index,
-	})
+	_pending_targets.append(EncounterTargetRef.new(zone, index))
 	if _pending_targets.size() >= _session_service.get_required_target_count(card):
-		var resolved_targets: Array[Dictionary] = []
+		var resolved_targets: Array[EncounterTargetRef] = []
 		for pending_target in _pending_targets:
-			var copied_target: Dictionary = pending_target.duplicate(true)
-			resolved_targets.append(copied_target)
+			resolved_targets.append(pending_target.duplicate_ref())
 		_resolve_card_play(_pending_card_index, resolved_targets)
 	else:
 		_refresh_view()
 
-func _resolve_card_play(card_index: int, targets: Array[Dictionary]) -> void:
+func _resolve_card_play(card_index: int, targets: Array[EncounterTargetRef]) -> void:
 	_clear_pending_selection()
-	_session_service.play_card_from_hand(card_index, targets, _effect_queue)
+	# SessionService still uses raw target dictionaries, so the controller is the typed boundary.
+	var raw_targets: Array[Dictionary] = []
+	for target in targets:
+		raw_targets.append(target.to_dictionary())
+	_session_service.play_card_from_hand(card_index, raw_targets, _effect_queue)
 	_refresh_view()
 
-func _build_interaction_state() -> Dictionary:
-	var pending_rule: String = ""
-	var pending_prompt: String = ""
-	var focused_customer_index: int = -1
+func _build_interaction_state() -> EncounterInteractionState:
+	var state: EncounterInteractionState = EncounterInteractionState.new()
 	if _pending_card_index != -1 and _pending_card_index < _session_service.deck_state.hand.size():
 		var pending_card: CardInstance = _session_service.deck_state.hand[_pending_card_index]
-		pending_rule = pending_card.card_def.targeting_rules
-		pending_prompt = _session_service.get_target_prompt(pending_card)
+		if pending_card != null and pending_card.card_def != null:
+			state.pending_card_index = _pending_card_index
+			state.pending_rule = pending_card.card_def.targeting_rules
+			state.pending_prompt = _session_service.get_target_prompt(pending_card)
+			state.valid_targets = _valid_targets_for_card(pending_card)
 	if not _session_service.combat_state.active_customers.is_empty():
 		_focused_customer_index = clampi(_focused_customer_index, 0, _session_service.combat_state.active_customers.size() - 1)
-		focused_customer_index = _focused_customer_index
-	return {
-		"pending_card_index": _pending_card_index,
-		"pending_rule": pending_rule,
-		"pending_prompt": pending_prompt,
-		"focused_customer_index": focused_customer_index,
-		"selected_indices": _selected_target_indices(),
-		"selected_targets": _selected_targets_copy(),
-	}
+		state.focused_customer_index = _focused_customer_index
+	state.selected_targets = _selected_targets_copy()
+	return state
 
-func _selected_target_indices() -> PackedInt32Array:
-	var indices: PackedInt32Array = PackedInt32Array()
+func _selected_targets_copy() -> Array[EncounterTargetRef]:
+	var copied_targets: Array[EncounterTargetRef] = []
 	for target in _pending_targets:
-		indices.append(int(target.get("index", -1)))
-	return indices
-
-func _selected_targets_copy() -> Array[Dictionary]:
-	var copied_targets: Array[Dictionary] = []
-	for target in _pending_targets:
-		var copied_target: Dictionary = target.duplicate(true)
-		copied_targets.append(copied_target)
+		copied_targets.append(target.duplicate_ref())
 	return copied_targets
 
 func _clear_pending_selection() -> void:
 	_pending_card_index = -1
 	_pending_targets.clear()
 
-func _can_auto_resolve_targets(card: CardInstance, target_count: int, valid_targets: Array[Dictionary]) -> bool:
+func _can_auto_resolve_targets(card: CardInstance, target_count: int, valid_targets: Array[EncounterTargetRef]) -> bool:
 	if card == null or card.card_def == null:
 		return false
 	if target_count == 1:
@@ -259,7 +250,7 @@ func _can_auto_resolve_targets(card: CardInstance, target_count: int, valid_targ
 		var has_customer_target: bool = false
 		var has_table_target: bool = false
 		for target in valid_targets:
-			var zone: StringName = StringName(target.get("zone", ""))
+			var zone: StringName = target.zone
 			if zone == &"customer":
 				if has_customer_target:
 					return false
@@ -270,6 +261,13 @@ func _can_auto_resolve_targets(card: CardInstance, target_count: int, valid_targ
 				has_table_target = true
 		return has_customer_target and has_table_target
 	return false
+
+func _valid_targets_for_card(card: CardInstance) -> Array[EncounterTargetRef]:
+	var valid_targets: Array[EncounterTargetRef] = []
+	for target_value in _session_service.get_valid_targets(card):
+		var valid_target: Dictionary = target_value
+		valid_targets.append(EncounterTargetRef.from_dictionary(valid_target.duplicate(true)))
+	return valid_targets
 
 func _on_resolution_started() -> void:
 	_session_service.combat_state.turn_state = GameEnums.TurnState.RESOLVING_EFFECTS

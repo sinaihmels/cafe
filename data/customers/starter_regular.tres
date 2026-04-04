@@ -1,15 +1,17 @@
-[gd_resource type="Resource" script_class="CustomerDef" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="CustomerDef" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/entities/customer_def.gd" id="1_regular"]
+[ext_resource type="Texture2D" path="res://assets/demo/customers/customer_regular_guest.png" id="2_portrait"]
 
 [resource]
 script = ExtResource("1_regular")
 customer_id = &"starter_regular"
 display_name = "Morning Regular"
+portrait = ExtResource("2_portrait")
 order_id = &"plain_scone"
-preferences = PackedStringArray("sweet")
-required_tags = PackedStringArray("sweet")
-bonus_tags = PackedStringArray("warm")
+preferences = PackedStringArray()
+required_tags = PackedStringArray()
+bonus_tags = PackedStringArray("warm", "sweet", "savory")
 forbidden_tags = PackedStringArray("failed")
 minimum_quality = 0
 base_reputation = 1

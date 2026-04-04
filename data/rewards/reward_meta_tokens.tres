@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="RewardDef" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="RewardDef" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/progression/reward_def.gd" id="1_rewardmeta"]
+[ext_resource type="Texture2D" path="res://assets/demo/cards/base_card.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_rewardmeta")
 reward_id = &"reward_meta_tokens"
 display_name = "Cafe Tokens"
+icon = ExtResource("2_icon")
 description = "Earn 3 permanent cafe tokens."
 reward_type = 3
 payload_id = &""

@@ -3,12 +3,22 @@ extends RefCounted
 
 const DOUGH_PATHS: Array[String] = [
 	"res://data/doughs/sweet_dough.tres",
+	"res://data/doughs/savory_dough.tres",
+	"res://data/doughs/laminated_dough.tres",
+	"res://data/doughs/sourdough.tres",
 ]
 
 const CARD_PATHS: Array[String] = [
 	"res://data/cards/starter_bake.tres",
 	"res://data/cards/starter_serve.tres",
 	"res://data/cards/starter_decorate.tres",
+	"res://data/cards/starter_focus.tres",
+	"res://data/cards/starter_second_wind.tres",
+	"res://data/cards/starter_cheese.tres",
+	"res://data/cards/starter_herbs.tres",
+	"res://data/cards/starter_fold.tres",
+	"res://data/cards/starter_culture.tres",
+	"res://data/cards/starter_proof.tres",
 	"res://data/cards/reward_chocolate.tres",
 	"res://data/cards/reward_cinnamon.tres",
 	"res://data/cards/reward_flash_bake.tres",
@@ -31,9 +41,15 @@ const ITEM_PATHS: Array[String] = [
 	"res://data/ingredients/cream.tres",
 	"res://data/ingredients/dough.tres",
 	"res://data/ingredients/sweet_dough.tres",
+	"res://data/ingredients/savory_dough.tres",
+	"res://data/ingredients/laminated_dough.tres",
+	"res://data/ingredients/sourdough.tres",
 	"res://data/ingredients/chocolate_dough.tres",
 	"res://data/ingredients/pastry.tres",
 	"res://data/ingredients/sweet_pastry.tres",
+	"res://data/ingredients/savory_pastry.tres",
+	"res://data/ingredients/laminated_pastry.tres",
+	"res://data/ingredients/sourdough_loaf.tres",
 	"res://data/ingredients/chocolate_pastry.tres",
 	"res://data/ingredients/decorated_pastry.tres",
 	"res://data/ingredients/perfect_sweet_pastry.tres",
@@ -46,9 +62,15 @@ const RECIPE_PATHS: Array[String] = [
 	"res://data/recipes/dough_chocolate_to_chocolate_dough.tres",
 	"res://data/recipes/bake_dough_to_pastry.tres",
 	"res://data/recipes/bake_sweet_dough_to_sweet_pastry.tres",
+	"res://data/recipes/bake_savory_dough_to_savory_pastry.tres",
+	"res://data/recipes/bake_laminated_dough_to_laminated_pastry.tres",
+	"res://data/recipes/bake_sourdough_to_sourdough_loaf.tres",
 	"res://data/recipes/bake_chocolate_dough_to_chocolate_pastry.tres",
 	"res://data/recipes/decorate_pastry_to_decorated_pastry.tres",
 	"res://data/recipes/decorate_sweet_pastry_to_perfect_sweet_pastry.tres",
+	"res://data/recipes/decorate_savory_pastry.tres",
+	"res://data/recipes/decorate_laminated_pastry.tres",
+	"res://data/recipes/decorate_sourdough_loaf.tres",
 ]
 
 const EQUIPMENT_PATHS: Array[String] = [

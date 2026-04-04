@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="RecipeDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/recipe_def.gd" id="1_sourdoughrecipe"]
+
+[resource]
+script = ExtResource("1_sourdoughrecipe")
+recipe_id = &"bake_sourdough_to_sourdough_loaf"
+input_item_ids = PackedStringArray("sourdough")
+output_item_id = &"sourdough_loaf"
+station = &"oven"
+added_tags = PackedStringArray("baked", "sourdough", "tangy")

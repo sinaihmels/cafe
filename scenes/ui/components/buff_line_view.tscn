@@ -1,0 +1,5 @@
+[gd_scene format=3]
+
+[node name="BuffLineView" type="Label"]
+autowrap_mode = 3
+text = "Buff"

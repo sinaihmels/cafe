@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="CardDef" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="CardDef" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_amvjr"]
 [ext_resource type="Script" path="res://scripts/effects/draw_cards_effect.gd" id="2_yl8i2"]
+[ext_resource type="Texture2D" path="res://assets/demo/cards/card_focus.png" id="3_art"]
 
 [sub_resource type="Resource" id="Resource_1x2aq"]
 script = ExtResource("2_yl8i2")
@@ -12,6 +13,7 @@ amount = 1
 script = ExtResource("1_amvjr")
 card_id = &"starter_focus"
 display_name = "Focus"
+art = ExtResource("3_art")
 energy_cost = 1
 tags = PackedStringArray("action", "planning")
 targeting_rules = "none"

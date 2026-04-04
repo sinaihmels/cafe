@@ -12,8 +12,8 @@ func _init() -> void:
 	var chocolate_pastry: ItemInstance = session.create_item_instance(&"chocolate_pastry")
 	assert(chocolate_pastry != null, "Chocolate pastry item should load.")
 	var sweet_outcome: Dictionary = session._score_item_for_customer(chocolate_pastry, sweet_customer)
-	assert(int(sweet_outcome.get("reputation_delta", 0)) == 2, "Sweet Tooth should score chocolate as a matching bonus tag.")
-	assert(int(sweet_outcome.get("tips", 0)) == 3, "Sweet Tooth should pay base reward plus one chocolate-tag bonus.")
+	assert(int(sweet_outcome.get("reputation_delta", 0)) == 3, "Sweet Tooth should reward both the sweet base and the chocolate bonus tag.")
+	assert(int(sweet_outcome.get("tips", 0)) == 4, "Sweet Tooth should pay base reward plus the sweet and chocolate bonus tags.")
 
 	var quality_customer: CustomerInstance = CustomerInstance.new()
 	quality_customer.reset_from_def(session.content_library.get_customer(&"quality_customer"))

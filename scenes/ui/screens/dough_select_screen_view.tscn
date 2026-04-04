@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://bf80id8fspyi7"]
+
+[ext_resource type="Script" uid="uid://b04xmwnrxedn" path="res://scripts/ui/screens/dough_select_screen_view.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/choice_entry_view.tscn" id="2_choice_entry"]
+
+[node name="DoughSelectScreenView" type="VBoxContainer" unique_id=1479176372]
+theme_override_constants/separation = 12
+script = ExtResource("1_script")
+choice_entry_scene = ExtResource("2_choice_entry")
+
+[node name="DoughIntroLabel" type="Label" parent="." unique_id=1076714035]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+text = "Choose the dough."
+autowrap_mode = 3
+
+[node name="DoughList" type="VBoxContainer" parent="." unique_id=722314422]
+layout_mode = 2
+theme_override_constants/separation = 12

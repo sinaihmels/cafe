@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/screens/title_screen_view.gd" id="1_script"]
+
+[node name="TitleScreenView" type="VBoxContainer"]
+theme_override_constants/separation = 12
+script = ExtResource("1_script")
+
+[node name="TitleIntroLabel" type="Label" parent="."]
+layout_mode = 2
+autowrap_mode = 3
+text = "One canonical project now drives the whole game: title, cafe hub, decoration flow, run encounters, rewards, shop, boss, and summary."
+
+[node name="ContinueButton" type="Button" parent="."]
+layout_mode = 2
+text = "Continue"
+
+[node name="ResetProfileButton" type="Button" parent="."]
+layout_mode = 2
+text = "Reset Profile"

@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="RewardDef" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="RewardDef" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/progression/reward_def.gd" id="1_rewardfocus"]
+[ext_resource type="Texture2D" path="res://assets/demo/cards/card_focus.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_rewardfocus")
 reward_id = &"reward_focus_buff"
 display_name = "Focused Service"
+icon = ExtResource("2_icon")
 description = "Gain a temporary buff that draws an extra card each turn."
 reward_type = 1
 payload_id = &"focused_service_buff"

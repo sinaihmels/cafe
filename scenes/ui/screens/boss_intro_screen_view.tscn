@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/screens/boss_intro_screen_view.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/hero_card_view.tscn" id="2_hero_card"]
+
+[node name="BossIntroScreenView" type="VBoxContainer"]
+theme_override_constants/separation = 12
+script = ExtResource("1_script")
+
+[node name="BossCard" parent="." instance=ExtResource("2_hero_card")]
+
+[node name="BossTextLabel" type="Label" parent="."]
+layout_mode = 2
+autowrap_mode = 3
+text = "The boss wants something sweet and decorated. Choose the dough for the final day, then prep, bake, and serve it before patience runs out."
+
+[node name="ChooseBossDoughButton" type="Button" parent="."]
+layout_mode = 2
+text = "Choose Boss Dough"

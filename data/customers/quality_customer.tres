@@ -1,15 +1,17 @@
-[gd_resource type="Resource" script_class="CustomerDef" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="CustomerDef" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/entities/customer_def.gd" id="1_quality"]
+[ext_resource type="Texture2D" path="res://assets/demo/customers/customer_critic_guest.png" id="2_portrait"]
 
 [resource]
 script = ExtResource("1_quality")
 customer_id = &"quality_customer"
 display_name = "Quality Seeker"
+portrait = ExtResource("2_portrait")
 order_id = &"quality_request"
-preferences = PackedStringArray("decorated")
+preferences = PackedStringArray()
 required_tags = PackedStringArray("decorated")
-bonus_tags = PackedStringArray("quality", "sweet")
+bonus_tags = PackedStringArray("quality", "sweet", "savory", "flaky", "tangy")
 forbidden_tags = PackedStringArray("failed")
 minimum_quality = 1
 base_reputation = 2

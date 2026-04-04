@@ -1,6 +1,7 @@
 class_name ArtCatalog
 extends RefCounted
 
+# Legacy path-based catalog kept for older references. The current editor-driven UI uses exported textures instead.
 const ROOT_DIR: String = "res://assets/demo/"
 const CARDS_DIR: String = ROOT_DIR + "cards/"
 const CUSTOMERS_DIR: String = ROOT_DIR + "customers/"
@@ -26,6 +27,11 @@ const CARD_ART_MAP: Dictionary = {
 	&"starter_mix": "card_mix.png",
 	&"starter_bake": "card_bake.png",
 	&"starter_second_wind": "card_coffee.png",
+	&"starter_cheese": "card_cream.png",
+	&"starter_herbs": "card_cinnamon_sugar.png",
+	&"starter_fold": "card_mix.png",
+	&"starter_culture": "card_coffee.png",
+	&"starter_proof": "card_bake.png",
 }
 
 const CUSTOMER_ART_MAP: Dictionary = {

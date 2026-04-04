@@ -1,0 +1,49 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/screens/oven_zone_view.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/zone_item_card_view.tscn" id="2_item_card"]
+
+[node name="OvenView" type="PanelContainer"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_script")
+item_card_scene = ExtResource("2_item_card")
+
+[node name="OvenMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="OvenBody" type="VBoxContainer" parent="OvenMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="OvenTitle" type="Label" parent="OvenMargin/OvenBody"]
+layout_mode = 2
+text = "Oven"
+
+[node name="OvenSubtitle" type="Label" parent="OvenMargin/OvenBody"]
+layout_mode = 2
+text = "0 slots"
+
+[node name="OvenArea" type="Control" parent="OvenMargin/OvenBody"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="OvenRow" type="HBoxContainer" parent="OvenMargin/OvenBody/OvenArea"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -132.0
+offset_top = -112.0
+offset_right = 132.0
+offset_bottom = 112.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12

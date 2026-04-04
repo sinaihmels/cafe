@@ -1,15 +1,17 @@
-[gd_resource type="Resource" script_class="CustomerDef" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="CustomerDef" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/entities/customer_def.gd" id="1_sweettooth"]
+[ext_resource type="Texture2D" path="res://assets/demo/customers/customer_patient_guest.png" id="2_portrait"]
 
 [resource]
 script = ExtResource("1_sweettooth")
 customer_id = &"sweet_tooth_customer"
 display_name = "Sweet Tooth"
+portrait = ExtResource("2_portrait")
 order_id = &"sweet_request"
-preferences = PackedStringArray("sweet")
-required_tags = PackedStringArray("sweet")
-bonus_tags = PackedStringArray("chocolate", "cinnamon", "decorated")
+preferences = PackedStringArray()
+required_tags = PackedStringArray()
+bonus_tags = PackedStringArray("sweet", "chocolate", "cinnamon", "decorated")
 forbidden_tags = PackedStringArray("failed")
 minimum_quality = 0
 base_reputation = 1

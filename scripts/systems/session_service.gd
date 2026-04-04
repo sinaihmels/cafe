@@ -243,7 +243,10 @@ func _enter_day(day_number: int) -> void:
 		return
 	combat_state.active_customers = _create_customers(run_state.current_customer_ids)
 	begin_player_turn(true)
-	_set_status_message("Day %d begins with %s prepped. Modify it, bake it, then serve before patience runs out." % [day_number, dough.display_name])
+	var opening_message: String = "Day %d begins with %s prepped from the morning. Customize it, bake it, then serve before patience runs out." % [day_number, dough.display_name]
+	if _has_prepped_item_that_needs_proofing():
+		opening_message = "Day %d begins with %s prepped from the morning. Customize it, proof it in the oven, then bake and serve before patience runs out." % [day_number, dough.display_name]
+	_set_status_message(opening_message)
 
 func _rebuild_deck_from_master_ids() -> void:
 	var cards: Array[CardInstance] = []
@@ -349,7 +352,7 @@ func get_required_target_count(card: CardInstance) -> int:
 			return 2
 		"select_one_customer_and_one_table_item":
 			return 2
-		"select_one_prep_item", "select_one_baked_item", "select_one_item", "select_one_customer":
+		"select_one_prep_item", "select_one_baked_item", "select_one_item", "select_one_customer", "select_one_bake_target", "select_one_proof_target":
 			return 1
 		_:
 			return 0
@@ -364,12 +367,16 @@ func get_target_prompt(card: CardInstance) -> String:
 			return "Select 1 customer and 1 table item."
 		"select_one_prep_item":
 			return "Select 1 prep item."
+		"select_one_bake_target":
+			return "Select 1 prep item to bake, or a proofed oven item to finish baking."
 		"select_one_baked_item":
 			return "Select 1 baked item on the table."
 		"select_one_item":
 			return "Select 1 item from prep or oven."
 		"select_one_customer":
 			return "Select 1 customer."
+		"select_one_proof_target":
+			return "Select 1 proof-required dough in prep."
 		_:
 			return ""
 
@@ -387,6 +394,8 @@ func is_valid_target(card: CardInstance, zone: StringName, index: int) -> bool:
 			return false
 		"select_one_prep_item":
 			return zone == &"prep" and index >= 0 and index < cafe_state.prep_items.size()
+		"select_one_bake_target":
+			return _can_bake_target(zone, index)
 		"select_one_baked_item":
 			if zone != &"table" or index < 0 or index >= cafe_state.table_items.size():
 				return false
@@ -400,6 +409,8 @@ func is_valid_target(card: CardInstance, zone: StringName, index: int) -> bool:
 			return false
 		"select_one_customer":
 			return zone == &"customer" and index >= 0 and index < combat_state.active_customers.size()
+		"select_one_proof_target":
+			return _can_proof_target(zone, index)
 		_:
 			return false
 
@@ -414,6 +425,19 @@ func get_valid_targets(card: CardInstance) -> Array[Dictionary]:
 					targets.append({
 						"zone": &"prep",
 						"index": prep_index,
+					})
+		"select_one_bake_target":
+			for prep_index in range(cafe_state.prep_items.size()):
+				if is_valid_target(card, &"prep", prep_index):
+					targets.append({
+						"zone": &"prep",
+						"index": prep_index,
+					})
+			for oven_index in range(cafe_state.oven_slots.size()):
+				if is_valid_target(card, &"oven", oven_index):
+					targets.append({
+						"zone": &"oven",
+						"index": oven_index,
 					})
 		"select_one_customer_and_one_table_item":
 			for customer_index in range(combat_state.active_customers.size()):
@@ -455,7 +479,33 @@ func get_valid_targets(card: CardInstance) -> Array[Dictionary]:
 						"zone": &"customer",
 						"index": customer_index,
 					})
+		"select_one_proof_target":
+			for prep_index in range(cafe_state.prep_items.size()):
+				if is_valid_target(card, &"prep", prep_index):
+					targets.append({
+						"zone": &"prep",
+						"index": prep_index,
+					})
 	return targets
+
+func notify_no_valid_targets_for_card(card: CardInstance) -> void:
+	if card == null or card.card_def == null:
+		return
+	match card.card_def.targeting_rules:
+		"select_one_bake_target":
+			if _first_empty_oven_slot() == null and not cafe_state.prep_items.is_empty():
+				_set_status_message("The oven is full.")
+			elif _has_prepped_item_that_needs_proofing():
+				_set_status_message("That dough needs to be proofed in the oven before it can be baked.")
+			else:
+				_set_status_message("There is nothing ready to bake.")
+		"select_one_proof_target":
+			if _first_empty_oven_slot() == null and _has_prepped_item_that_needs_proofing():
+				_set_status_message("The oven is full.")
+			else:
+				_set_status_message("Only doughs that require proofing can use Proof.")
+		_:
+			_set_status_message("No valid targets for %s right now." % card.get_display_name())
 
 func play_card_from_hand(card_index: int, targets: Array[Dictionary], effect_queue: EffectQueueService) -> bool:
 	if effect_queue == null:
@@ -540,9 +590,9 @@ func mix_selected_prep_items(targets: Array) -> bool:
 	_set_status_message("Mixed into %s." % output.get_display_name())
 	return true
 
-func bake_selected_prep_item(targets: Array) -> bool:
+func proof_selected_prep_item(targets: Array) -> bool:
 	if targets.size() != 1:
-		_set_status_message("Bake needs 1 prep item.")
+		_set_status_message("Proof needs 1 prep item.")
 		return false
 	var index: int = int(targets[0].get("index", -1))
 	if index < 0 or index >= cafe_state.prep_items.size():
@@ -552,25 +602,93 @@ func bake_selected_prep_item(targets: Array) -> bool:
 		_set_status_message("No free oven slot.")
 		return false
 	var item: ItemInstance = cafe_state.prep_items[index]
+	if not item_needs_proofing(item):
+		_set_status_message("%s does not need proofing." % item.get_display_name())
+		return false
 	cafe_state.prep_items.remove_at(index)
 	item.zone = &"oven"
 	slot.item = item
+	slot.stage = &"proofing"
 	slot.remaining_turns = 1
-	_set_status_message("%s is baking." % item.get_display_name())
+	_set_status_message("%s is proofing in the oven." % item.get_display_name())
 	return true
+
+func bake_selected_item(targets: Array) -> bool:
+	if targets.size() != 1:
+		_set_status_message("Bake needs 1 item.")
+		return false
+	var zone: StringName = StringName(targets[0].get("zone", ""))
+	var index: int = int(targets[0].get("index", -1))
+	if zone == &"prep":
+		if index < 0 or index >= cafe_state.prep_items.size():
+			return false
+		var slot: OvenSlotState = _first_empty_oven_slot()
+		if slot == null:
+			_set_status_message("No free oven slot.")
+			return false
+		var prep_item: ItemInstance = cafe_state.prep_items[index]
+		if item_needs_proofing(prep_item):
+			_set_status_message("%s needs proofing before it can be baked." % prep_item.get_display_name())
+			return false
+		cafe_state.prep_items.remove_at(index)
+		prep_item.zone = &"oven"
+		slot.item = prep_item
+		slot.stage = &"baking"
+		slot.remaining_turns = 1
+		_set_status_message("%s is baking." % prep_item.get_display_name())
+		return true
+	if zone == &"oven":
+		if index < 0 or index >= cafe_state.oven_slots.size():
+			return false
+		var oven_slot: OvenSlotState = cafe_state.oven_slots[index]
+		if oven_slot == null or oven_slot.item == null:
+			return false
+		if oven_slot.stage != &"proofed":
+			_set_status_message("%s is not ready to bake yet." % oven_slot.item.get_display_name())
+			return false
+		oven_slot.stage = &"baking"
+		oven_slot.remaining_turns = 1
+		_set_status_message("%s is now baking." % oven_slot.item.get_display_name())
+		return true
+	return false
 
 func flash_bake_selected_item(targets: Array, burn_chance: float) -> bool:
 	if targets.size() != 1:
-		_set_status_message("Flash Bake needs 1 prep item.")
+		_set_status_message("Flash Bake needs 1 bake target.")
 		return false
+	var zone: StringName = StringName(targets[0].get("zone", ""))
 	var index: int = int(targets[0].get("index", -1))
-	if index < 0 or index >= cafe_state.prep_items.size():
+	var item: ItemInstance = null
+	if zone == &"prep":
+		if index < 0 or index >= cafe_state.prep_items.size():
+			return false
+		item = cafe_state.prep_items[index]
+		if item_needs_proofing(item):
+			_set_status_message("%s needs proofing before it can be flash baked." % item.get_display_name())
+			return false
+		cafe_state.prep_items.remove_at(index)
+	elif zone == &"oven":
+		if index < 0 or index >= cafe_state.oven_slots.size():
+			return false
+		var oven_slot: OvenSlotState = cafe_state.oven_slots[index]
+		if oven_slot == null or oven_slot.item == null or oven_slot.stage != &"proofed":
+			return false
+		item = oven_slot.item
+		oven_slot.item = null
+		oven_slot.remaining_turns = 0
+		oven_slot.stage = &""
+	else:
 		return false
 	if cafe_state.table_items.size() >= cafe_state.serving_table_capacity:
+		if zone == &"prep":
+			cafe_state.prep_items.insert(index, item)
+		elif zone == &"oven":
+			var blocked_slot: OvenSlotState = cafe_state.oven_slots[index]
+			blocked_slot.item = item
+			blocked_slot.remaining_turns = 0
+			blocked_slot.stage = &"proofed"
 		_set_status_message("Table is full.")
 		return false
-	var item: ItemInstance = cafe_state.prep_items[index]
-	cafe_state.prep_items.remove_at(index)
 	var result_item: ItemInstance = null
 	if randf() < burn_chance:
 		result_item = create_item_instance(&"burned")
@@ -580,7 +698,13 @@ func flash_bake_selected_item(targets: Array, burn_chance: float) -> bool:
 	else:
 		result_item = _create_baked_result(item)
 		if result_item == null:
-			cafe_state.prep_items.insert(index, item)
+			if zone == &"prep":
+				cafe_state.prep_items.insert(index, item)
+			elif zone == &"oven":
+				var restored_slot: OvenSlotState = cafe_state.oven_slots[index]
+				restored_slot.item = item
+				restored_slot.remaining_turns = 0
+				restored_slot.stage = &"proofed"
 			_set_status_message("That item cannot be baked.")
 			return false
 		_set_status_message("%s was flash baked." % result_item.get_display_name())
@@ -608,10 +732,9 @@ func decorate_selected_table_item(targets: Array) -> bool:
 	output.zone = &"table"
 	output.steps_used = item.steps_used + 1
 	output.quality = item.quality + recipe.quality_delta
+	output.custom_tags = item.custom_tags.duplicate()
 	for tag in recipe.added_tags:
 		output.add_tag(StringName(tag))
-	if item.has_tag(&"cinnamon"):
-		output.add_tag(&"cinnamon")
 	cafe_state.table_items[index] = output
 	_set_status_message("Decorated into %s." % output.get_display_name())
 	return true
@@ -633,6 +756,7 @@ func remove_selected_item(targets: Array) -> bool:
 		var removed_name: String = slot.item.get_display_name()
 		slot.item = null
 		slot.remaining_turns = 0
+		slot.stage = &""
 		_set_status_message("Removed %s from the oven." % removed_name)
 		return true
 	return false
@@ -641,7 +765,7 @@ func can_collect_oven_item(slot_index: int) -> bool:
 	if slot_index < 0 or slot_index >= cafe_state.oven_slots.size():
 		return false
 	var slot: OvenSlotState = cafe_state.oven_slots[slot_index]
-	return slot != null and slot.item != null and slot.remaining_turns <= 0
+	return _is_slot_collect_ready(slot)
 
 func collect_oven_item(slot_index: int) -> bool:
 	if not can_collect_oven_item(slot_index):
@@ -655,6 +779,7 @@ func collect_oven_item(slot_index: int) -> bool:
 	cafe_state.table_items.append(item)
 	slot.item = null
 	slot.remaining_turns = 0
+	slot.stage = &""
 	_set_status_message("%s moved from the oven to the table." % item.get_display_name())
 	return true
 
@@ -950,24 +1075,37 @@ func advance_oven() -> void:
 			continue
 		if slot.remaining_turns > 0:
 			slot.remaining_turns -= 1
-		if slot.remaining_turns <= 0 and not slot.item.has_tag(&"baked"):
-			var result_item: ItemInstance = _create_baked_result(slot.item)
-			if result_item == null:
-				continue
-			result_item.zone = &"oven"
-			result_item.active_statuses = slot.item.active_statuses.duplicate(true)
-			slot.item = result_item
-			slot.remaining_turns = 0
-			_add_modifier_to_collection(
-				result_item.active_statuses,
-				GameEnums.ModifierTarget.ITEM,
-				&"warm_status",
-				&"oven",
-				result_item.get_item_id(),
-				1
-			)
-			_notify_item_baked(result_item, [{"zone": &"oven", "index": slot_index}])
-			_set_status_message("%s is ready in the oven." % result_item.get_display_name())
+		if slot.remaining_turns > 0:
+			continue
+		match slot.stage:
+			&"proofing":
+				slot.stage = &"proofed"
+				slot.remaining_turns = 0
+				_set_status_message("%s is proofed and ready to bake." % slot.item.get_display_name())
+			&"baking", &"":
+				if slot.item.has_tag(&"baked"):
+					slot.stage = &"ready"
+					continue
+				var result_item: ItemInstance = _create_baked_result(slot.item)
+				if result_item == null:
+					continue
+				result_item.zone = &"oven"
+				result_item.active_statuses = slot.item.active_statuses.duplicate(true)
+				slot.item = result_item
+				slot.remaining_turns = 0
+				slot.stage = &"ready"
+				_add_modifier_to_collection(
+					result_item.active_statuses,
+					GameEnums.ModifierTarget.ITEM,
+					&"warm_status",
+					&"oven",
+					result_item.get_item_id(),
+					1
+				)
+				_notify_item_baked(result_item, [{"zone": &"oven", "index": slot_index}])
+				_set_status_message("%s is ready in the oven." % result_item.get_display_name())
+			_:
+				slot.stage = &"ready" if slot.item.has_tag(&"baked") else slot.stage
 
 func pop_status_message() -> String:
 	var message: String = _last_status_message
@@ -1298,12 +1436,9 @@ func _create_baked_result(item: ItemInstance) -> ItemInstance:
 		return null
 	result_item.steps_used = item.steps_used + 1
 	result_item.quality = item.quality + recipe.quality_delta
+	result_item.custom_tags = item.custom_tags.duplicate()
 	for tag in recipe.added_tags:
 		result_item.add_tag(StringName(tag))
-	if item.has_tag(&"cinnamon"):
-		result_item.add_tag(&"cinnamon")
-	if item.has_tag(&"cream"):
-		result_item.add_tag(&"cream")
 	result_item.add_tag(&"warm")
 	return result_item
 
@@ -1399,6 +1534,40 @@ func _get_item_from_target(target: Dictionary) -> ItemInstance:
 		if slot != null:
 			return slot.item
 	return null
+
+func item_needs_proofing(item: ItemInstance) -> bool:
+	return item != null and item.has_tag(&"proof_required")
+
+func _can_bake_target(zone: StringName, index: int) -> bool:
+	if zone == &"prep":
+		if index < 0 or index >= cafe_state.prep_items.size():
+			return false
+		var prep_item: ItemInstance = cafe_state.prep_items[index]
+		return prep_item != null and not item_needs_proofing(prep_item) and _first_empty_oven_slot() != null
+	if zone == &"oven":
+		if index < 0 or index >= cafe_state.oven_slots.size():
+			return false
+		var slot: OvenSlotState = cafe_state.oven_slots[index]
+		return slot != null and slot.item != null and slot.stage == &"proofed"
+	return false
+
+func _can_proof_target(zone: StringName, index: int) -> bool:
+	if zone != &"prep" or index < 0 or index >= cafe_state.prep_items.size():
+		return false
+	return item_needs_proofing(cafe_state.prep_items[index]) and _first_empty_oven_slot() != null
+
+func _has_prepped_item_that_needs_proofing() -> bool:
+	for prep_item in cafe_state.prep_items:
+		if item_needs_proofing(prep_item):
+			return true
+	return false
+
+func _is_slot_collect_ready(slot: OvenSlotState) -> bool:
+	if slot == null or slot.item == null or slot.remaining_turns > 0:
+		return false
+	if slot.stage == &"":
+		return slot.item.has_tag(&"baked")
+	return slot.stage == &"ready"
 
 func _first_empty_oven_slot() -> OvenSlotState:
 	for slot in cafe_state.oven_slots:

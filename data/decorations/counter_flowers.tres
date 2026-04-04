@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="DecorationDef" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="DecorationDef" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/progression/decoration_def.gd" id="1_flowers"]
+[ext_resource type="Texture2D" path="res://assets/demo/cards/card_cream.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_flowers")
 decoration_id = &"counter_flowers"
 display_name = "Counter Flowers"
+icon = ExtResource("2_icon")
 description = "A cheerful counter arrangement. Cosmetic only."
 slot = 1
 cost = 3

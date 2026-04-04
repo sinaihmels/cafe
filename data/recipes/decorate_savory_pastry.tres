@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="RecipeDef" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/recipe_def.gd" id="1_savorydecorate"]
+
+[resource]
+script = ExtResource("1_savorydecorate")
+recipe_id = &"decorate_savory_pastry"
+input_item_ids = PackedStringArray("savory_pastry")
+output_item_id = &"savory_pastry"
+station = &"prep"
+added_tags = PackedStringArray("decorated", "quality")
+quality_delta = 1

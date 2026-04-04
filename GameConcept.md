@@ -187,7 +187,7 @@ Example:
 ### Persistent
 
 * Dough unlocks
-* Equipment
+* Equipment (when you die you can keep 1 of the Perma Buffs but not all)
 * Decorations
 
 ### Reset
@@ -195,25 +195,3 @@ Example:
 * Deck
 * Buffs
 * Money
-
----
-
-## 🎨 Scenes / Biomes
-
-### Starter Café
-
-* Basic customers
-
-### Busy Downtown
-
-* Faster pacing
-
-### Night Market
-
-* Exotic requests
-
-### Festival Day
-
-* High pressure, high rewards
-
----

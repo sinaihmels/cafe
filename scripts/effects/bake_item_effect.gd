@@ -10,4 +10,4 @@ func apply(context: EffectContext) -> void:
 	if instant:
 		context.session_service.flash_bake_selected_item(context.targets, burn_chance)
 	else:
-		context.session_service.bake_selected_prep_item(context.targets)
+		context.session_service.bake_selected_item(context.targets)

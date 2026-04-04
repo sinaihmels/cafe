@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DoughDef" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/progression/dough_def.gd" id="1_savorydough"]
+[ext_resource type="Texture2D" path="res://assets/demo/doughs/dough_placeholder.png" id="2_art"]
+
+[resource]
+script = ExtResource("1_savorydough")
+dough_id = &"savory_dough"
+prep_item_id = &"savory_dough"
+display_name = "Savory Dough"
+art = ExtResource("2_art")
+description = "Prep a savory dough in the morning, then season it during service with cheese and herbs before baking."
+starting_deck_ids = PackedStringArray("starter_cheese", "starter_cheese", "starter_herbs", "starter_herbs", "starter_bake", "starter_bake", "starter_serve", "starter_serve", "starter_decorate", "starter_decorate")
+passive_modifier_ids = PackedStringArray()
+unlocked_by_default = true

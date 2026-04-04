@@ -1,11 +1,13 @@
-[gd_resource type="Resource" script_class="ShopUpgradeDef" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ShopUpgradeDef" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/progression/shop_upgrade_def.gd" id="1_ovenup"]
+[ext_resource type="Texture2D" path="res://assets/demo/cards/card_bake.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_ovenup")
 upgrade_id = &"oven_slot_upgrade"
 display_name = "Oven Slot Upgrade"
+icon = ExtResource("2_icon")
 description = "Permanent cafe upgrade. Future runs begin with one more oven slot."
 cost = 8
 passive_modifier_ids = PackedStringArray("oven_mastery_buff")
