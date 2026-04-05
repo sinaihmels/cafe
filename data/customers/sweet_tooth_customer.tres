@@ -26,4 +26,5 @@ personality_modifiers = {
 "kind": true
 }
 talent_ids = PackedStringArray("social")
+gift_decoration_ids = PackedStringArray("pastry_shelf")
 starting_status_ids = PackedStringArray()

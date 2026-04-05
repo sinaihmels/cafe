@@ -26,4 +26,5 @@ personality_modifiers = {
 "impatient": true
 }
 talent_ids = PackedStringArray()
+gift_decoration_ids = PackedStringArray("awning_sign")
 starting_status_ids = PackedStringArray("impatient_status")

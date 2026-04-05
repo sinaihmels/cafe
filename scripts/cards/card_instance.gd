@@ -24,11 +24,31 @@ func get_preview_text() -> String:
 		return ""
 	return card_def.preview_text
 
+func get_art_texture() -> Texture2D:
+	if card_def == null:
+		return null
+	return card_def.get_art_texture()
+
+func get_pastry_tags_added() -> PackedStringArray:
+	if card_def == null:
+		return PackedStringArray()
+	return card_def.get_pastry_tags_added()
+
+func get_card_type() -> int:
+	if card_def == null:
+		return CardDef.CardType.INGREDIENT
+	return card_def.card_type
+
+func get_card_type_label() -> StringName:
+	if card_def == null:
+		return &"unknown"
+	return card_def.get_card_type_label()
+
 func get_all_tags() -> PackedStringArray:
 	var merged: PackedStringArray = PackedStringArray()
-	if card_def != null:
-		for tag in card_def.tags:
-			merged.append(tag)
+	var card_type_label: StringName = get_card_type_label()
+	if card_type_label != &"" and card_type_label != &"unknown":
+		merged.append(card_type_label)
 	for tag in temporary_tags:
 		if not merged.has(tag):
 			merged.append(tag)

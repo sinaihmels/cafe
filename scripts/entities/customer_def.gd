@@ -20,4 +20,5 @@ extends Resource
 @export var customer_type: int = GameEnums.CustomerType.REGULAR
 @export var personality_modifiers: Dictionary = {}
 @export var talent_ids: PackedStringArray = []
+@export var gift_decoration_ids: PackedStringArray = []
 @export var starting_status_ids: PackedStringArray = []

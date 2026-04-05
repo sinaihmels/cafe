@@ -26,4 +26,5 @@ personality_modifiers = {
 "boss": true
 }
 talent_ids = PackedStringArray()
+gift_decoration_ids = PackedStringArray()
 starting_status_ids = PackedStringArray("critic_status")

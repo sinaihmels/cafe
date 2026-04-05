@@ -1,6 +1,10 @@
 class_name CustomerInstance
 extends Resource
 
+const SATISFIED_THRESHOLD: int = 4
+const VERY_SATISFIED_THRESHOLD: int = 6
+const EXTREMELY_SATISFIED_THRESHOLD: int = 8
+
 @export var customer_def: CustomerDef
 @export var current_patience: int = 3
 @export var mood_flags: Dictionary = {}
@@ -86,10 +90,36 @@ func get_talent_ids() -> PackedStringArray:
 		return PackedStringArray()
 	return customer_def.talent_ids
 
+func get_gift_decoration_ids() -> PackedStringArray:
+	if customer_def == null:
+		return PackedStringArray()
+	return customer_def.gift_decoration_ids
+
 func has_talent(talent_id: StringName) -> bool:
 	if talent_id == &"" or customer_def == null:
 		return false
 	return customer_def.talent_ids.has(talent_id)
+
+func get_satisfaction_tier() -> StringName:
+	if satisfaction_score >= EXTREMELY_SATISFIED_THRESHOLD:
+		return &"extremely_satisfied"
+	if satisfaction_score >= VERY_SATISFIED_THRESHOLD:
+		return &"very_satisfied"
+	if satisfaction_score >= SATISFIED_THRESHOLD:
+		return &"satisfied"
+	return &""
+
+func get_max_extra_return_visits() -> int:
+	match get_satisfaction_tier():
+		&"very_satisfied", &"extremely_satisfied":
+			return 2
+		&"satisfied":
+			return 1
+		_:
+			return 0
+
+func is_extremely_satisfied() -> bool:
+	return satisfaction_score >= EXTREMELY_SATISFIED_THRESHOLD
 
 func is_still_hungry() -> bool:
 	return remaining_hunger > 0

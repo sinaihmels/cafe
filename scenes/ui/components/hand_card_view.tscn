@@ -1,145 +1,91 @@
 [gd_scene format=3 uid="uid://bn25mh5b1vog0"]
 
 [ext_resource type="Script" uid="uid://dpaw1vavkkupn" path="res://scripts/ui/components/hand_card_view.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://cw5wox7dt3kxa" path="res://assets/demo/cards/base_card.png" id="2_fallback"]
+[ext_resource type="Texture2D" uid="uid://cw5wox7dt3kxa" path="res://assets/demo/cards/base_card.png" id="2_background"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
-bg_color = Color(0.95, 0.89, 0.78, 0.9)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.34, 0.23, 0.15, 0.96)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_selected"]
-bg_color = Color(0.82, 0.45, 0.27, 0.98)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(1, 0.83, 0.74, 0.98)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hover"]
-bg_color = Color(0.98, 0.84, 0.72, 0.98)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.82, 0.45, 0.27, 0.98)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_disabled"]
-bg_color = Color(0.88, 0.84, 0.76, 0.72)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.58, 0.52, 0.46, 0.54)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chip"]
-bg_color = Color(0.98, 0.84, 0.72, 0.98)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.82, 0.45, 0.27, 0.98)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-
-[node name="HandCardView" type="Button" unique_id=306788367]
+[node name="HandCardView" type="Control" unique_id=306788367]
 custom_minimum_size = Vector2(154, 214)
+offset_right = 154.0
+offset_bottom = 214.0
 focus_mode = 0
-theme_override_styles/normal = SubResource("StyleBoxFlat_normal")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_selected")
-theme_override_styles/hover = SubResource("StyleBoxFlat_hover")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_disabled")
+mouse_filter = 0
 script = ExtResource("1_script")
-fallback_texture = ExtResource("2_fallback")
-normal_style = SubResource("StyleBoxFlat_normal")
-hover_style = SubResource("StyleBoxFlat_hover")
-selected_style = SubResource("StyleBoxFlat_selected")
-disabled_style = SubResource("StyleBoxFlat_disabled")
 
-[node name="Margin" type="MarginContainer" parent="." unique_id=253560082]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
+[node name="CardContent" type="Control" parent="."]
+custom_minimum_size = Vector2(154, 214)
+layout_mode = 0
+offset_right = 154.0
+offset_bottom = 214.0
+mouse_filter = 2
 
-[node name="Body" type="VBoxContainer" parent="Margin" unique_id=763940315]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 8
+[node name="CardBackground" type="TextureRect" parent="CardContent" unique_id=474113482]
+layout_mode = 0
+offset_right = 154.0
+offset_bottom = 214.0
+mouse_filter = 2
+texture = ExtResource("2_background")
+expand_mode = 1
+stretch_mode = 6
 
-[node name="TopRow" type="HBoxContainer" parent="Margin/Body" unique_id=2049807388]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="CostChip" type="PanelContainer" parent="Margin/Body/TopRow" unique_id=189642402]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_chip")
-
-[node name="ChipMargin" type="MarginContainer" parent="Margin/Body/TopRow/CostChip" unique_id=1821121073]
-layout_mode = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 8
-
-[node name="ChipBody" type="VBoxContainer" parent="Margin/Body/TopRow/CostChip/ChipMargin" unique_id=1867310670]
-layout_mode = 2
-theme_override_constants/separation = 2
-
-[node name="TitleLabel" type="Label" parent="Margin/Body/TopRow/CostChip/ChipMargin/ChipBody" unique_id=451977664]
-layout_mode = 2
-text = "COST"
-
-[node name="ValueLabel" type="Label" parent="Margin/Body/TopRow/CostChip/ChipMargin/ChipBody" unique_id=198806029]
-layout_mode = 2
+[node name="EnergyCostLabel" type="Label" parent="CardContent" unique_id=198806029]
+layout_mode = 0
+offset_left = 7.0
+offset_top = 5.0
+offset_right = 31.0
+offset_bottom = 29.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.470588, 0.192157, 0.184314, 1)
+theme_override_font_sizes/font_size = 18
 text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="TagLabel" type="Label" parent="Margin/Body/TopRow" unique_id=1078571958]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "action"
-autowrap_mode = 3
-
-[node name="TitleLabel" type="Label" parent="Margin/Body" unique_id=231733685]
-layout_mode = 2
+[node name="DisplayNameLabel" type="Label" parent="CardContent" unique_id=231733685]
+layout_mode = 0
+offset_left = 34.0
+offset_top = 6.0
+offset_right = 144.0
+offset_bottom = 25.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.470588, 0.25098, 0.141176, 1)
+theme_override_font_sizes/font_size = 12
 text = "Card"
+clip_text = true
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CardArtFrame" type="Control" parent="CardContent" unique_id=1821121073]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 37.0
+offset_right = 137.0
+offset_bottom = 116.0
+mouse_filter = 2
+clip_contents = true
+
+[node name="CardImage" type="Sprite2D" parent="CardContent/CardArtFrame" unique_id=25347468]
+position = Vector2(60, 39.5)
+
+[node name="PastryTagsLabel" type="Label" parent="CardContent" unique_id=1078571958]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 124.0
+offset_right = 140.0
+offset_bottom = 150.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.470588, 0.25098, 0.141176, 1)
+theme_override_font_sizes/font_size = 10
+text = "Adds: none"
 autowrap_mode = 3
 
-[node name="DetailLabel" type="Label" parent="Margin/Body" unique_id=259249836]
-layout_mode = 2
+[node name="PreviewLabel" type="Label" parent="CardContent" unique_id=259249836]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 152.0
+offset_right = 140.0
+offset_bottom = 198.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.372549, 0.231373, 0.164706, 1)
+theme_override_font_sizes/font_size = 10
 text = "Preview text"
 autowrap_mode = 3
-
-[node name="Art" type="TextureRect" parent="Margin/Body" unique_id=437654893]
-custom_minimum_size = Vector2(0, 78)
-layout_mode = 2
-texture = ExtResource("2_fallback")
-expand_mode = 1
-stretch_mode = 5

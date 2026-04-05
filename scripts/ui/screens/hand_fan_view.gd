@@ -26,7 +26,6 @@ func render(session_service: SessionService, interaction_state: EncounterInterac
 		var hand_card: HandCardView = _instantiate_hand_card()
 		hand_card.configure(
 			card,
-			UiTextureLibrary.card_texture(card.card_def),
 			session_service.can_play_card(card),
 			card_index == _selected_card_index
 		)

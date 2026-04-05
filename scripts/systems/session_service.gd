@@ -239,6 +239,8 @@ func _enter_day(day_number: int) -> void:
 	run_state.current_customer_ids = day_customer_ids
 	run_state.pending_reward_ids.clear()
 	run_state.pending_shop_offer_ids.clear()
+	run_state.current_day_satisfaction_score = 0
+	run_state.day_gifted_decoration_ids.clear()
 	run_state.screen = GameEnums.Screen.ENCOUNTER
 	run_state.run_phase = GameEnums.RunPhase.ENCOUNTER
 	combat_state.turn_number = 1
@@ -831,7 +833,8 @@ func serve_item_to_customer(customer_index: int, item_index: int) -> bool:
 	var matched_bonus_tags: int = int(outcome.get("matched_bonus_tags", 0))
 	var satiation: int = _calculate_pastry_satiation(pastry)
 	customer.remaining_hunger = maxi(0, customer.remaining_hunger - satiation)
-	customer.satisfaction_score += 2 + matched_bonus_tags
+	var satisfaction_gain: int = 2 + matched_bonus_tags
+	_apply_customer_satisfaction(customer, satisfaction_gain)
 	customer.pending_tip_bonus += 1 + matched_bonus_tags
 	if customer.remaining_hunger > 0:
 		_set_status_message("%s %s is still hungry (%d hunger left)." % [
@@ -855,11 +858,16 @@ func serve_item_to_customer(customer_index: int, item_index: int) -> bool:
 	apply_reputation_delta(reputation_delta)
 	player_state.gain_tips(tips_delta)
 	customer.served = true
-	var will_return: bool = _maybe_schedule_customer_return(customer)
+	var scheduled_return_count: int = _schedule_customer_returns(customer)
+	var gifted_decoration_id: StringName = _maybe_grant_customer_decoration_gift(customer)
 	combat_state.active_customers.remove_at(customer_index)
 	_notify_customer_served(customer, pastry)
-	if will_return:
+	if scheduled_return_count == 1:
 		final_message += " They may come back on another day."
+	elif scheduled_return_count > 1:
+		final_message += " They may come back on later days."
+	if gifted_decoration_id != &"":
+		final_message += " They gifted %s." % _get_decoration_display_name(gifted_decoration_id)
 	_set_status_message(final_message)
 	_clamp_focused_customer_index()
 	if combat_state.active_customers.is_empty():
@@ -895,24 +903,102 @@ func _calculate_pastry_satiation(pastry: PastryInstance) -> int:
 		satiation -= 1
 	return maxi(1, satiation)
 
-func _maybe_schedule_customer_return(customer: CustomerInstance) -> bool:
+func _apply_customer_satisfaction(customer: CustomerInstance, satisfaction_gain: int) -> void:
+	if customer == null or satisfaction_gain <= 0:
+		return
+	customer.satisfaction_score += satisfaction_gain
+	run_state.current_day_satisfaction_score += satisfaction_gain
+	run_state.run_satisfaction_score += satisfaction_gain
+
+func _schedule_customer_returns(customer: CustomerInstance) -> int:
 	if customer == null or customer.customer_def == null:
-		return false
-	if customer.satisfaction_score < 4:
-		return false
+		return 0
 	var customer_id: StringName = customer.customer_def.customer_id
-	if run_state.customer_ids_already_scheduled_to_return.has(customer_id):
-		return false
+	if customer_id == &"critic_boss":
+		return 0
+	var max_return_visits: int = customer.get_max_extra_return_visits()
+	if max_return_visits <= 0:
+		return 0
+	var already_scheduled_visits: int = int(run_state.scheduled_return_visit_counts_by_customer.get(customer_id, 0))
+	var remaining_visits_to_schedule: int = max_return_visits - already_scheduled_visits
+	if remaining_visits_to_schedule <= 0:
+		return 0
+	var scheduled_now: int = 0
 	for future_day in range(run_state.day_number + 1, 4):
+		if scheduled_now >= remaining_visits_to_schedule:
+			break
+		var base_customer_ids: PackedStringArray = _to_packed_strings(ENCOUNTER_CUSTOMERS.get(future_day, []))
+		if base_customer_ids.has(customer_id):
+			continue
 		var scheduled_ids: PackedStringArray = _to_packed_strings(run_state.scheduled_return_customer_ids_by_day.get(future_day, []))
-		if not scheduled_ids.is_empty():
+		if scheduled_ids.has(customer_id) or not scheduled_ids.is_empty():
 			continue
 		scheduled_ids.append(customer_id)
 		run_state.scheduled_return_customer_ids_by_day[future_day] = scheduled_ids
+		scheduled_now += 1
+	if scheduled_now <= 0:
+		return 0
+	run_state.scheduled_return_visit_counts_by_customer[customer_id] = already_scheduled_visits + scheduled_now
+	if not run_state.customer_ids_already_scheduled_to_return.has(customer_id):
 		run_state.customer_ids_already_scheduled_to_return.append(customer_id)
-		customer.has_return_scheduled = true
-		return true
-	return false
+	customer.has_return_scheduled = true
+	return scheduled_now
+
+func _maybe_schedule_customer_return(customer: CustomerInstance) -> bool:
+	return _schedule_customer_returns(customer) > 0
+
+func _maybe_grant_customer_decoration_gift(customer: CustomerInstance) -> StringName:
+	if customer == null or customer.customer_def == null or meta_profile_service == null:
+		return &""
+	if not customer.is_extremely_satisfied():
+		return &""
+	var customer_id: StringName = customer.customer_def.customer_id
+	if customer_id == &"" or run_state.customer_ids_who_gifted_decoration_this_run.has(customer_id):
+		return &""
+	var profile: MetaProfileState = get_profile_state()
+	for raw_decoration_id in customer.get_gift_decoration_ids():
+		var decoration_id: StringName = StringName(raw_decoration_id)
+		if decoration_id == &"":
+			continue
+		var decoration: DecorationDef = content_library.get_decoration(decoration_id)
+		if decoration == null or profile.owned_decoration_ids.has(decoration_id):
+			continue
+		if not meta_profile_service.grant_decoration(decoration_id):
+			continue
+		run_state.customer_ids_who_gifted_decoration_this_run.append(customer_id)
+		if not run_state.day_gifted_decoration_ids.has(decoration_id):
+			run_state.day_gifted_decoration_ids.append(decoration_id)
+		if not run_state.gifted_decoration_ids_this_run.has(decoration_id):
+			run_state.gifted_decoration_ids_this_run.append(decoration_id)
+		return decoration_id
+	return &""
+
+func _complete_day_satisfaction_tracking() -> void:
+	run_state.last_completed_day_satisfaction_score = run_state.current_day_satisfaction_score
+	run_state.day_satisfaction_history[run_state.day_number] = run_state.current_day_satisfaction_score
+
+func _build_day_completion_message(next_step_message: String) -> String:
+	var message: String = "Day %d complete. Satisfaction: %d." % [
+		run_state.day_number,
+		run_state.last_completed_day_satisfaction_score,
+	]
+	if not run_state.day_gifted_decoration_ids.is_empty():
+		message += " Gifts: %s." % _format_decoration_name_list(run_state.day_gifted_decoration_ids)
+	if next_step_message != "":
+		message += " %s" % next_step_message
+	return message
+
+func _format_decoration_name_list(decoration_ids: PackedStringArray) -> String:
+	var decoration_names: Array[String] = []
+	for raw_decoration_id in decoration_ids:
+		decoration_names.append(_get_decoration_display_name(StringName(raw_decoration_id)))
+	return UiTextFormatter.join_strings(decoration_names) if not decoration_names.is_empty() else "none"
+
+func _get_decoration_display_name(decoration_id: StringName) -> String:
+	var decoration: DecorationDef = content_library.get_decoration(decoration_id)
+	if decoration != null and decoration.display_name != "":
+		return decoration.display_name
+	return String(decoration_id)
 
 func _clamp_focused_customer_index() -> void:
 	if combat_state.active_customers.is_empty():
@@ -1038,7 +1124,7 @@ func open_boss_intro() -> void:
 	run_state.screen = GameEnums.Screen.BOSS_INTRO
 	run_state.run_phase = GameEnums.RunPhase.BOSS_INTRO
 	run_state.current_customer_ids = _to_packed_strings([&"critic_boss"])
-	_set_status_message("The Final Critic is waiting. Choose the dough you want to prep for the boss day.")
+	_set_status_message(_build_day_completion_message("The Final Critic is waiting. Choose the dough you want to prep for the boss day."))
 
 func start_boss_encounter() -> void:
 	_open_dough_select_for_day(4)
@@ -1326,17 +1412,18 @@ func _process_customer_turn() -> void:
 		_advance_after_encounter_clear()
 
 func _advance_after_encounter_clear() -> void:
+	_complete_day_satisfaction_tracking()
 	match run_state.day_number:
 		1:
 			run_state.screen = GameEnums.Screen.REWARD
 			run_state.run_phase = GameEnums.RunPhase.REWARD
 			run_state.pending_reward_ids = _to_packed_strings(DAY_REWARD_IDS.get(1, []))
-			_set_status_message("Day 1 complete. Choose a reward for the run.")
+			_set_status_message(_build_day_completion_message("Choose a reward for the run."))
 		2:
 			run_state.screen = GameEnums.Screen.RUN_SHOP
 			run_state.run_phase = GameEnums.RunPhase.RUN_SHOP
 			run_state.pending_shop_offer_ids = _to_packed_strings(DAY_SHOP_OFFER_IDS.get(2, []))
-			_set_status_message("Day 2 complete. Spend your run tips in the shop.")
+			_set_status_message(_build_day_completion_message("Spend your run tips in the shop."))
 		3:
 			open_boss_intro()
 		4:
@@ -1927,7 +2014,14 @@ func _finish_run(won: bool, message: String) -> void:
 	run_state.lost = not won
 	var meta_reward: int = maxi(1, run_state.day_number) + player_state.reputation
 	run_state.meta_currency_earned = meta_reward
-	run_state.summary_message = "%s Reputation: %d. Run tips: %d. Earned %d cafe tokens." % [message, player_state.reputation, player_state.tips, meta_reward]
+	run_state.summary_message = "%s Reputation: %d. Run tips: %d. Satisfaction: %d. Gifted decorations: %s. Earned %d cafe tokens." % [
+		message,
+		player_state.reputation,
+		player_state.tips,
+		run_state.run_satisfaction_score,
+		_format_decoration_name_list(run_state.gifted_decoration_ids_this_run),
+		meta_reward,
+	]
 	if meta_profile_service != null:
 		if won:
 			meta_profile_service.unlock_customer(&"critic_boss")

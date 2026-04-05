@@ -26,4 +26,5 @@ personality_modifiers = {
 "critical": true
 }
 talent_ids = PackedStringArray()
+gift_decoration_ids = PackedStringArray("checker_floor")
 starting_status_ids = PackedStringArray("critic_status")

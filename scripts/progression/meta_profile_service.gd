@@ -94,6 +94,17 @@ func purchase_decoration(decoration_id: StringName, cost: int) -> bool:
 	save_profile()
 	return true
 
+func grant_decoration(decoration_id: StringName) -> bool:
+	if decoration_id == &"":
+		return false
+	if profile_state.owned_decoration_ids.has(decoration_id):
+		return false
+	profile_state.owned_decoration_ids.append(decoration_id)
+	if not profile_state.unlocked_decoration_ids.has(decoration_id):
+		profile_state.unlocked_decoration_ids.append(decoration_id)
+	save_profile()
+	return true
+
 func place_decoration(slot_name: String, decoration_id: StringName) -> bool:
 	if decoration_id != &"" and not profile_state.owned_decoration_ids.has(decoration_id):
 		return false

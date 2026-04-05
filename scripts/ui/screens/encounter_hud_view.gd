@@ -25,6 +25,8 @@ func render(session_service: SessionService) -> void:
 	_add_chip("Stress", "%d/%d" % [session_service.player_state.stress, session_service.player_state.max_stress], _stress_tone(session_service))
 	_add_chip("Rep", str(session_service.player_state.reputation), "accent")
 	_add_chip("Tips", str(session_service.player_state.tips), "gold")
+	_add_chip("Day Sat", str(session_service.run_state.current_day_satisfaction_score), _satisfaction_tone(session_service.run_state.current_day_satisfaction_score))
+	_add_chip("Run Sat", str(session_service.run_state.run_satisfaction_score), _satisfaction_tone(session_service.run_state.run_satisfaction_score))
 	_add_chip("Day", str(session_service.run_state.day_number), "paper")
 	_add_chip("Turn", str(session_service.combat_state.turn_number), "paper")
 
@@ -41,6 +43,13 @@ func _stress_tone(session_service: SessionService) -> String:
 		return "danger"
 	if session_service.player_state.stress * 2 >= session_service.player_state.max_stress:
 		return "gold"
+	return "paper"
+
+func _satisfaction_tone(satisfaction_score: int) -> String:
+	if satisfaction_score >= CustomerInstance.EXTREMELY_SATISFIED_THRESHOLD:
+		return "gold"
+	if satisfaction_score >= CustomerInstance.SATISFIED_THRESHOLD:
+		return "accent"
 	return "paper"
 
 func _instantiate_stat_chip() -> StatChipView:

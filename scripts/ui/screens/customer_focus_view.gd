@@ -49,6 +49,11 @@ func render(session_service: SessionService, interaction_state: EncounterInterac
 	var satisfaction_chip: StatChipView = _instantiate_stat_chip()
 	satisfaction_chip.configure("Satisfaction", str(customer.satisfaction_score), _satisfaction_tone(customer.satisfaction_score))
 	_patience_slot.add_child(satisfaction_chip)
+	var satisfaction_tier: StringName = customer.get_satisfaction_tier()
+	if satisfaction_tier != &"":
+		var tier_chip: StatChipView = _instantiate_stat_chip()
+		tier_chip.configure("Tier", _format_satisfaction_tier_label(satisfaction_tier), _satisfaction_tier_tone(satisfaction_tier))
+		_patience_slot.add_child(tier_chip)
 	for raw_talent_id in customer.get_talent_ids():
 		var talent_chip: StatChipView = _instantiate_stat_chip()
 		talent_chip.configure("Talent", _format_talent_label(StringName(raw_talent_id)), "accent")
@@ -87,11 +92,22 @@ func _hunger_tone(remaining_hunger: int) -> String:
 	return "paper"
 
 func _satisfaction_tone(satisfaction_score: int) -> String:
-	if satisfaction_score >= 4:
+	if satisfaction_score >= CustomerInstance.EXTREMELY_SATISFIED_THRESHOLD:
 		return "gold"
-	if satisfaction_score >= 2:
+	if satisfaction_score >= CustomerInstance.SATISFIED_THRESHOLD:
 		return "accent"
 	return "paper"
+
+func _satisfaction_tier_tone(satisfaction_tier: StringName) -> String:
+	match satisfaction_tier:
+		&"extremely_satisfied":
+			return "gold"
+		&"very_satisfied":
+			return "accent"
+		&"satisfied":
+			return "paper"
+		_:
+			return "paper"
 
 func _format_talent_label(talent_id: StringName) -> String:
 	match talent_id:
@@ -99,6 +115,17 @@ func _format_talent_label(talent_id: StringName) -> String:
 			return "Social"
 		_:
 			return String(talent_id).capitalize()
+
+func _format_satisfaction_tier_label(satisfaction_tier: StringName) -> String:
+	match satisfaction_tier:
+		&"extremely_satisfied":
+			return "Extremely Satisfied"
+		&"very_satisfied":
+			return "Very Satisfied"
+		&"satisfied":
+			return "Satisfied"
+		_:
+			return "Warming Up"
 
 func _on_select_pressed() -> void:
 	if _focused_customer_index >= 0:
