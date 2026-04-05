@@ -16,3 +16,5 @@ extends Resource
 @export var won: bool = false
 @export var lost: bool = false
 @export var meta_currency_earned: int = 0
+@export var scheduled_return_customer_ids_by_day: Dictionary = {}
+@export var customer_ids_already_scheduled_to_return: PackedStringArray = []

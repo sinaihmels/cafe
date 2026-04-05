@@ -89,16 +89,18 @@ func _test_interaction_and_timing_cards() -> void:
 	for index in range(session.combat_state.active_customers.size()):
 		assert(session.combat_state.active_customers[index].current_patience == patience_before[index] + 1, "Mini Cookies should grant +1 patience to each customer.")
 	assert(session.play_card_from_hand(0, [], effect_queue), "Small Talk should queue patience protection for the next customer turn.")
-	var patience_after_cookies: int = session.combat_state.active_customers[0].current_patience
+	var patience_after_small_talk: int = session.combat_state.active_customers[0].current_patience
+	assert(patience_after_small_talk == patience_before[0] + 2, "Small Talk should also trigger the Social talent on the focused customer.")
 	session.combat_state.turn_state = GameEnums.TurnState.CUSTOMER_TURN
 	session._process_customer_turn()
 	session.combat_state.turn_state = GameEnums.TurnState.PLAYER_TURN
-	assert(session.combat_state.active_customers[0].current_patience == patience_after_cookies, "Small Talk should prevent patience loss during the next customer turn.")
+	assert(session.combat_state.active_customers[0].current_patience == patience_after_small_talk, "Small Talk should prevent patience loss during the next customer turn.")
 
 	assert(session.play_card_from_hand(0, [], effect_queue), "Bake should send the sweet pastry into the oven.")
 	session.advance_oven()
 	assert(session.collect_oven_item(0), "The baked sweet pastry should be plated.")
 	assert(session.play_card_from_hand(0, [], effect_queue), "Perfect Timing should arm the next warm serve bonus.")
+	session.combat_state.active_customers[0].remaining_hunger = 1
 	var reputation_before_serve: int = session.player_state.reputation
 	var tips_before_serve: int = session.player_state.tips
 	var serve_targets: Array[Dictionary] = [
@@ -112,5 +114,5 @@ func _test_interaction_and_timing_cards() -> void:
 		},
 	]
 	assert(session.play_card_from_hand(0, serve_targets, effect_queue), "Serve should deliver the warm pastry.")
-	assert(session.player_state.reputation == reputation_before_serve + 4, "Perfect Timing should add +1 reputation to a successful warm serve.")
-	assert(session.player_state.tips == tips_before_serve + 5, "Perfect Timing should add +1 tip to a successful warm serve.")
+	assert(session.player_state.reputation == reputation_before_serve + 3, "Perfect Timing should add +1 reputation to the final successful warm serve.")
+	assert(session.player_state.tips == tips_before_serve + 6, "Final payout should include the warm-serve tip bonus and accumulated satisfaction tips.")

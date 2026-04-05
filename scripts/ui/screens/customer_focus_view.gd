@@ -43,6 +43,20 @@ func render(session_service: SessionService, interaction_state: EncounterInterac
 	var patience_chip: StatChipView = _instantiate_stat_chip()
 	patience_chip.configure("Patience", str(customer.current_patience), _patience_tone(customer.current_patience))
 	_patience_slot.add_child(patience_chip)
+	var hunger_chip: StatChipView = _instantiate_stat_chip()
+	hunger_chip.configure("Hunger", str(customer.remaining_hunger), _hunger_tone(customer.remaining_hunger))
+	_patience_slot.add_child(hunger_chip)
+	var satisfaction_chip: StatChipView = _instantiate_stat_chip()
+	satisfaction_chip.configure("Satisfaction", str(customer.satisfaction_score), _satisfaction_tone(customer.satisfaction_score))
+	_patience_slot.add_child(satisfaction_chip)
+	for raw_talent_id in customer.get_talent_ids():
+		var talent_chip: StatChipView = _instantiate_stat_chip()
+		talent_chip.configure("Talent", _format_talent_label(StringName(raw_talent_id)), "accent")
+		_patience_slot.add_child(talent_chip)
+	if customer.is_returning_visit() or customer.has_return_scheduled:
+		var returning_chip: StatChipView = _instantiate_stat_chip()
+		returning_chip.configure("Returning", "Yes", "gold")
+		_patience_slot.add_child(returning_chip)
 	_request_label.text = UiTextFormatter.describe_customer_request(customer)
 	var selected: bool = interaction_state.is_target_selected(&"customer", _focused_customer_index)
 	var targetable: bool = interaction_state.is_zone_targetable(&"customer", _focused_customer_index)
@@ -64,6 +78,27 @@ func _patience_tone(current_patience: int) -> String:
 	if current_patience <= 2:
 		return "gold"
 	return "accent"
+
+func _hunger_tone(remaining_hunger: int) -> String:
+	if remaining_hunger >= 3:
+		return "danger"
+	if remaining_hunger == 2:
+		return "gold"
+	return "paper"
+
+func _satisfaction_tone(satisfaction_score: int) -> String:
+	if satisfaction_score >= 4:
+		return "gold"
+	if satisfaction_score >= 2:
+		return "accent"
+	return "paper"
+
+func _format_talent_label(talent_id: StringName) -> String:
+	match talent_id:
+		&"social":
+			return "Social"
+		_:
+			return String(talent_id).capitalize()
 
 func _on_select_pressed() -> void:
 	if _focused_customer_index >= 0:

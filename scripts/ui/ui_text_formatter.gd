@@ -66,13 +66,14 @@ static func describe_customer_request(customer: CustomerInstance) -> String:
 	var details: Array[String] = []
 	if required_text != "none":
 		details.append("Needs: %s" % required_text)
+	else:
+		details.append("Needs: any plated pastry")
 	var bonus_text: String = join_packed(customer.get_bonus_tags())
 	if bonus_text != "none":
 		details.append("Likes: %s" % bonus_text)
 	if customer.get_minimum_quality() > 0:
 		details.append("Q>=%d" % customer.get_minimum_quality())
-	if details.is_empty():
-		return "Request: any plated pastry"
+	details.append("Hunger: %d" % maxi(0, customer.remaining_hunger))
 	return "Request: %s" % join_strings(details)
 
 static func describe_item(item: ItemInstance) -> String:

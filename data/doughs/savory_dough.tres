@@ -11,6 +11,7 @@ display_name = "Savory Dough"
 pastry_display_name = "Savory Pastry"
 starting_pastry_tags = PackedStringArray("savory")
 requires_proofing = false
+base_satiation = 2
 art = ExtResource("2_art")
 description = "Prep a savory dough in the morning, then season it during service with cheese and herbs before baking."
 starting_deck_ids = PackedStringArray("starter_cheese", "starter_cheese", "starter_tomato_sauce", "starter_herbs", "starter_bake", "starter_bake", "starter_serve", "starter_serve", "starter_egg_wash", "starter_small_talk")

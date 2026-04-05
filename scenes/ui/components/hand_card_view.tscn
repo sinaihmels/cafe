@@ -1,7 +1,7 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene format=3 uid="uid://bn25mh5b1vog0"]
 
-[ext_resource type="Script" path="res://scripts/ui/components/hand_card_view.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/demo/cards/base_card.png" id="2_fallback"]
+[ext_resource type="Script" uid="uid://dpaw1vavkkupn" path="res://scripts/ui/components/hand_card_view.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cw5wox7dt3kxa" path="res://assets/demo/cards/base_card.png" id="2_fallback"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_normal"]
 bg_color = Color(0.95, 0.89, 0.78, 0.9)
@@ -15,18 +15,6 @@ corner_radius_top_right = 18
 corner_radius_bottom_right = 18
 corner_radius_bottom_left = 18
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hover"]
-bg_color = Color(0.98, 0.84, 0.72, 0.98)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.82, 0.45, 0.27, 0.98)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_selected"]
 bg_color = Color(0.82, 0.45, 0.27, 0.98)
 border_width_left = 2
@@ -34,6 +22,18 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(1, 0.83, 0.74, 0.98)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hover"]
+bg_color = Color(0.98, 0.84, 0.72, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.82, 0.45, 0.27, 0.98)
 corner_radius_top_left = 18
 corner_radius_top_right = 18
 corner_radius_bottom_right = 18
@@ -63,12 +63,12 @@ corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
-[node name="HandCardView" type="Button"]
+[node name="HandCardView" type="Button" unique_id=306788367]
 custom_minimum_size = Vector2(154, 214)
 focus_mode = 0
 theme_override_styles/normal = SubResource("StyleBoxFlat_normal")
-theme_override_styles/hover = SubResource("StyleBoxFlat_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_selected")
+theme_override_styles/hover = SubResource("StyleBoxFlat_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_disabled")
 script = ExtResource("1_script")
 fallback_texture = ExtResource("2_fallback")
@@ -77,7 +77,7 @@ hover_style = SubResource("StyleBoxFlat_hover")
 selected_style = SubResource("StyleBoxFlat_selected")
 disabled_style = SubResource("StyleBoxFlat_disabled")
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="Margin" type="MarginContainer" parent="." unique_id=253560082]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -89,57 +89,57 @@ theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="Body" type="VBoxContainer" parent="Margin"]
+[node name="Body" type="VBoxContainer" parent="Margin" unique_id=763940315]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="TopRow" type="HBoxContainer" parent="Margin/Body"]
+[node name="TopRow" type="HBoxContainer" parent="Margin/Body" unique_id=2049807388]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="CostChip" type="PanelContainer" parent="Margin/Body/TopRow"]
+[node name="CostChip" type="PanelContainer" parent="Margin/Body/TopRow" unique_id=189642402]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_chip")
 
-[node name="ChipMargin" type="MarginContainer" parent="Margin/Body/TopRow/CostChip"]
+[node name="ChipMargin" type="MarginContainer" parent="Margin/Body/TopRow/CostChip" unique_id=1821121073]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 8
 
-[node name="ChipBody" type="VBoxContainer" parent="Margin/Body/TopRow/CostChip/ChipMargin"]
+[node name="ChipBody" type="VBoxContainer" parent="Margin/Body/TopRow/CostChip/ChipMargin" unique_id=1867310670]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="TitleLabel" type="Label" parent="Margin/Body/TopRow/CostChip/ChipMargin/ChipBody"]
+[node name="TitleLabel" type="Label" parent="Margin/Body/TopRow/CostChip/ChipMargin/ChipBody" unique_id=451977664]
 layout_mode = 2
 text = "COST"
 
-[node name="ValueLabel" type="Label" parent="Margin/Body/TopRow/CostChip/ChipMargin/ChipBody"]
+[node name="ValueLabel" type="Label" parent="Margin/Body/TopRow/CostChip/ChipMargin/ChipBody" unique_id=198806029]
 layout_mode = 2
 text = "1"
 
-[node name="TagLabel" type="Label" parent="Margin/Body/TopRow"]
+[node name="TagLabel" type="Label" parent="Margin/Body/TopRow" unique_id=1078571958]
 layout_mode = 2
 size_flags_horizontal = 3
-autowrap_mode = 3
 text = "action"
+autowrap_mode = 3
 
-[node name="Art" type="TextureRect" parent="Margin/Body"]
+[node name="TitleLabel" type="Label" parent="Margin/Body" unique_id=231733685]
 layout_mode = 2
+text = "Card"
+autowrap_mode = 3
+
+[node name="DetailLabel" type="Label" parent="Margin/Body" unique_id=259249836]
+layout_mode = 2
+text = "Preview text"
+autowrap_mode = 3
+
+[node name="Art" type="TextureRect" parent="Margin/Body" unique_id=437654893]
 custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+texture = ExtResource("2_fallback")
 expand_mode = 1
 stretch_mode = 5
-texture = ExtResource("2_fallback")
-
-[node name="TitleLabel" type="Label" parent="Margin/Body"]
-layout_mode = 2
-autowrap_mode = 3
-text = "Card"
-
-[node name="DetailLabel" type="Label" parent="Margin/Body"]
-layout_mode = 2
-autowrap_mode = 3
-text = "Preview text"

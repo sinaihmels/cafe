@@ -18,10 +18,12 @@ base_reputation = 3
 bonus_reputation_per_match = 1
 bonus_tips_per_match = 1
 patience = 6
+hunger = 2
 reward = 4
 stress_damage = 4
 customer_type = 5
 personality_modifiers = {
 "boss": true
 }
+talent_ids = PackedStringArray()
 starting_status_ids = PackedStringArray("critic_status")

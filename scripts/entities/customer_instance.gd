@@ -6,6 +6,10 @@ extends Resource
 @export var mood_flags: Dictionary = {}
 @export var turns_waited: int = 0
 @export var served: bool = false
+@export var remaining_hunger: int = 1
+@export var satisfaction_score: int = 0
+@export var pending_tip_bonus: int = 0
+@export var has_return_scheduled: bool = false
 @export var active_statuses: Array[ModifierInstance] = []
 
 func reset_from_def(definition: CustomerDef) -> void:
@@ -14,6 +18,10 @@ func reset_from_def(definition: CustomerDef) -> void:
 	mood_flags.clear()
 	turns_waited = 0
 	served = false
+	remaining_hunger = maxi(1, definition.hunger if definition != null else 1)
+	satisfaction_score = 0
+	pending_tip_bonus = 0
+	has_return_scheduled = false
 	active_statuses.clear()
 
 func get_display_name() -> String:
@@ -67,6 +75,27 @@ func get_order_id() -> StringName:
 	if customer_def == null:
 		return &""
 	return customer_def.order_id
+
+func get_hunger() -> int:
+	if customer_def == null:
+		return 1
+	return maxi(1, customer_def.hunger)
+
+func get_talent_ids() -> PackedStringArray:
+	if customer_def == null:
+		return PackedStringArray()
+	return customer_def.talent_ids
+
+func has_talent(talent_id: StringName) -> bool:
+	if talent_id == &"" or customer_def == null:
+		return false
+	return customer_def.talent_ids.has(talent_id)
+
+func is_still_hungry() -> bool:
+	return remaining_hunger > 0
+
+func is_returning_visit() -> bool:
+	return bool(mood_flags.get(&"returning_customer", false))
 
 func get_customer_type() -> int:
 	if customer_def == null:

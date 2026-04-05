@@ -9,10 +9,13 @@ func _init() -> void:
 	effect_queue.configure(event_bus)
 	meta.reset_profile(session.content_library)
 	assert(session.start_new_run_with_dough(&"sweet_dough"), "A run should start with Sweet Dough.")
+	session.player_state.energy = 10
 	session.deck_state.draw_pile.clear()
 	session.deck_state.discard_pile.clear()
 	session.deck_state.hand.clear()
 	session.deck_state.hand.append(session.content_library.build_card_instance(&"reward_cinnamon"))
+	session.deck_state.hand.append(session.content_library.build_card_instance(&"starter_bake"))
+	session.deck_state.hand.append(session.content_library.build_card_instance(&"starter_serve"))
 	session.deck_state.hand.append(session.content_library.build_card_instance(&"starter_bake"))
 	session.deck_state.hand.append(session.content_library.build_card_instance(&"starter_serve"))
 	assert(session.play_card_from_hand(0, [], effect_queue), "Cinnamon Sugar should play onto the active pastry.")
@@ -30,6 +33,13 @@ func _init() -> void:
 		},
 	]
 	assert(session.play_card_from_hand(0, serve_targets, effect_queue), "Serve should deliver the plated pastry to the customer.")
-	assert(session.cafe_state.plated_pastries.is_empty(), "Serving should remove the pastry from the table.")
+	assert(session.cafe_state.plated_pastries.is_empty(), "Serving should remove the first pastry from the table.")
+	assert(session.combat_state.active_customers.size() == 1, "A hungry customer should stay after the first accepted pastry.")
+	assert(session.combat_state.active_customers[0].remaining_hunger == 1, "The first sweet pastry should reduce the customer's hunger by 1.")
+
+	assert(session.play_card_from_hand(0, [], effect_queue), "Bake should still work for the replacement pastry.")
+	session.advance_oven()
+	assert(session.collect_oven_item(0), "The second pastry should also be collectible from the oven.")
+	assert(session.play_card_from_hand(0, serve_targets, effect_queue), "Serve should be able to finish the hungry customer with a second pastry.")
 	assert(session.run_state.screen == GameEnums.Screen.REWARD, "Serving the last customer on day 1 should clear the encounter and route to reward.")
 	quit()

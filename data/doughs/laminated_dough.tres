@@ -11,6 +11,7 @@ display_name = "Laminated Dough"
 pastry_display_name = "Laminated Pastry"
 starting_pastry_tags = PackedStringArray()
 requires_proofing = true
+base_satiation = 2
 art = ExtResource("2_art")
 description = "Prep a layered dough in the morning, fold it during service, proof it in the oven, then bake it into something flaky."
 starting_deck_ids = PackedStringArray("starter_fold", "starter_fold", "starter_butter", "starter_proof", "starter_proof", "starter_bake", "starter_bake", "starter_serve", "starter_double_batch", "starter_perfect_timing")

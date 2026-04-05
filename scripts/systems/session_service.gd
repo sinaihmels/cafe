@@ -230,16 +230,20 @@ func _enter_day(day_number: int) -> void:
 	if dough == null:
 		_set_status_message("Choose a dough before starting the day.")
 		return
+	var day_customer_roster: Dictionary = _build_day_customer_roster(day_number)
+	var day_customer_ids: PackedStringArray = day_customer_roster.get("customer_ids", PackedStringArray())
+	var returning_customer_ids: PackedStringArray = day_customer_roster.get("returning_customer_ids", PackedStringArray())
 	run_state.day_number = day_number
 	run_state.pending_day_number = 0
 	run_state.encounter_index = maxi(0, day_number - 1)
-	run_state.current_customer_ids = _to_packed_strings(ENCOUNTER_CUSTOMERS.get(day_number, []))
+	run_state.current_customer_ids = day_customer_ids
 	run_state.pending_reward_ids.clear()
 	run_state.pending_shop_offer_ids.clear()
 	run_state.screen = GameEnums.Screen.ENCOUNTER
 	run_state.run_phase = GameEnums.RunPhase.ENCOUNTER
 	combat_state.turn_number = 1
 	combat_state.turn_state = GameEnums.TurnState.IDLE
+	combat_state.focused_customer_index = 0
 	combat_state.next_plated_pastry_duplications = 0
 	combat_state.skip_next_customer_patience_loss = false
 	combat_state.next_warm_serve_bonus = false
@@ -247,12 +251,32 @@ func _enter_day(day_number: int) -> void:
 	_rebuild_deck_from_master_ids()
 	if not _spawn_fresh_active_pastry():
 		return
-	combat_state.active_customers = _create_customers(run_state.current_customer_ids)
+	combat_state.active_customers = _create_customers(run_state.current_customer_ids, returning_customer_ids)
 	begin_player_turn(true)
 	var opening_message: String = "Day %d begins with %s ready to shape. Build one pastry at a time and serve each customer before patience runs out." % [day_number, dough.display_name]
 	if dough.requires_proofing:
 		opening_message = "Day %d begins with %s ready to shape. Proof it, bake it, plate it, and keep the line moving one pastry at a time." % [day_number, dough.display_name]
 	_set_status_message(opening_message)
+
+func _build_day_customer_roster(day_number: int) -> Dictionary:
+	var customer_ids: PackedStringArray = _to_packed_strings(ENCOUNTER_CUSTOMERS.get(day_number, []))
+	var returning_customer_ids: PackedStringArray = PackedStringArray()
+	if day_number >= 4:
+		return {
+			"customer_ids": customer_ids,
+			"returning_customer_ids": returning_customer_ids,
+		}
+	var scheduled_customer_ids: PackedStringArray = _to_packed_strings(run_state.scheduled_return_customer_ids_by_day.get(day_number, []))
+	for scheduled_customer_id in scheduled_customer_ids:
+		var customer_id: StringName = StringName(scheduled_customer_id)
+		if customer_ids.has(customer_id):
+			continue
+		customer_ids.append(customer_id)
+		returning_customer_ids.append(customer_id)
+	return {
+		"customer_ids": customer_ids,
+		"returning_customer_ids": returning_customer_ids,
+	}
 
 func _reset_cafe_pastry_state() -> void:
 	cafe_state.active_pastry = null
@@ -289,6 +313,8 @@ func _create_pastry_from_dough(dough_id: StringName) -> PastryInstance:
 	pastry.dough_id = dough.dough_id
 	pastry.display_name = dough.pastry_display_name if dough.pastry_display_name != "" else dough.display_name
 	pastry.art = dough.art
+	pastry.base_satiation = maxi(1, dough.base_satiation)
+	pastry.bonus_satiation = 0
 	pastry.pastry_tags = dough.starting_pastry_tags.duplicate()
 	if dough.requires_proofing:
 		pastry.internal_flags[&"requires_proofing"] = true
@@ -302,7 +328,7 @@ func _rebuild_deck_from_master_ids() -> void:
 			cards.append(instance)
 	deck_state.reset_from_cards(cards)
 
-func _create_customers(customer_ids: PackedStringArray) -> Array[CustomerInstance]:
+func _create_customers(customer_ids: PackedStringArray, returning_customer_ids: PackedStringArray = PackedStringArray()) -> Array[CustomerInstance]:
 	var output: Array[CustomerInstance] = []
 	for customer_id in customer_ids:
 		var customer_def: CustomerDef = content_library.get_customer(StringName(customer_id))
@@ -310,6 +336,8 @@ func _create_customers(customer_ids: PackedStringArray) -> Array[CustomerInstanc
 			continue
 		var customer: CustomerInstance = CustomerInstance.new()
 		customer.reset_from_def(customer_def)
+		if returning_customer_ids.has(customer_def.customer_id):
+			customer.mood_flags[&"returning_customer"] = true
 		for status_id in customer_def.starting_status_ids:
 			_add_modifier_to_collection(
 				customer.active_statuses,
@@ -538,7 +566,7 @@ func play_card_from_hand(card_index: int, targets: Array[Dictionary], effect_que
 	effect_queue.enqueue_all(card.card_def.effects, context)
 	effect_queue.resolve_all()
 	deck_state.discard_from_hand(card)
-	after_card_played(card)
+	after_card_played(card, targets)
 	return true
 
 func add_tags_to_pastry(
@@ -649,6 +677,7 @@ func proof_active_pastry() -> bool:
 	cafe_state.active_pastry = null
 	cafe_state.oven_mode = &"proofing"
 	cafe_state.oven_turns_remaining = 1
+	_spawn_fresh_active_pastry()
 	_set_status_message("%s is proofing in the oven." % pastry.get_display_name())
 	return true
 
@@ -668,6 +697,7 @@ func bake_active_pastry() -> bool:
 		cafe_state.active_pastry = null
 		cafe_state.oven_mode = &"baking"
 		cafe_state.oven_turns_remaining = 1
+		_spawn_fresh_active_pastry()
 		_set_status_message("%s is baking." % pastry.get_display_name())
 		return true
 	if cafe_state.oven_pastry != null and cafe_state.oven_mode == &"" and cafe_state.oven_pastry.has_pastry_state(&"proofed"):
@@ -776,12 +806,62 @@ func serve_item_to_customer(customer_index: int, item_index: int) -> bool:
 	var customer: CustomerInstance = combat_state.active_customers[customer_index]
 	var pastry: PastryInstance = cafe_state.plated_pastries[item_index]
 	var outcome: Dictionary = _score_pastry_for_customer(pastry, customer)
-	apply_reputation_delta(int(outcome.get("reputation_delta", 0)))
-	player_state.gain_tips(int(outcome.get("tips", 0)))
 	cafe_state.plated_pastries.remove_at(item_index)
+	if not bool(outcome.get("accepted", false)):
+		customer.current_patience = maxi(0, customer.current_patience - 1)
+		var failed_message: String = "%s %s lost 1 patience." % [
+			String(outcome.get("message", "The pastry was rejected.")),
+			customer.get_display_name(),
+		]
+		if customer.current_patience <= 0:
+			var stress_damage: int = customer.customer_def.stress_damage if customer.customer_def != null else 2
+			player_state.lose_stress(stress_damage)
+			combat_state.active_customers.remove_at(customer_index)
+			_set_status_message("%s They left upset. Stress -%d." % [failed_message, stress_damage])
+			if player_state.stress <= 0:
+				_finish_run(false, "The bakery became too stressful to continue.")
+				return true
+		else:
+			_set_status_message(failed_message)
+		_clamp_focused_customer_index()
+		if combat_state.active_customers.is_empty():
+			_advance_after_encounter_clear()
+		return true
+
+	var matched_bonus_tags: int = int(outcome.get("matched_bonus_tags", 0))
+	var satiation: int = _calculate_pastry_satiation(pastry)
+	customer.remaining_hunger = maxi(0, customer.remaining_hunger - satiation)
+	customer.satisfaction_score += 2 + matched_bonus_tags
+	customer.pending_tip_bonus += 1 + matched_bonus_tags
+	if customer.remaining_hunger > 0:
+		_set_status_message("%s %s is still hungry (%d hunger left)." % [
+			String(outcome.get("message", "The pastry was accepted.")),
+			customer.get_display_name(),
+			customer.remaining_hunger,
+		])
+		combat_state.focused_customer_index = clampi(customer_index, 0, combat_state.active_customers.size() - 1)
+		return true
+
+	var reputation_delta: int = int(outcome.get("reputation_delta", 0))
+	var tips_delta: int = int(outcome.get("tips", 0))
+	var final_message: String = String(outcome.get("message", "Served a customer."))
+	if combat_state.next_warm_serve_bonus and pastry.has_pastry_state(&"warm") and reputation_delta > 0:
+		reputation_delta += 1
+		tips_delta += 1
+		combat_state.next_warm_serve_bonus = false
+		final_message = "%s caught the pastry at the perfect moment." % customer.get_display_name()
+	tips_delta += customer.pending_tip_bonus
+	customer.pending_tip_bonus = 0
+	apply_reputation_delta(reputation_delta)
+	player_state.gain_tips(tips_delta)
+	customer.served = true
+	var will_return: bool = _maybe_schedule_customer_return(customer)
 	combat_state.active_customers.remove_at(customer_index)
 	_notify_customer_served(customer, pastry)
-	_set_status_message(String(outcome.get("message", "Served a customer.")))
+	if will_return:
+		final_message += " They may come back on another day."
+	_set_status_message(final_message)
+	_clamp_focused_customer_index()
 	if combat_state.active_customers.is_empty():
 		_advance_after_encounter_clear()
 	return true
@@ -800,6 +880,49 @@ func serve_targets(targets: Array[Dictionary]) -> bool:
 		_set_status_message("Serve needs 1 customer and 1 plated pastry.")
 		return false
 	return serve_item_to_customer(customer_index, pastry_index)
+
+func _calculate_pastry_satiation(pastry: PastryInstance) -> int:
+	if pastry == null:
+		return 0
+	if pastry.has_pastry_state(&"burned"):
+		return 0
+	var satiation: int = pastry.base_satiation + pastry.bonus_satiation
+	if pastry.has_pastry_tag(&"luxurious"):
+		satiation += 1
+	if pastry.has_pastry_tag(&"salty"):
+		satiation += 1
+	if pastry.has_pastry_tag(&"airy"):
+		satiation -= 1
+	return maxi(1, satiation)
+
+func _maybe_schedule_customer_return(customer: CustomerInstance) -> bool:
+	if customer == null or customer.customer_def == null:
+		return false
+	if customer.satisfaction_score < 4:
+		return false
+	var customer_id: StringName = customer.customer_def.customer_id
+	if run_state.customer_ids_already_scheduled_to_return.has(customer_id):
+		return false
+	for future_day in range(run_state.day_number + 1, 4):
+		var scheduled_ids: PackedStringArray = _to_packed_strings(run_state.scheduled_return_customer_ids_by_day.get(future_day, []))
+		if not scheduled_ids.is_empty():
+			continue
+		scheduled_ids.append(customer_id)
+		run_state.scheduled_return_customer_ids_by_day[future_day] = scheduled_ids
+		run_state.customer_ids_already_scheduled_to_return.append(customer_id)
+		customer.has_return_scheduled = true
+		return true
+	return false
+
+func _clamp_focused_customer_index() -> void:
+	if combat_state.active_customers.is_empty():
+		combat_state.focused_customer_index = 0
+		return
+	combat_state.focused_customer_index = clampi(
+		combat_state.focused_customer_index,
+		0,
+		combat_state.active_customers.size() - 1
+	)
 
 func _resolve_pastry_target(targets: Array) -> PastryInstance:
 	for target_value in targets:
@@ -868,7 +991,7 @@ func _plate_pastry(pastry: PastryInstance, add_warm: bool) -> bool:
 		var pastry_copy: PastryInstance = pastry.duplicate_pastry()
 		pastry_copy.zone = &"table"
 		cafe_state.plated_pastries.append(pastry_copy)
-	if cafe_state.active_pastry == null and cafe_state.oven_pastry == null:
+	if cafe_state.active_pastry == null:
 		_spawn_fresh_active_pastry()
 	return true
 
@@ -1191,6 +1314,7 @@ func _process_customer_turn() -> void:
 		remaining_customers.append(customer)
 	combat_state.active_customers = remaining_customers
 	combat_state.skip_next_customer_patience_loss = false
+	_clamp_focused_customer_index()
 	if patience_loss_prevented:
 		_set_status_message("Small Talk kept the whole line patient for a turn.")
 	if unhappy_departures > 0:
@@ -1457,11 +1581,65 @@ func _revert_modifier_stats(_instance: ModifierInstance, modifier_def: ModifierD
 			GameEnums.ModifierTarget.ITEM:
 				pass
 
-func after_card_played(card: CardInstance) -> void:
+func after_card_played(card: CardInstance, targets: Array = []) -> void:
 	if event_bus != null and card != null:
 		event_bus.emit_card_played(card)
 	_run_modifier_effects_from_collection(player_state.passive_modifiers, &"card_played")
 	_run_modifier_effects_from_collection(player_state.active_buffs, &"card_played")
+	_trigger_card_interaction_talents(card, targets)
+
+func _trigger_card_interaction_talents(card: CardInstance, targets: Array) -> void:
+	if card == null or card.card_def == null or card.card_def.interaction_traits.is_empty():
+		return
+	var customer_index: int = _resolve_interaction_customer_index(targets)
+	for raw_trait in card.card_def.interaction_traits:
+		var interaction_trait: StringName = StringName(raw_trait)
+		var event_name: StringName = &""
+		match interaction_trait:
+			&"talk":
+				event_name = &"talked_to"
+			_:
+				event_name = &""
+		if event_name == &"":
+			continue
+		_trigger_customer_talents(event_name, customer_index, card, targets)
+
+func _resolve_interaction_customer_index(targets: Array) -> int:
+	var customer_indices: Array = _collect_customer_indices(targets)
+	if not customer_indices.is_empty():
+		return int(customer_indices[0])
+	if combat_state.active_customers.is_empty():
+		return -1
+	return clampi(combat_state.focused_customer_index, 0, combat_state.active_customers.size() - 1)
+
+func _trigger_customer_talents(event_name: StringName, customer_index: int, source_card: CardInstance, targets: Array) -> void:
+	if event_name == &"" or customer_index < 0 or customer_index >= combat_state.active_customers.size():
+		return
+	var customer: CustomerInstance = combat_state.active_customers[customer_index]
+	if customer == null:
+		return
+	for raw_talent_id in customer.get_talent_ids():
+		_apply_customer_talent(event_name, customer_index, StringName(raw_talent_id), source_card, targets)
+
+func _apply_customer_talent(
+	event_name: StringName,
+	customer_index: int,
+	talent_id: StringName,
+	_source_card: CardInstance,
+	_targets: Array
+) -> void:
+	if customer_index < 0 or customer_index >= combat_state.active_customers.size():
+		return
+	var customer: CustomerInstance = combat_state.active_customers[customer_index]
+	if customer == null:
+		return
+	match talent_id:
+		&"social":
+			if event_name == &"talked_to":
+				customer.current_patience += 1
+				_append_status_message("%s warmed up to the conversation and gained 1 patience." % customer.get_display_name())
+		_:
+			pass
 func _find_recipe(input_item_ids: PackedStringArray, station: StringName) -> RecipeDef:
 	for recipe in content_library.recipes.values():
 		var recipe_def: RecipeDef = recipe
@@ -1505,9 +1683,11 @@ func _create_baked_result(item: ItemInstance) -> ItemInstance:
 func _score_pastry_for_customer(pastry: PastryInstance, customer: CustomerInstance) -> Dictionary:
 	var customer_name: String = customer.get_display_name() if customer != null else "The customer"
 	var result: Dictionary = {
+		"accepted": false,
 		"success": false,
 		"reputation_delta": -1,
 		"tips": 0,
+		"matched_bonus_tags": 0,
 		"message": "%s left disappointed." % customer_name,
 	}
 	if pastry == null or customer == null:
@@ -1532,6 +1712,7 @@ func _score_pastry_for_customer(pastry: PastryInstance, customer: CustomerInstan
 	var reputation_delta: int = customer.get_base_reputation() + (matched_bonus_tags * customer.get_bonus_reputation_per_match())
 	var tips_delta: int = customer.get_base_tips() + (matched_bonus_tags * customer.get_bonus_tips_per_match())
 	var message: String = _build_pastry_success_message(customer, required_tokens, customer.get_bonus_tags(), matched_bonus_tags)
+	result["accepted"] = true
 	if customer.get_customer_type() == GameEnums.CustomerType.IMPATIENT and pastry.steps_used <= 2 and customer.turns_waited <= 1:
 		reputation_delta += 1
 		tips_delta += 1
@@ -1540,14 +1721,10 @@ func _score_pastry_for_customer(pastry: PastryInstance, customer: CustomerInstan
 		reputation_delta = mini(reputation_delta, 0)
 		tips_delta = mini(tips_delta, 0)
 		message = "%s expected a more polished pastry." % customer.get_display_name()
-	if combat_state.next_warm_serve_bonus and pastry.has_pastry_state(&"warm") and reputation_delta > 0:
-		reputation_delta += 1
-		tips_delta += 1
-		combat_state.next_warm_serve_bonus = false
-		message = "%s caught the pastry at the perfect moment." % customer.get_display_name()
 	result["success"] = reputation_delta > 0 or tips_delta > 0
 	result["reputation_delta"] = reputation_delta
 	result["tips"] = tips_delta
+	result["matched_bonus_tags"] = matched_bonus_tags
 	result["message"] = message
 	return result
 
@@ -1737,7 +1914,7 @@ func _rebuild_oven_slots() -> void:
 	for _index in range(cafe_state.oven_capacity):
 		cafe_state.oven_slots.append(OvenSlotState.new())
 
-func _to_packed_strings(values: Array) -> PackedStringArray:
+func _to_packed_strings(values) -> PackedStringArray:
 	var output: PackedStringArray = PackedStringArray()
 	for value in values:
 		output.append(String(value))
@@ -1760,3 +1937,11 @@ func _finish_run(won: bool, message: String) -> void:
 func _set_status_message(message: String) -> void:
 	run_state.status_message = message
 	_last_status_message = message
+
+func _append_status_message(message: String) -> void:
+	if message == "":
+		return
+	if run_state.status_message == "":
+		_set_status_message(message)
+		return
+	_set_status_message("%s %s" % [run_state.status_message, message])

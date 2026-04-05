@@ -5,6 +5,8 @@ extends Resource
 @export var display_name: String = ""
 @export var art: Texture2D
 @export var quality: int = 0
+@export var base_satiation: int = 1
+@export var bonus_satiation: int = 0
 @export var pastry_tags: PackedStringArray = []
 @export var pastry_states: Dictionary = {}
 @export var zone: StringName = &"active"

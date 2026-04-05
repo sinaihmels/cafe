@@ -22,6 +22,8 @@ func _init() -> void:
 	assert(session.cafe_state.active_pastry.has_pastry_tag(&"sticky"), "Cinnamon Sugar should update the active pastry instead of spawning a loose ingredient.")
 	assert(session.play_card_from_hand(0, [], effect_queue), "Bake should play successfully on the modified pastry.")
 	assert(session.cafe_state.oven_pastry != null, "Baking should move the pastry into the oven.")
+	assert(session.cafe_state.active_pastry != null, "Sending a pastry to the oven should immediately refill prep with more of the day's dough.")
+	assert(session.cafe_state.active_pastry.dough_id == &"sweet_dough", "The refill pastry should keep using the selected dough.")
 	assert(session.cafe_state.oven_turns_remaining == 1, "Normal baking should take one full turn before the pastry is ready.")
 	assert(not session.cafe_state.oven_pastry.has_pastry_state(&"baked"), "Pastries should not be baked immediately when they enter the oven.")
 	session.advance_oven()

@@ -12,3 +12,4 @@ extends Resource
 @export var pastry_display_name: String = ""
 @export var starting_pastry_tags: PackedStringArray = []
 @export var requires_proofing: bool = false
+@export var base_satiation: int = 1

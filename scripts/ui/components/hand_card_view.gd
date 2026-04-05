@@ -17,6 +17,7 @@ signal hover_ended()
 @onready var _title_label: Label = $Margin/Body/TitleLabel
 @onready var _detail_label: Label = $Margin/Body/DetailLabel
 
+
 var _is_selected: bool = false
 var _is_hovered: bool = false
 var _configured_card: CardInstance

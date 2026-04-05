@@ -16,6 +16,7 @@ display_name = "Small Talk"
 art = ExtResource("3_art")
 energy_cost = 2
 tags = PackedStringArray("interaction")
+interaction_traits = PackedStringArray("talk")
 targeting_rules = "none"
 effects = [SubResource("Resource_small_talk")]
 preview_text = "Buy a little more time and prevent patience loss this turn."

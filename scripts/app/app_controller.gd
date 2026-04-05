@@ -159,12 +159,14 @@ func _on_prep_item_requested(item_index: int) -> void:
 
 func _on_customer_item_requested(customer_index: int) -> void:
 	_focused_customer_index = customer_index
+	_sync_focused_customer_index()
 	_handle_target_click(&"customer", customer_index)
 
 func _on_focus_customer_requested(customer_index: int) -> void:
 	if _session_service.run_state.screen != GameEnums.Screen.ENCOUNTER:
 		return
 	_focused_customer_index = customer_index
+	_sync_focused_customer_index()
 	if _pending_card_index != -1 and _pending_card_index < _session_service.deck_state.hand.size():
 		var card: CardInstance = _session_service.deck_state.hand[_pending_card_index]
 		if _session_service.is_valid_target(card, &"customer", customer_index):
@@ -279,4 +281,13 @@ func _on_resolution_finished() -> void:
 	_refresh_view()
 
 func _refresh_view() -> void:
+	_sync_focused_customer_index()
 	_app_view.render(_session_service, _build_interaction_state())
+
+func _sync_focused_customer_index() -> void:
+	if _session_service.run_state.screen != GameEnums.Screen.ENCOUNTER or _session_service.combat_state.active_customers.is_empty():
+		_focused_customer_index = 0
+		_session_service.combat_state.focused_customer_index = 0
+		return
+	_focused_customer_index = clampi(_focused_customer_index, 0, _session_service.combat_state.active_customers.size() - 1)
+	_session_service.combat_state.focused_customer_index = _focused_customer_index

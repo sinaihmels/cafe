@@ -11,6 +11,7 @@ display_name = "Sweet Dough"
 pastry_display_name = "Sweet Pastry"
 starting_pastry_tags = PackedStringArray("sweet")
 requires_proofing = false
+base_satiation = 1
 art = ExtResource("2_art")
 description = "Prep it in the morning, then open the cafe and turn it into a sweet pastry with toppings, baking, and finishing cards."
 starting_deck_ids = PackedStringArray("reward_chocolate", "reward_chocolate", "reward_cinnamon", "starter_vanilla", "starter_bake", "starter_bake", "starter_serve", "starter_serve", "starter_sugar_glaze", "starter_mini_cookies")

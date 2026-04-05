@@ -22,7 +22,8 @@ func _init() -> void:
 
 	assert(not session.can_play_card(session.deck_state.hand[1]), "Bake should be blocked until the laminated pastry is proofed.")
 	assert(session.play_card_from_hand(0, [], effect_queue), "Proof should move the laminated pastry into the oven.")
-	assert(session.cafe_state.active_pastry == null, "Proofing should remove the pastry from prep.")
+	assert(session.cafe_state.active_pastry != null, "Proofing should immediately refill prep with the day's dough.")
+	assert(session.cafe_state.active_pastry.dough_id == &"laminated_dough", "The refill pastry should use the selected dough for the day.")
 	assert(session.cafe_state.oven_pastry != null, "Proofing should place the pastry in the oven.")
 	assert(session.cafe_state.oven_mode == &"proofing", "The oven should enter the proofing stage.")
 
