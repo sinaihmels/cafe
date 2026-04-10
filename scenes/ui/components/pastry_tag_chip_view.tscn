@@ -1,0 +1,29 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/components/pastry_tag_chip_view.gd" id="1_script"]
+
+[node name="PastryTagChipView" type="PanelContainer"]
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Padding" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 7
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 7
+theme_override_constants/margin_bottom = 4
+
+[node name="Body" type="VBoxContainer" parent="Padding"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="NameLabel" type="Label" parent="Padding/Body"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+text = "Sweet"
+
+[node name="ConditionLabel" type="Label" parent="Padding/Body"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "if warm"

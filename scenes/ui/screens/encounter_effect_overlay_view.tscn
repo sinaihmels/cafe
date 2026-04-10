@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/screens/encounter_effect_overlay_view.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/pastry_tag_chip_view.tscn" id="2_chip"]
+
+[node name="EncounterEffectOverlayView" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+z_index = 20
+script = ExtResource("1_script")
+pastry_tag_chip_scene = ExtResource("2_chip")
+
+[node name="EffectsLayer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

@@ -52,3 +52,8 @@ func _instantiate_item_card() -> ZoneItemCardView:
 	var card: ZoneItemCardView = node as ZoneItemCardView
 	assert(card != null, "OvenZoneView.item_card_scene must instantiate ZoneItemCardView.")
 	return card
+
+func get_pastry_card_control(item_index: int) -> Control:
+	if item_index < 0 or item_index >= _row.get_child_count():
+		return null
+	return _row.get_child(item_index) as Control

@@ -10,6 +10,7 @@ signal hover_ended()
 @export var selected_modulate: Color = Color(1, 0.96, 0.90, 1)
 @export var disabled_modulate: Color = Color(0.78, 0.78, 0.78, 0.82)
 @export var hide_art_when_matching_background: bool = true
+@export var pastry_tag_chip_scene: PackedScene
 
 const DESIGN_SIZE: Vector2 = Vector2(154, 214)
 
@@ -17,8 +18,8 @@ const DESIGN_SIZE: Vector2 = Vector2(154, 214)
 @onready var _background: TextureRect = $CardContent/CardBackground
 @onready var _cost_label: Label = $CardContent/EnergyCostLabel
 @onready var _display_name_label: Label = $CardContent/DisplayNameLabel
-@onready var _pastry_tags_label: Label = $CardContent/PastryTagsLabel
-@onready var _preview_label: Label = $CardContent/PreviewLabel
+@onready var _pastry_tags_flow: FlowContainer = $CardContent/LowerBody/PastryTagsFlow
+@onready var _preview_label: Label = $CardContent/LowerBody/PreviewLabel
 @onready var _art_frame: Control = $CardContent/CardArtFrame
 @onready var _card_image: Sprite2D = $CardContent/CardArtFrame/CardImage
 
@@ -64,11 +65,20 @@ func _notification(what: int) -> void:
 		_layout_card_art()
 
 func _apply_configuration() -> void:
+	_background.texture = CardDef.background_texture_for_type(CardDef.CardType.INGREDIENT)
+	_cost_label.text = ""
+	_display_name_label.text = ""
+	_preview_label.text = ""
+	_clear_pastry_tag_chips()
+	_pastry_tags_flow.visible = false
+	_apply_card_art()
+	_apply_visual_state()
 	if _configured_card == null:
 		return
+	_background.texture = _configured_card.get_background_texture()
 	_cost_label.text = str(_configured_card.get_cost())
 	_display_name_label.text = _configured_card.get_display_name()
-	_pastry_tags_label.text = _build_pastry_tags_line(_configured_card)
+	_render_pastry_tag_chips(_configured_card)
 	_preview_label.text = _configured_card.get_preview_text()
 	_apply_card_art()
 	_apply_visual_state()
@@ -84,9 +94,8 @@ func _apply_card_art() -> void:
 	var art_texture: Texture2D = null
 	if _configured_card != null:
 		art_texture = _configured_card.get_art_texture()
-	var background_texture: Texture2D = _background.texture
 	var should_hide_art: bool = art_texture == null
-	if hide_art_when_matching_background and art_texture != null and art_texture == background_texture:
+	if hide_art_when_matching_background and CardDef.is_background_texture(art_texture):
 		should_hide_art = true
 	_card_image.visible = not should_hide_art
 	if should_hide_art:
@@ -109,13 +118,35 @@ func _layout_card_art() -> void:
 	var scale_factor: float = minf(frame_size.x / texture_size.x, frame_size.y / texture_size.y)
 	_card_image.scale = Vector2.ONE * scale_factor
 
-func _build_pastry_tags_line(card: CardInstance) -> String:
+func _render_pastry_tag_chips(card: CardInstance) -> void:
 	if card == null:
-		return "Adds: none"
-	var added_tags: PackedStringArray = card.get_pastry_tags_added()
-	if added_tags.is_empty():
-		return "Adds: none"
-	return "Adds: %s" % UiTextFormatter.join_packed(added_tags)
+		return
+	var previews: Array[PastryTagPreview] = card.get_pastry_tag_previews()
+	if previews.is_empty():
+		return
+	for preview in previews:
+		if preview == null:
+			continue
+		var chip: PastryTagChipView = _instantiate_pastry_tag_chip()
+		chip.configure(
+			UiPastryTagCatalog.label_for_tag(preview.tag_id),
+			UiPastryTagCatalog.presentation_for_tag(preview.tag_id),
+			preview.is_conditional,
+			preview.condition_text
+		)
+		_pastry_tags_flow.add_child(chip)
+	_pastry_tags_flow.visible = _pastry_tags_flow.get_child_count() > 0
+
+func _clear_pastry_tag_chips() -> void:
+	if _pastry_tags_flow == null:
+		return
+	UiSceneUtils.clear_children(_pastry_tags_flow)
+
+func _instantiate_pastry_tag_chip() -> PastryTagChipView:
+	var node: Node = UiSceneUtils.instantiate_required(pastry_tag_chip_scene, "HandCardView.pastry_tag_chip_scene")
+	var chip: PastryTagChipView = node as PastryTagChipView
+	assert(chip != null, "HandCardView.pastry_tag_chip_scene must instantiate PastryTagChipView.")
+	return chip
 
 func _apply_visual_state() -> void:
 	if not _configured_playable:

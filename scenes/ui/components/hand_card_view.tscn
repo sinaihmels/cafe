@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dpaw1vavkkupn" path="res://scripts/ui/components/hand_card_view.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://cw5wox7dt3kxa" path="res://assets/demo/cards/base_card.png" id="2_background"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/pastry_tag_chip_view.tscn" id="3_chip"]
 
 [node name="HandCardView" type="Control" unique_id=306788367]
 custom_minimum_size = Vector2(154, 214)
@@ -10,6 +11,7 @@ offset_bottom = 214.0
 focus_mode = 0
 mouse_filter = 0
 script = ExtResource("1_script")
+pastry_tag_chip_scene = ExtResource("3_chip")
 
 [node name="CardContent" type="Control" parent="."]
 custom_minimum_size = Vector2(154, 214)
@@ -66,24 +68,24 @@ clip_contents = true
 [node name="CardImage" type="Sprite2D" parent="CardContent/CardArtFrame" unique_id=25347468]
 position = Vector2(60, 39.5)
 
-[node name="PastryTagsLabel" type="Label" parent="CardContent" unique_id=1078571958]
+[node name="LowerBody" type="VBoxContainer" parent="CardContent" unique_id=1078571958]
 layout_mode = 0
 offset_left = 14.0
-offset_top = 124.0
+offset_top = 121.0
 offset_right = 140.0
-offset_bottom = 150.0
+offset_bottom = 202.0
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.470588, 0.25098, 0.141176, 1)
-theme_override_font_sizes/font_size = 10
-text = "Adds: none"
-autowrap_mode = 3
+theme_override_constants/separation = 4
 
-[node name="PreviewLabel" type="Label" parent="CardContent" unique_id=259249836]
-layout_mode = 0
-offset_left = 14.0
-offset_top = 152.0
-offset_right = 140.0
-offset_bottom = 198.0
+[node name="PastryTagsFlow" type="FlowContainer" parent="CardContent/LowerBody"]
+visible = false
+layout_mode = 2
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+
+[node name="PreviewLabel" type="Label" parent="CardContent/LowerBody" unique_id=259249836]
+layout_mode = 2
+size_flags_vertical = 3
 mouse_filter = 2
 theme_override_colors/font_color = Color(0.372549, 0.231373, 0.164706, 1)
 theme_override_font_sizes/font_size = 10

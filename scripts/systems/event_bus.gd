@@ -7,6 +7,7 @@ signal customer_served(customer_id: StringName)
 signal turn_started(turn_number: int)
 signal turn_ended(turn_number: int)
 signal effect_applied(effect: BaseEffect, context: EffectContext)
+signal pastry_feedback_requested(feedback: PastryFeedbackEvent)
 signal energy_changed(new_energy: int, delta: int)
 
 func emit_card_played(card: CardInstance) -> void:
@@ -26,6 +27,9 @@ func emit_turn_ended(turn_number: int) -> void:
 
 func emit_effect_applied(effect: BaseEffect, context: EffectContext) -> void:
 	effect_applied.emit(effect, context)
+
+func emit_pastry_feedback_requested(feedback: PastryFeedbackEvent) -> void:
+	pastry_feedback_requested.emit(feedback)
 
 func emit_energy_changed(new_energy: int, delta: int) -> void:
 	energy_changed.emit(new_energy, delta)

@@ -2,7 +2,10 @@
 
 Place your PNG files inside these folders. The demo UI auto-loads by filename:
 
-- `cards/base_card.png` (always-used card frame)
+- `cards/base_card.png` (ingredient card frame)
+- `cards/base_card_process.png` (process card frame tint)
+- `cards/base_card_technique.png` (technique card frame tint)
+- `cards/base_card_interaction.png` (interaction card frame tint)
 - `cards/<card_id>.png` (example: `cards/card_chocolate.png`)
 - `customers/<customer_id>.png` (example: `customers/customer_critic_guest.png`)
 - `doughs/<dough_id>.png` (example: `doughs/sweet_dough.png`)

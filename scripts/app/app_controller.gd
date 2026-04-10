@@ -26,6 +26,7 @@ func _ready() -> void:
 	# AppView is a sibling scene, so its @onready node bindings are only valid after its own ready signal.
 	if not _app_view.is_node_ready():
 		await _app_view.ready
+	_app_view.configure(_event_bus)
 	_refresh_view()
 
 func _connect_view() -> void:

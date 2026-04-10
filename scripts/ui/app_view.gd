@@ -45,6 +45,9 @@ func _ready() -> void:
 	_show_simple_screen(GameEnums.Screen.TITLE)
 	_encounter_screen.visible = false
 
+func configure(event_bus: EventBus) -> void:
+	_encounter_screen.configure_event_bus(event_bus)
+
 func render(session_service: SessionService, interaction_state: EncounterInteractionState) -> void:
 	# Encounter owns a completely different authored layout, so the root shell acts as a simple screen router.
 	if session_service.run_state.screen == GameEnums.Screen.ENCOUNTER:

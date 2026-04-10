@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/screens/encounter_screen_view.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_hud_view.tscn" id="2_hud"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/oven_zone_view.tscn" id="6_oven"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/table_zone_view.tscn" id="7_table"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/hand_fan_view.tscn" id="8_hand"]
+[ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_effect_overlay_view.tscn" id="9_overlay"]
 
 [node name="EncounterScreenView" type="Control"]
 anchors_preset = 15
@@ -131,5 +132,13 @@ offset_left = 18.0
 offset_top = 6.0
 offset_right = -18.0
 offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="EncounterEffectOverlayView" parent="." instance=ExtResource("9_overlay")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2

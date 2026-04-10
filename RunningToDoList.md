@@ -3,8 +3,7 @@
 ##  Enemies
 * Multiple Enemies per day
 * Enemies can gift decorations if they are extremely satisfied
-* have a score system on how satisfied your customers are 
-* Implement that very satisfied customers come more often (e.g. on multiple days)
+
 
 
 ## Dialogue
@@ -14,3 +13,7 @@ and gives the player options to choose from and different options determine how 
 
 
 ## Pastry
+
+
+## Cards
+* Add the category of card to the card layout

@@ -586,17 +586,20 @@ func add_tags_to_pastry(
 		_set_status_message("%s is not in the right state for that card." % pastry.get_display_name())
 		return false
 	var changed: bool = false
+	var added_tags: PackedStringArray = PackedStringArray()
 	for raw_tag in tags_to_add:
 		var tag_name: StringName = StringName(raw_tag)
 		if tag_name == &"" or pastry.has_pastry_tag(tag_name):
 			continue
 		pastry.add_pastry_tag(tag_name)
+		added_tags.append(tag_name)
 		changed = true
 	if not changed:
 		_set_status_message("%s already has those traits." % pastry.get_display_name())
 		return false
 	pastry.steps_used += 1
-	_set_status_message("%s gained %s." % [pastry.get_display_name(), UiTextFormatter.join_packed(tags_to_add)])
+	_set_status_message("%s gained %s." % [pastry.get_display_name(), UiTextFormatter.join_packed(added_tags)])
+	_emit_pastry_feedback(targets, pastry, added_tags, PackedStringArray(), 0)
 	return true
 
 func add_states_to_pastry(targets: Array, states_to_add: PackedStringArray, duration: int = -1, quality_delta: int = 0) -> bool:
@@ -605,19 +608,30 @@ func add_states_to_pastry(targets: Array, states_to_add: PackedStringArray, dura
 		_set_status_message("There is no pastry to update.")
 		return false
 	var changed: bool = false
+	var added_states: PackedStringArray = PackedStringArray()
 	for raw_state in states_to_add:
 		var state_name: StringName = StringName(raw_state)
 		if state_name == &"":
 			continue
+		var had_state_before: bool = pastry.has_pastry_state(state_name)
+		var previous_duration: int = pastry.get_pastry_state_duration(state_name)
 		pastry.add_pastry_state(state_name, duration)
-		changed = true
+		if not had_state_before:
+			added_states.append(state_name)
+			changed = true
+		elif previous_duration != duration:
+			changed = true
+	var previous_quality: int = pastry.quality
 	if quality_delta != 0:
 		pastry.quality = maxi(0, pastry.quality + quality_delta)
+	var applied_quality_delta: int = pastry.quality - previous_quality
+	if applied_quality_delta != 0:
 		changed = true
 	if not changed:
 		return false
 	pastry.steps_used += 1
 	_set_status_message("%s was updated." % pastry.get_display_name())
+	_emit_pastry_feedback(targets, pastry, PackedStringArray(), added_states, applied_quality_delta)
 	return true
 
 func selected_pastry_meets_conditions(
@@ -633,8 +647,13 @@ func change_selected_pastry_quality(targets: Array, amount: int) -> void:
 	var pastry: PastryInstance = _resolve_pastry_target(targets)
 	if pastry == null:
 		return
+	var previous_quality: int = pastry.quality
 	pastry.quality = maxi(0, pastry.quality + amount)
+	var applied_delta: int = pastry.quality - previous_quality
+	if applied_delta == 0:
+		return
 	_set_status_message("%s quality is now %d." % [pastry.get_display_name(), pastry.quality])
+	_emit_pastry_feedback(targets, pastry, PackedStringArray(), PackedStringArray(), applied_delta)
 
 func set_selected_pastry_flag(targets: Array, flag_name: StringName, flag_value: bool) -> void:
 	var pastry: PastryInstance = _resolve_pastry_target(targets)
@@ -1023,6 +1042,83 @@ func _resolve_pastry_target(targets: Array) -> PastryInstance:
 	if not cafe_state.plated_pastries.is_empty():
 		return cafe_state.plated_pastries[0]
 	return null
+
+func _emit_pastry_feedback(
+	targets: Array,
+	pastry: PastryInstance,
+	added_tags: PackedStringArray,
+	added_states: PackedStringArray,
+	quality_delta: int
+) -> void:
+	if event_bus == null:
+		return
+	var feedback: PastryFeedbackEvent = _build_pastry_feedback(targets, pastry, added_tags, added_states, quality_delta)
+	if feedback == null or not feedback.has_visible_feedback():
+		return
+	event_bus.emit_pastry_feedback_requested(feedback)
+
+func _build_pastry_feedback(
+	targets: Array,
+	pastry: PastryInstance,
+	added_tags: PackedStringArray,
+	added_states: PackedStringArray,
+	quality_delta: int
+) -> PastryFeedbackEvent:
+	if pastry == null:
+		return null
+	var target_anchor: Dictionary = _resolve_pastry_feedback_anchor(targets, pastry)
+	var zone: StringName = StringName(target_anchor.get("zone", ""))
+	var index: int = int(target_anchor.get("index", -1))
+	if zone == &"" or index < 0:
+		return null
+	return PastryFeedbackEvent.new(zone, index, added_tags, added_states, quality_delta)
+
+func _resolve_pastry_feedback_anchor(targets: Array, pastry: PastryInstance) -> Dictionary:
+	for target_value in targets:
+		var target: Dictionary = target_value
+		var target_pastry: PastryInstance = _get_pastry_from_target(target)
+		if target_pastry == pastry:
+			return {
+				"zone": StringName(target.get("zone", "")),
+				"index": int(target.get("index", -1)),
+			}
+	if pastry == cafe_state.active_pastry:
+		return {
+			"zone": &"prep",
+			"index": 0,
+		}
+	if pastry == cafe_state.oven_pastry:
+		return {
+			"zone": &"oven",
+			"index": 0,
+		}
+	var plated_index: int = cafe_state.plated_pastries.find(pastry)
+	if plated_index >= 0:
+		return {
+			"zone": &"table",
+			"index": plated_index,
+		}
+	match pastry.zone:
+		&"prep":
+			return {
+				"zone": &"prep",
+				"index": 0,
+			}
+		&"oven":
+			return {
+				"zone": &"oven",
+				"index": 0,
+			}
+		&"table":
+			var current_table_index: int = cafe_state.plated_pastries.find(pastry)
+			if current_table_index >= 0:
+				return {
+					"zone": &"table",
+					"index": current_table_index,
+				}
+			return {}
+		_:
+			return {}
 
 func _get_pastry_from_target(target: Dictionary) -> PastryInstance:
 	var zone: StringName = StringName(target.get("zone", ""))
