@@ -3,6 +3,7 @@
 ##  Enemies
 * Multiple Enemies per day
 * Enemies can gift decorations if they are extremely satisfied
+[] 
 
 
 
@@ -13,7 +14,26 @@ and gives the player options to choose from and different options determine how 
 
 
 ## Pastry
+* Add models that get customized 
 
 
 ## Cards
 * Add the category of card to the card layout
+* Create better card
+
+
+## Decoration
+* What should I decorate
+* What do I need to add
+* Create base version for everything
+
+
+
+## Style
+* Choose Font
+* Create Styleguide for everything 
+
+## Shop Cards in between customers / rounds
+* Ensure that the cards are rendered corectly 
+* Add a basic simple background (maybe a little bit transparent over the current szene)
+* Add a text to explain that this is where you can choose a card

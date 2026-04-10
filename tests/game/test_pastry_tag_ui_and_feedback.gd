@@ -9,6 +9,8 @@ func _run() -> void:
 	await _test_hand_card_chip_rendering()
 	_test_pastry_feedback_events()
 	await _test_encounter_overlay_survives_rerender()
+	await _test_stage_wrapper_scene_smoke()
+	await _test_encounter_stage_layout_smoke()
 	quit()
 
 func _new_session() -> Array:
@@ -171,6 +173,84 @@ func _test_encounter_overlay_survives_rerender() -> void:
 	await process_frame
 	assert(encounter_screen.get_node("EncounterEffectOverlayView").get_instance_id() == overlay_id, "Encounter re-renders should keep the same overlay node alive.")
 	assert(overlay.active_feedback_count() == 1, "Encounter re-renders should not destroy active feedback visuals.")
+
+	encounter_screen.queue_free()
+	await process_frame
+
+func _test_stage_wrapper_scene_smoke() -> void:
+	var setup: Array = _new_session()
+	var session: SessionService = setup[0]
+	assert(session.start_new_run_with_dough(&"sweet_dough"), "Sweet Dough should start for the stage wrapper smoke test.")
+	var interaction_state: EncounterInteractionState = EncounterInteractionState.new()
+
+	var prep_scene: PackedScene = load("res://scenes/ui/screens/prep_area_stage_view.tscn")
+	var prep_stage: PrepAreaStageView = prep_scene.instantiate()
+	get_root().add_child(prep_stage)
+	prep_stage.size = Vector2(420, 360)
+	await process_frame
+	prep_stage.render(session, interaction_state)
+	await process_frame
+	assert(prep_stage.get_node("DecorationAnchor") != null, "Prep stage should expose a decoration anchor.")
+	assert(prep_stage.get_zone_view() != null, "Prep stage should instantiate its nested prep zone.")
+	assert(prep_stage.get_pastry_card_control(0) != null, "Prep stage should expose the active pastry card control.")
+
+	var oven_scene: PackedScene = load("res://scenes/ui/screens/oven_stage_view.tscn")
+	var oven_stage: OvenStageView = oven_scene.instantiate()
+	get_root().add_child(oven_stage)
+	oven_stage.size = Vector2(420, 360)
+	await process_frame
+	oven_stage.render(session, interaction_state)
+	await process_frame
+	assert(oven_stage.get_node("DecorationAnchor") != null, "Oven stage should expose a decoration anchor.")
+	assert(oven_stage.get_zone_view() != null, "Oven stage should instantiate its nested oven zone.")
+	assert(oven_stage.get_pastry_card_control(0) != null, "Oven stage should expose its pastry slot card control, even when empty.")
+
+	var table_scene: PackedScene = load("res://scenes/ui/screens/finished_pastry_stage_view.tscn")
+	var table_stage: FinishedPastryStageView = table_scene.instantiate()
+	get_root().add_child(table_stage)
+	table_stage.size = Vector2(420, 360)
+	await process_frame
+	table_stage.render(session, interaction_state)
+	await process_frame
+	assert(table_stage.get_node("DecorationAnchor") != null, "Finished pastry stage should expose a decoration anchor.")
+	assert(table_stage.get_zone_view() != null, "Finished pastry stage should instantiate its nested table zone.")
+
+	prep_stage.queue_free()
+	oven_stage.queue_free()
+	table_stage.queue_free()
+	await process_frame
+
+func _test_encounter_stage_layout_smoke() -> void:
+	var setup: Array = _new_session()
+	var session: SessionService = setup[0]
+	var event_bus: EventBus = setup[2]
+	assert(session.start_new_run_with_dough(&"sweet_dough"), "Sweet Dough should start for the encounter stage layout smoke test.")
+
+	var encounter_scene: PackedScene = load("res://scenes/ui/screens/encounter_screen_view.tscn")
+	var encounter_screen: EncounterScreenView = encounter_scene.instantiate()
+	get_root().add_child(encounter_screen)
+	await process_frame
+	encounter_screen.configure_event_bus(event_bus)
+
+	for test_size in [Vector2(1600, 900), Vector2(1280, 800)]:
+		encounter_screen.size = test_size
+		encounter_screen.render(session, EncounterInteractionState.new())
+		await process_frame
+		for node_path in [
+			"SupportHudView",
+			"CustomerLaneView",
+			"PrepStageView",
+			"OvenStageView",
+			"TableStageView",
+			"PromptView",
+			"HandFanView",
+			"EndTurnButton",
+		]:
+			var control: Control = encounter_screen.get_node(node_path)
+			assert(control.position.x >= -0.1, "%s should stay inside the encounter stage on the x-axis." % node_path)
+			assert(control.position.y >= -0.1, "%s should stay inside the encounter stage on the y-axis." % node_path)
+			assert(control.position.x + control.size.x <= encounter_screen.size.x + 0.1, "%s should fit within the encounter width." % node_path)
+			assert(control.position.y + control.size.y <= encounter_screen.size.y + 0.1, "%s should fit within the encounter height." % node_path)
 
 	encounter_screen.queue_free()
 	await process_frame

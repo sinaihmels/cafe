@@ -1,17 +1,15 @@
 class_name TableZoneView
-extends PanelContainer
+extends Control
 
 signal table_item_requested(item_index: int)
 
 @export var item_card_scene: PackedScene
 
-@onready var _subtitle: Label = $TableMargin/TableBody/TableSubtitle
-@onready var _row: HBoxContainer = $TableMargin/TableBody/TableArea/TableRow
-@onready var _empty_label: Label = $TableMargin/TableBody/TableArea/TableEmptyLabel
+@onready var _row: HBoxContainer = $TableRow
+@onready var _empty_label: Label = $TableEmptyLabel
 
 func render(session_service: SessionService, interaction_state: EncounterInteractionState) -> void:
 	UiSceneUtils.clear_children(_row)
-	_subtitle.text = "%d / %d plated" % [session_service.cafe_state.plated_pastries.size(), session_service.cafe_state.serving_table_capacity]
 	_empty_label.visible = session_service.cafe_state.plated_pastries.is_empty()
 	for table_index in range(session_service.cafe_state.plated_pastries.size()):
 		var pastry: PastryInstance = session_service.cafe_state.plated_pastries[table_index]

@@ -1,0 +1,278 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/components/customer_stage_spot_view.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/stat_chip_view.tscn" id="2_stat_chip"]
+
+[sub_resource type="StyleBoxFlat" id="1_actor_style"]
+bg_color = Color(0.95, 0.92, 0.84, 0.94)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.45, 0.31, 0.20, 0.96)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="2_focused_actor_style"]
+bg_color = Color(0.99, 0.96, 0.91, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.67, 0.45, 0.27, 0.98)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+
+[sub_resource type="StyleBoxFlat" id="3_targetable_actor_style"]
+bg_color = Color(1, 0.91, 0.78, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.86, 0.49, 0.28, 1)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+
+[sub_resource type="StyleBoxFlat" id="4_selected_actor_style"]
+bg_color = Color(0.84, 0.46, 0.28, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.90, 0.84, 1)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+
+[sub_resource type="StyleBoxEmpty" id="5_empty_style"]
+
+[sub_resource type="StyleBoxFlat" id="6_request_style"]
+bg_color = Color(0.93, 0.90, 0.84, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.43, 0.33, 0.94)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="7_request_disabled_style"]
+bg_color = Color(0.82, 0.79, 0.74, 0.80)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.43, 0.33, 0.55)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="8_patience_style"]
+bg_color = Color(0.58, 0.28, 0.58, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.94, 0.84, 0.98, 0.95)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="9_hunger_style"]
+bg_color = Color(0.79, 0.34, 0.31, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.86, 0.82, 0.95)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="10_satisfaction_style"]
+bg_color = Color(0.91, 0.78, 0.35, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.94, 0.80, 0.95)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[node name="CustomerStageSpotView" type="PanelContainer"]
+custom_minimum_size = Vector2(170, 190)
+theme_override_styles/panel = SubResource("5_empty_style")
+script = ExtResource("1_script")
+stat_chip_scene = ExtResource("2_stat_chip")
+normal_style = SubResource("1_actor_style")
+focused_style = SubResource("2_focused_actor_style")
+targetable_style = SubResource("3_targetable_actor_style")
+selected_style = SubResource("4_selected_actor_style")
+
+[node name="FocusButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+text = ""
+flat = true
+theme_override_styles/normal = SubResource("5_empty_style")
+theme_override_styles/hover = SubResource("5_empty_style")
+theme_override_styles/pressed = SubResource("5_empty_style")
+theme_override_styles/focus = SubResource("5_empty_style")
+
+[node name="BodyMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="StageRow" type="HBoxContainer" parent="BodyMargin"]
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="InfoColumn" type="VBoxContainer" parent="BodyMargin/StageRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="BodyMargin/StageRow/InfoColumn"]
+layout_mode = 2
+text = "CUSTOMER"
+horizontal_alignment = 2
+
+[node name="RequestBubbleButton" type="Button" parent="BodyMargin/StageRow/InfoColumn"]
+layout_mode = 2
+custom_minimum_size = Vector2(192, 90)
+size_flags_horizontal = 3
+text = "Request"
+autowrap_mode = 3
+clip_text = true
+alignment = 0
+theme_override_styles/normal = SubResource("6_request_style")
+theme_override_styles/hover = SubResource("6_request_style")
+theme_override_styles/pressed = SubResource("3_targetable_actor_style")
+theme_override_styles/disabled = SubResource("7_request_disabled_style")
+
+[node name="DetailedStats" type="HFlowContainer" parent="BodyMargin/StageRow/InfoColumn"]
+visible = false
+layout_mode = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+
+[node name="ActorColumn" type="VBoxContainer" parent="BodyMargin/StageRow"]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="CompactRequestLabel" type="Label" parent="BodyMargin/StageRow/ActorColumn"]
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(120, 0)
+text = "Needs any pastry"
+horizontal_alignment = 1
+autowrap_mode = 3
+clip_text = true
+
+[node name="PortraitShell" type="PanelContainer" parent="BodyMargin/StageRow/ActorColumn"]
+layout_mode = 2
+custom_minimum_size = Vector2(116, 136)
+theme_override_styles/panel = SubResource("1_actor_style")
+
+[node name="PortraitMargin" type="MarginContainer" parent="BodyMargin/StageRow/ActorColumn/PortraitShell"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Portrait" type="TextureRect" parent="BodyMargin/StageRow/ActorColumn/PortraitShell/PortraitMargin"]
+layout_mode = 2
+custom_minimum_size = Vector2(92, 104)
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PatienceBadge" type="PanelContainer" parent="BodyMargin/StageRow/ActorColumn/PortraitShell"]
+layout_mode = 1
+offset_left = -18.0
+offset_top = 6.0
+offset_right = 20.0
+offset_bottom = 42.0
+theme_override_styles/panel = SubResource("8_patience_style")
+
+[node name="PatienceValue" type="Label" parent="BodyMargin/StageRow/ActorColumn/PortraitShell/PatienceBadge"]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HungerBadge" type="PanelContainer" parent="BodyMargin/StageRow/ActorColumn/PortraitShell"]
+layout_mode = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -20.0
+offset_top = 40.0
+offset_right = 18.0
+offset_bottom = 76.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("9_hunger_style")
+
+[node name="HungerValue" type="Label" parent="BodyMargin/StageRow/ActorColumn/PortraitShell/HungerBadge"]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SatisfactionBadge" type="PanelContainer" parent="BodyMargin/StageRow/ActorColumn/PortraitShell"]
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -22.0
+offset_top = -18.0
+offset_right = 22.0
+offset_bottom = 18.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("10_satisfaction_style")
+
+[node name="SatisfactionValue" type="Label" parent="BodyMargin/StageRow/ActorColumn/PortraitShell/SatisfactionBadge"]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CompactStatsLabel" type="Label" parent="BodyMargin/StageRow/ActorColumn"]
+visible = false
+layout_mode = 2
+text = "Customer"
+horizontal_alignment = 1

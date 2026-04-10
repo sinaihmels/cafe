@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://bphg1lsun857s"]
 
 [ext_resource type="Script" uid="uid://48gp58kxlj45" path="res://scripts/ui/app_view.gd" id="1_appview"]
-[ext_resource type="Texture2D" uid="uid://djqbyghlwpi4j" path="res://assets/demo/ui/demo_background.png" id="2_background"]
 [ext_resource type="PackedScene" path="res://scenes/ui/components/hero_strip_view.tscn" id="3_hero_strip"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/title_screen_view.tscn" id="4_title"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/hub_screen_view.tscn" id="5_hub"]
@@ -12,6 +11,9 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/boss_intro_screen_view.tscn" id="10_boss"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/summary_screen_view.tscn" id="11_summary"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_screen_view.tscn" id="12_encounter"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_xysd6"]
+specular_color = Color(0.19506672, 0.19506672, 0.19506669, 1)
 
 [node name="AppView" type="Control" unique_id=834789276]
 layout_mode = 3
@@ -29,7 +31,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_background")
+texture = SubResource("CanvasTexture_xysd6")
 expand_mode = 1
 stretch_mode = 6
 

@@ -1,0 +1,74 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/screens/encounter_resources_view.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="1_panel_style"]
+bg_color = Color(0.20, 0.16, 0.19, 0.88)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.52, 0.58, 0.78, 0.45)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[node name="EncounterResourcesView" type="PanelContainer"]
+custom_minimum_size = Vector2(132, 132)
+theme_override_styles/panel = SubResource("1_panel_style")
+script = ExtResource("1_script")
+
+[node name="Padding" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Body" type="VBoxContainer" parent="Padding"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ManaLabel" type="Label" parent="Padding/Body"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Mana"
+
+[node name="ManaValue" type="Label" parent="Padding/Body"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 38
+text = "0"
+
+[node name="StressLabel" type="Label" parent="Padding/Body"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Stress"
+
+[node name="StressValue" type="Label" parent="Padding/Body"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "0/0"
+
+[node name="StressMeter" type="Control" parent="Padding/Body"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 14)
+
+[node name="MeterBackground" type="ColorRect" parent="Padding/Body/StressMeter"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.12, 0.11, 0.14, 0.96)
+
+[node name="MeterFill" type="ColorRect" parent="Padding/Body/StressMeter"]
+layout_mode = 1
+anchors_preset = 3
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 2.0
+offset_bottom = -2.0
+grow_vertical = 2
+color = Color(0.78, 0.34, 0.31, 0.98)

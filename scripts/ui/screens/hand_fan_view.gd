@@ -8,12 +8,40 @@ signal play_card_requested(card_index: int)
 @export var card_height: float = 214.0
 @export var min_spacing: float = 34.0
 @export var ideal_spacing: float = 94.0
+@export var curve_depth: float = 34.0
+@export var rotation_max_degrees: float = 13.0
+@export var selected_lift: float = 40.0
+@export var hover_lift: float = 28.0
+@export var bottom_padding: float = 12.0
 
 @onready var _cards_layer: Control = $CardsLayer
 
 var _card_nodes: Array[HandCardView] = []
 var _hovered_card_index: int = -1
 var _selected_card_index: int = -1
+
+func configure_layout_metrics(
+	new_card_width: float,
+	new_card_height: float,
+	new_min_spacing: float,
+	new_ideal_spacing: float,
+	new_curve_depth: float,
+	new_rotation_max_degrees: float,
+	new_selected_lift: float,
+	new_hover_lift: float,
+	new_bottom_padding: float
+) -> void:
+	card_width = new_card_width
+	card_height = new_card_height
+	min_spacing = new_min_spacing
+	ideal_spacing = new_ideal_spacing
+	curve_depth = new_curve_depth
+	rotation_max_degrees = new_rotation_max_degrees
+	selected_lift = new_selected_lift
+	hover_lift = new_hover_lift
+	bottom_padding = new_bottom_padding
+	if is_node_ready():
+		call_deferred("_layout_cards")
 
 func render(session_service: SessionService, interaction_state: EncounterInteractionState) -> void:
 	UiSceneUtils.clear_children(_cards_layer)
@@ -75,12 +103,12 @@ func _layout_cards() -> void:
 	# The cards themselves are authored scenes; this method only handles the fan positioning math.
 	var base_width: float = card_width
 	var base_height: float = card_height
-	var desired_spacing: float = ideal_spacing if hand_count <= 5 else 64.0
+	var desired_spacing: float = ideal_spacing if hand_count <= 5 else maxf(min_spacing, ideal_spacing * 0.72)
 	var spacing: float = desired_spacing
 	if hand_count > 1 and (base_width + (hand_count - 1) * spacing) > available_width:
 		spacing = maxf(min_spacing, (available_width - base_width) / float(hand_count - 1))
 	if hand_count > 1 and (base_width + (hand_count - 1) * spacing) > available_width:
-		var shrunk_width: float = maxf(124.0, available_width - (hand_count - 1) * spacing)
+		var shrunk_width: float = maxf(140.0, available_width - (hand_count - 1) * spacing)
 		var width_scale: float = shrunk_width / base_width
 		base_width = shrunk_width
 		base_height *= width_scale
@@ -91,23 +119,23 @@ func _layout_cards() -> void:
 		var normalized: float = 0.0
 		if hand_count > 1:
 			normalized = (float(card_index) / float(hand_count - 1)) * 2.0 - 1.0
-		var curve_drop: float = pow(absf(normalized), 1.4) * 34.0
+		var curve_drop: float = pow(absf(normalized), 1.4) * curve_depth
 		var is_selected: bool = card_index == _selected_card_index
 		var is_hovered: bool = card_index == _hovered_card_index
 		var lift: float = 0.0
 		if is_selected:
-			lift = 40.0
+			lift = selected_lift
 		elif is_hovered:
-			lift = 28.0
+			lift = hover_lift
 		var rotation_multiplier: float = 1.0
 		if is_selected:
 			rotation_multiplier = 0.0
 		elif is_hovered:
 			rotation_multiplier = 0.35
 		card_button.size = Vector2(base_width, base_height)
-		card_button.position = Vector2(start_x + spacing * float(card_index), maxf(6.0, size.y - base_height - 12.0 + curve_drop - lift))
+		card_button.position = Vector2(start_x + spacing * float(card_index), maxf(6.0, size.y - base_height - bottom_padding + curve_drop - lift))
 		card_button.pivot_offset = card_button.size * 0.5
-		card_button.rotation_degrees = normalized * 13.0 * rotation_multiplier
+		card_button.rotation_degrees = normalized * rotation_max_degrees * rotation_multiplier
 		card_button.z_index = 100 + card_index
 		if is_hovered:
 			card_button.z_index = 250

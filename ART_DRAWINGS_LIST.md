@@ -1,111 +1,285 @@
-# Placeholder Art Checklist (Layered Setup)
+# Art Production Todo List
 
-This checklist matches the current placeholder-art renderer exactly.  
-All files are PNG.
+This checklist is for drawing the game's art from zero.
 
-## 1) Card Layering (Slay the Spire style)
+Current assumptions:
 
-Drop into: `assets/demo/cards/`
+- No cafe nook for now.
+- No seated customer sprites.
+- No walking customer sprites.
+- One cozy bakery storefront background that can scale to different screen sizes.
+- Keep layered source files, then export PNGs for the game.
 
-- `base_card.png`  
-Canvas: `1024 x 1434`  
-Use this as the reusable card frame/background. You only draw this once.
+## 1) Art Pipeline Setup
 
-- Per-card art files:  
-`card_chocolate.png`  
-`card_cinnamon_sugar.png`  
-`card_cream.png`  
-`card_mix.png`  
-`card_bake.png`  
-`card_tell_joke.png`  
-`card_apologize.png`  
-`card_coffee.png`  
-`card_focus.png`  
-Canvas for each: `780 x 545` recommended (or larger in same aspect ratio).
+- [ ] Create layered source files for background, cards, portraits, icons, prep area, and oven.
+- [ ] Draw background masters at `3840 x 2160` minimum. `5120 x 2880` is even safer.
+- [ ] Draw kitchen stage assets at `1024 x 1024` minimum. `2048 x 2048` is safer if you want zoom room.
+- [ ] Draw card frames at `1024 x 1434`. If you prefer, paint card source art at `2048 x 2868` and export down.
+- [ ] Draw portraits and icons at `1024 x 1024`, then export smaller versions as needed.
+- [ ] Keep every prop on separate transparent layers so you can move or resize it later.
+- [ ] Keep the center of the customer lane visually lighter so request bubbles stay readable.
+- [ ] Do not bake gameplay text into art, except small decorative signs like `OPEN`.
+- [ ] Test exported assets at `1280 x 720`, `1920 x 1080`, and `2560 x 1440`.
+- [ ] Save final runtime exports as PNG.
 
-Card render behavior:
-- Base card is always drawn.
-- Per-card image is layered over the art window.
-- Mana, title, status, description are drawn as UI text on top.
+## 2) Phase 1: Playably Complete Art
 
-Card text/art layout reference (on base card canvas `1024x1434`):
-- Art window: `x=122, y=286, w=780, h=545`
-- Mana plate: `x=34, y=34, w=168, h=168`
-- Title area: `x=132, y=84, w=760, h=132`
-- Playable/status area: `x=130, y=830, w=760, h=92`
-- Description area: `x=118, y=918, w=788, h=438`
+This is the smallest set that makes the current build feel fully illustrated.
 
-Optional compatibility card:
-- `card_flash_bake.png`
+### A. Main Environment Background
 
-## 2) Customer Art
+Current runtime export:
 
-Drop into: `assets/demo/customers/`
+- [ ] `assets/demo/ui/demo_background.png`
 
-- `customer_placeholder.png` (fallback)
-- `customer_regular_guest.png`
-- `customer_patient_guest.png`
-- `customer_impatient_guest.png`
-- `customer_critic_guest.png`
-- `customer_chaotic_guest.png`
-- `customer_final_critic.png`
+Recommended source layers for that background:
 
-Recommended canvas:
-- `512 x 512`
+- [ ] Back wall base colors and wall trim
+- [ ] Storefront window band behind the customer queue
+- [ ] Front door
+- [ ] Chalkboard menu or pastry poster
+- [ ] Three pendant lamps above the customer lane
+- [ ] Counter front texture or paneling
+- [ ] Counter prop cluster: pastry dome, napkins, tip jar
+- [ ] Prep shelf cluster: bowls, jars, flour bag, utensils
+- [ ] Oven hood
+- [ ] Oven tile backsplash or warm glow area
+- [ ] Right-side finishing prop: plant or coat stand
+- [ ] Floor pattern and soft shadow pass
+- [ ] Ambient lighting pass to unify the whole scene
 
-## 3) Dough Art
+Keep out of this version:
 
-Drop into: `assets/demo/doughs/`
+- [ ] No cafe nook
+- [ ] No extra customer seating area
+- [ ] No walking/sitting customer sprite requirements
 
-- `dough_placeholder.png` (fallback)
-- `sweet_dough.png`
+### B. Prep Area and Finished Pastry Stage
 
-Recommended canvas:
-- `512 x 512`
+These are the files the current runtime expects:
 
-## 4) Dish Area Layering (Base + Overlay)
+- [ ] `assets/demo/dish/dough_area_empty.png`
+- [ ] `assets/demo/dish/dough_area_base.png`
+- [ ] `assets/demo/dish/dough_with_items_overlay.png`
+- [ ] `assets/demo/dish/formed_pastry_overlay.png`
+- [ ] `assets/demo/dish/baked_pastry.png`
+- [ ] `assets/demo/dish/dish_placeholder.png`
 
-Drop into: `assets/demo/dish/`
+Optional helper exports if you want extra source flexibility:
 
-Base layer (always visible):
-- `dough_area_base.png`
-Canvas: `512 x 512` recommended
+- [ ] `assets/demo/dish/dough_with_items.png`
+- [ ] `assets/demo/dish/formed_pastry.png`
+- [ ] `assets/demo/dish/pastry.png`
 
-Overlay layers (draw only changing content):
-- `dough_with_items_overlay.png`
-- `formed_pastry_overlay.png`
+### C. Oven Stage
 
-Optional fallback:
-- `dish_placeholder.png`
+These are the files the current runtime expects:
 
-Layering behavior:
-- `dough_area_base.png` is always rendered.
-- Overlay switches by stage and draws above base.
+- [ ] `assets/demo/oven/oven_empty.png`
+- [ ] `assets/demo/oven/oven_loaded.png`
+- [ ] `assets/demo/oven/oven_ready.png`
+- [ ] `assets/demo/oven/oven_needs_bake.png`
+- [ ] `assets/demo/oven/pastry_on_oven_rack_overlay.png`
+- [ ] `assets/demo/oven/baked_pastry_on_oven_rack_overlay.png`
+- [ ] `assets/demo/oven/oven_placeholder.png`
 
-## 5) Oven Area Layering (Base + Overlay)
+Optional helper export:
 
-Drop into: `assets/demo/oven/`
+- [ ] `assets/demo/oven/oven_base.png`
 
-Base layer (always visible):
-- `oven_base.png`
-Canvas: `512 x 512` recommended
+### D. Card Frames and Card Art
 
-Overlay layers:
-- `pastry_on_oven_rack_overlay.png`
-- `baked_pastry_on_oven_rack_overlay.png`
+Card frame exports:
 
-Optional fallback:
-- `oven_placeholder.png`
+- [ ] `assets/demo/cards/base_card.png`
+- [ ] `assets/demo/cards/base_card_process.png`
+- [ ] `assets/demo/cards/base_card_technique.png`
+- [ ] `assets/demo/cards/base_card_interaction.png`
 
-Layering behavior:
-- `oven_base.png` is always rendered.
-- Overlay draws pastry states above the base.
+Shared card art exports currently used by the project:
 
-## 6) Optional UI Background
+- [ ] `assets/demo/cards/card_chocolate.png`
+- [ ] `assets/demo/cards/card_cinnamon_sugar.png`
+- [ ] `assets/demo/cards/card_flash_bake.png`
+- [ ] `assets/demo/cards/card_bake.png`
+- [ ] `assets/demo/cards/card_cream.png`
+- [ ] `assets/demo/cards/card_coffee.png`
+- [ ] `assets/demo/cards/card_focus.png`
+- [ ] `assets/demo/cards/card_mix.png`
+- [ ] `assets/demo/cards/card_tell_joke.png`
 
-Drop into: `assets/demo/ui/`
+Cards that still need a real illustration pass because they currently point at placeholder/base art:
 
-- `demo_background.png`
+- [ ] `starter_decorate`
+- [ ] `starter_egg_wash`
+- [ ] `starter_serve`
+- [ ] `starter_sugar_glaze`
 
-Recommended canvas:
-- `2560 x 1440` (scales cleanly to 1080p)
+If you later want every card concept to have its own unique illustration, these are the current card ids:
+
+- [ ] `reward_chocolate`
+- [ ] `reward_cinnamon`
+- [ ] `reward_flash_bake`
+- [ ] `starter_bake`
+- [ ] `starter_butter`
+- [ ] `starter_cheese`
+- [ ] `starter_culture`
+- [ ] `starter_decorate`
+- [ ] `starter_double_batch`
+- [ ] `starter_egg_wash`
+- [ ] `starter_focus`
+- [ ] `starter_fold`
+- [ ] `starter_herbs`
+- [ ] `starter_lemon`
+- [ ] `starter_mini_cookies`
+- [ ] `starter_perfect_timing`
+- [ ] `starter_proof`
+- [ ] `starter_second_wind`
+- [ ] `starter_serve`
+- [ ] `starter_small_talk`
+- [ ] `starter_strawberry`
+- [ ] `starter_sugar_glaze`
+- [ ] `starter_tomato_sauce`
+- [ ] `starter_vanilla`
+
+### E. Customer Portraits
+
+Current must-have portraits:
+
+- [ ] `assets/demo/customers/customer_placeholder.png`
+- [ ] `assets/demo/customers/customer_regular_guest.png`
+- [ ] `assets/demo/customers/customer_patient_guest.png`
+- [ ] `assets/demo/customers/customer_impatient_guest.png`
+- [ ] `assets/demo/customers/customer_critic_guest.png`
+- [ ] `assets/demo/customers/customer_final_critic.png`
+
+Future-ready portrait if you bring this type back into active content:
+
+- [ ] `assets/demo/customers/customer_chaotic_guest.png`
+
+### F. Dough Art
+
+Current dough exports:
+
+- [ ] `assets/demo/doughs/dough_placeholder.png`
+- [ ] `assets/demo/doughs/sweet_dough.png`
+- [ ] `assets/demo/doughs/laminated_dough.png`
+- [ ] `assets/demo/doughs/savory_dough.png`
+- [ ] `assets/demo/doughs/sourdough.png`
+
+### G. Progression and Shop Icons
+
+These do not all need fully separate paintings. Many can be cropped or simplified from larger art.
+
+Decoration icons:
+
+- [ ] `awning_sign`
+- [ ] `chalkboard_menu`
+- [ ] `checker_floor`
+- [ ] `counter_flowers`
+- [ ] `pastry_shelf`
+
+Equipment icons:
+
+- [ ] `coffee_machine`
+- [ ] `display_case`
+
+Offer icons:
+
+- [ ] `offer_chocolate`
+- [ ] `offer_cinnamon`
+- [ ] `offer_focus`
+- [ ] `offer_second_wind_buff`
+
+Reward icons:
+
+- [ ] `reward_add_chocolate`
+- [ ] `reward_flash_bake`
+- [ ] `reward_focus_buff`
+- [ ] `reward_meta_tokens`
+
+Shop upgrade icons:
+
+- [ ] `oven_slot_upgrade`
+- [ ] `prep_counter_upgrade`
+- [ ] `tip_jar_upgrade`
+
+## 3) Phase 2: Ingredient and Pastry Icons
+
+These resources already have art fields or will benefit from item art as more UI comes online.
+You can often derive these from the larger dough/pastry illustrations instead of painting each one from scratch.
+
+- [ ] `burned`
+- [ ] `butter`
+- [ ] `chocolate`
+- [ ] `chocolate_dough`
+- [ ] `chocolate_pastry`
+- [ ] `cinnamon`
+- [ ] `cream`
+- [ ] `decorated_pastry`
+- [ ] `dough`
+- [ ] `flour`
+- [ ] `laminated_dough`
+- [ ] `laminated_pastry`
+- [ ] `pastry`
+- [ ] `perfect_sweet_pastry`
+- [ ] `savory_dough`
+- [ ] `savory_pastry`
+- [ ] `sourdough`
+- [ ] `sourdough_loaf`
+- [ ] `sugar`
+- [ ] `sweet_dough`
+- [ ] `sweet_pastry`
+
+## 4) Phase 3: UI Polish Pass
+
+These are not the first files to paint, but they will matter if you want the whole game to feel custom instead of prototype-like.
+
+- [ ] Mana icon or orb
+- [ ] Energy bar frame
+- [ ] Energy bar fill
+- [ ] Request bubble art pass
+- [ ] Patience icon
+- [ ] Hunger icon
+- [ ] Satisfaction icon
+- [ ] End turn button skin
+- [ ] Choice/reward panel icon frames
+- [ ] Card category badge styling
+- [ ] Decorative divider lines or panel flourishes
+
+## 5) Recommended Draw Order
+
+Use this order if you want the biggest visual improvement fastest:
+
+1. Draw the full bakery background.
+2. Draw the prep area and oven stage assets.
+3. Draw the four card frames.
+4. Draw the nine shared card illustrations currently used by the project.
+5. Draw the six customer portraits.
+6. Draw the four dough illustrations plus the dough placeholder.
+7. Create progression/shop icons by cropping or simplifying from the larger art.
+8. Add ingredient and pastry icons.
+9. Finish with UI polish assets.
+
+## 6) Reuse Strategy
+
+To keep the workload manageable:
+
+- [ ] Reuse larger dough paintings to create smaller dough/item icons.
+- [ ] Reuse pastry paintings to create reward and offer icons where appropriate.
+- [ ] Reuse prop art from the background for decoration icons when the object already exists in the scene.
+- [ ] Keep one master card frame, then recolor or ornament it into the four card type variants.
+- [ ] Build one consistent lighting pass across the bakery so separate assets feel like they belong together.
+
+## 7) Minimum Export Sizes
+
+Use these as a safe baseline:
+
+- Background: `3840 x 2160`
+- Stage assets: `1024 x 1024`
+- Cards: `1024 x 1434`
+- Portraits: `1024 x 1024`
+- Icons: `512 x 512` export from `1024 x 1024` source
+
+If you stay at or above these sizes and keep layered source files, you should be able to support different screen sizes without redrawing everything.

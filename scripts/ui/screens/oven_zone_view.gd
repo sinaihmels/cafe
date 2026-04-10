@@ -1,20 +1,18 @@
 class_name OvenZoneView
-extends PanelContainer
+extends Control
 
 signal oven_item_requested(slot_index: int)
 
 @export var item_card_scene: PackedScene
 
-@onready var _subtitle: Label = $OvenMargin/OvenBody/OvenSubtitle
-@onready var _row: HBoxContainer = $OvenMargin/OvenBody/OvenArea/OvenRow
+@onready var _row: HBoxContainer = $OvenRow
 
 func render(session_service: SessionService, interaction_state: EncounterInteractionState) -> void:
 	UiSceneUtils.clear_children(_row)
-	_subtitle.text = "1 oven lane"
 	var card: ZoneItemCardView = _instantiate_item_card()
 	var pastry: PastryInstance = session_service.cafe_state.oven_pastry
 	if pastry == null:
-		card.configure(UiTextureLibrary.pastry_texture(null), "Oven", "Empty", false, false, false)
+		card.configure(UiTextureLibrary.pastry_texture(null), "Oven", "", false, false, false)
 		_row.add_child(card)
 		return
 	var ready: bool = session_service.cafe_state.oven_mode == &"ready"

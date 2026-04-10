@@ -1,14 +1,78 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/screens/encounter_screen_view.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_hud_view.tscn" id="2_hud"]
-[ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_prompt_view.tscn" id="3_prompt"]
-[ext_resource type="PackedScene" path="res://scenes/ui/screens/customer_focus_view.tscn" id="4_customer"]
-[ext_resource type="PackedScene" path="res://scenes/ui/screens/prep_zone_view.tscn" id="5_prep"]
-[ext_resource type="PackedScene" path="res://scenes/ui/screens/oven_zone_view.tscn" id="6_oven"]
-[ext_resource type="PackedScene" path="res://scenes/ui/screens/table_zone_view.tscn" id="7_table"]
+[ext_resource type="PackedScene" path="res://scenes/ui/screens/customer_lane_view.tscn" id="3_customer_lane"]
+[ext_resource type="PackedScene" path="res://scenes/ui/screens/prep_area_stage_view.tscn" id="4_prep_stage"]
+[ext_resource type="PackedScene" path="res://scenes/ui/screens/oven_stage_view.tscn" id="5_oven_stage"]
+[ext_resource type="PackedScene" path="res://scenes/ui/screens/finished_pastry_stage_view.tscn" id="6_table_stage"]
+[ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_prompt_view.tscn" id="7_prompt"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/hand_fan_view.tscn" id="8_hand"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_effect_overlay_view.tscn" id="9_overlay"]
+[ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_resources_view.tscn" id="10_resources"]
+
+[sub_resource type="StyleBoxFlat" id="1_counter_surface_style"]
+bg_color = Color(0.31, 0.23, 0.17, 0.96)
+border_width_top = 3
+border_width_bottom = 2
+border_color = Color(0.54, 0.43, 0.31, 0.96)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+
+[sub_resource type="StyleBoxFlat" id="2_counter_front_style"]
+bg_color = Color(0.40, 0.22, 0.18, 0.98)
+border_width_top = 4
+border_color = Color(0.63, 0.47, 0.36, 0.96)
+corner_radius_bottom_left = 24
+corner_radius_bottom_right = 24
+
+[sub_resource type="StyleBoxFlat" id="3_pile_style"]
+bg_color = Color(0.24, 0.21, 0.25, 0.88)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.56, 0.61, 0.80, 0.42)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="4_end_turn_normal"]
+bg_color = Color(0.24, 0.28, 0.49, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.55, 0.62, 0.92, 0.98)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="5_end_turn_hover"]
+bg_color = Color(0.29, 0.35, 0.60, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.71, 0.77, 1, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="6_end_turn_pressed"]
+bg_color = Color(0.18, 0.21, 0.40, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.49, 0.56, 0.86, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
 
 [node name="EncounterScreenView" type="Control"]
 anchors_preset = 15
@@ -18,122 +82,136 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="EncounterRoot" type="VBoxContainer" parent="."]
+[node name="BackgroundArt" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 14
+expand_mode = 1
+stretch_mode = 6
+modulate = Color(0.50, 0.58, 0.46, 1)
+mouse_filter = 2
 
-[node name="HeaderRow" type="HBoxContainer" parent="EncounterRoot"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 170)
-theme_override_constants/separation = 14
-
-[node name="HudView" parent="EncounterRoot/HeaderRow" instance=ExtResource("2_hud")]
-
-[node name="PromptView" parent="EncounterRoot/HeaderRow" instance=ExtResource("3_prompt")]
-size_flags_horizontal = 3
-
-[node name="CustomerView" parent="EncounterRoot/HeaderRow" instance=ExtResource("4_customer")]
-
-[node name="BoardArea" type="Control" parent="EncounterRoot"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="ZonesRow" type="HBoxContainer" parent="EncounterRoot/BoardArea"]
+[node name="BackdropTint" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_bottom = -68.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 14
+mouse_filter = 2
+color = Color(0.11, 0.10, 0.09, 0.44)
 
-[node name="PrepView" parent="EncounterRoot/BoardArea/ZonesRow" instance=ExtResource("5_prep")]
+[node name="CounterFront" type="PanelContainer" parent="."]
+layout_mode = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("2_counter_front_style")
 
-[node name="OvenView" parent="EncounterRoot/BoardArea/ZonesRow" instance=ExtResource("6_oven")]
+[node name="CounterSurface" type="PanelContainer" parent="."]
+layout_mode = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("1_counter_surface_style")
 
-[node name="TableView" parent="EncounterRoot/BoardArea/ZonesRow" instance=ExtResource("7_table")]
+[node name="CounterLine" type="ColorRect" parent="."]
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.73, 0.60, 0.46, 0.88)
 
-[node name="DeckPile" type="PanelContainer" parent="EncounterRoot/BoardArea"]
-layout_mode = 1
-anchors_preset = 1
-anchor_right = 0.0
-anchor_bottom = 1.0
-offset_left = 12.0
-offset_top = -136.0
-offset_right = 106.0
-offset_bottom = -16.0
+[node name="TableCounterVertical" type="ColorRect" parent="."]
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.52, 0.39, 0.29, 0.86)
 
-[node name="DeckPileMargin" type="MarginContainer" parent="EncounterRoot/BoardArea/DeckPile"]
+[node name="TableCounterBottom" type="ColorRect" parent="."]
+layout_mode = 0
+mouse_filter = 2
+color = Color(0.52, 0.39, 0.29, 0.86)
+
+[node name="SupportHudView" parent="." instance=ExtResource("2_hud")]
+layout_mode = 0
+
+[node name="CustomerLaneView" parent="." instance=ExtResource("3_customer_lane")]
+layout_mode = 0
+
+[node name="PrepStageView" parent="." instance=ExtResource("4_prep_stage")]
+layout_mode = 0
+
+[node name="OvenStageView" parent="." instance=ExtResource("5_oven_stage")]
+layout_mode = 0
+
+[node name="TableStageView" parent="." instance=ExtResource("6_table_stage")]
+layout_mode = 0
+
+[node name="DeckPile" type="PanelContainer" parent="."]
+layout_mode = 0
+theme_override_styles/panel = SubResource("3_pile_style")
+
+[node name="DeckPileMargin" type="MarginContainer" parent="DeckPile"]
 layout_mode = 2
-theme_override_constants/margin_left = 14
-theme_override_constants/margin_top = 14
-theme_override_constants/margin_right = 14
-theme_override_constants/margin_bottom = 14
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
 
-[node name="DeckPileBody" type="VBoxContainer" parent="EncounterRoot/BoardArea/DeckPile/DeckPileMargin"]
+[node name="DeckPileBody" type="VBoxContainer" parent="DeckPile/DeckPileMargin"]
 layout_mode = 2
+theme_override_constants/separation = 2
 
-[node name="DeckPileTitle" type="Label" parent="EncounterRoot/BoardArea/DeckPile/DeckPileMargin/DeckPileBody"]
+[node name="DeckPileTitle" type="Label" parent="DeckPile/DeckPileMargin/DeckPileBody"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 13
 text = "Deck"
 
-[node name="DeckPileCount" type="Label" parent="EncounterRoot/BoardArea/DeckPile/DeckPileMargin/DeckPileBody"]
+[node name="DeckPileCount" type="Label" parent="DeckPile/DeckPileMargin/DeckPileBody"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 26
 text = "0"
 
-[node name="DiscardPile" type="PanelContainer" parent="EncounterRoot/BoardArea"]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -106.0
-offset_top = -136.0
-offset_right = -12.0
-offset_bottom = -16.0
+[node name="DiscardPile" type="PanelContainer" parent="."]
+layout_mode = 0
+theme_override_styles/panel = SubResource("3_pile_style")
 
-[node name="DiscardPileMargin" type="MarginContainer" parent="EncounterRoot/BoardArea/DiscardPile"]
+[node name="DiscardPileMargin" type="MarginContainer" parent="DiscardPile"]
 layout_mode = 2
-theme_override_constants/margin_left = 14
-theme_override_constants/margin_top = 14
-theme_override_constants/margin_right = 14
-theme_override_constants/margin_bottom = 14
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
 
-[node name="DiscardPileBody" type="VBoxContainer" parent="EncounterRoot/BoardArea/DiscardPile/DiscardPileMargin"]
+[node name="DiscardPileBody" type="VBoxContainer" parent="DiscardPile/DiscardPileMargin"]
 layout_mode = 2
+theme_override_constants/separation = 2
 
-[node name="DiscardPileTitle" type="Label" parent="EncounterRoot/BoardArea/DiscardPile/DiscardPileMargin/DiscardPileBody"]
+[node name="DiscardPileTitle" type="Label" parent="DiscardPile/DiscardPileMargin/DiscardPileBody"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 13
 text = "Discard"
 
-[node name="DiscardPileCount" type="Label" parent="EncounterRoot/BoardArea/DiscardPile/DiscardPileMargin/DiscardPileBody"]
+[node name="DiscardPileCount" type="Label" parent="DiscardPile/DiscardPileMargin/DiscardPileBody"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 26
 text = "0"
 
-[node name="HandShell" type="Control" parent="EncounterRoot"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 232)
-size_flags_horizontal = 3
+[node name="PromptView" parent="." instance=ExtResource("7_prompt")]
+layout_mode = 0
 
-[node name="HandFanView" parent="EncounterRoot/HandShell" instance=ExtResource("8_hand")]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 18.0
-offset_top = 6.0
-offset_right = -18.0
-offset_bottom = -6.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="ResourcesView" parent="." instance=ExtResource("10_resources")]
+layout_mode = 0
+
+[node name="HandFanView" parent="." instance=ExtResource("8_hand")]
+layout_mode = 0
+
+[node name="EndTurnButton" type="Button" parent="."]
+layout_mode = 0
+custom_minimum_size = Vector2(160, 56)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("4_end_turn_normal")
+theme_override_styles/hover = SubResource("5_end_turn_hover")
+theme_override_styles/pressed = SubResource("6_end_turn_pressed")
+theme_override_styles/focus = SubResource("5_end_turn_hover")
+text = "End Turn"
 
 [node name="EncounterEffectOverlayView" parent="." instance=ExtResource("9_overlay")]
 layout_mode = 1
