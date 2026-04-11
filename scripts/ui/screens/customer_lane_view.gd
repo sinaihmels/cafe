@@ -39,13 +39,19 @@ func render(session_service: SessionService, interaction_state: EncounterInterac
 		var customer: CustomerInstance = session_service.combat_state.active_customers[customer_index]
 		var portrait_texture: Texture2D = UiTextureLibrary.customer_texture(customer.customer_def) if customer.customer_def != null else null
 		var spot: CustomerStageSpotView = _instantiate_spot()
+		var layout_variant: StringName = &"supporting"
+		if session_service.combat_state.active_customers.size() == 1:
+			layout_variant = &"solo"
+		elif customer_index == _focused_customer_index:
+			layout_variant = &"focused"
 		spot.configure(
 			customer_index,
 			customer,
 			portrait_texture,
 			customer_index == _focused_customer_index,
 			interaction_state.is_target_selected(&"customer", customer_index),
-			interaction_state.is_zone_targetable(&"customer", customer_index)
+			interaction_state.is_zone_targetable(&"customer", customer_index),
+			layout_variant
 		)
 		spot.focus_requested.connect(func(requested_index: int) -> void:
 			focus_customer_requested.emit(requested_index)
@@ -72,7 +78,27 @@ func _apply_layout_profile() -> void:
 	var compactness: float = clampf(maxf(width_pressure, height_pressure), 0.0, 1.0)
 	var display_scale: float = lerpf(1.08, 0.82, compactness)
 	var gap: int = maxi(8, int(round(lerpf(26.0, 10.0, compactness))))
+	if count == 1:
+		gap = 0
 	_row.add_theme_constant_override("separation", gap)
+	if count == 1:
+		# Solo customers use their own width cap so the focused request cluster does not
+		# stretch across the full lane on smaller screens.
+		_row.alignment = BoxContainer.ALIGNMENT_END
+		var solo_spot: CustomerStageSpotView = _spot_nodes[0]
+		var is_compact: bool = size.x < 420.0 or size.y < 220.0
+		var solo_min_width: float = minf((280.0 if is_compact else 340.0), maxf(220.0, size.x - 24.0))
+		var solo_max_width: float = minf((420.0 if is_compact else 540.0), maxf(solo_min_width, size.x - 4.0))
+		var solo_ratio: float = 0.30 if is_compact else 0.34
+		var solo_width: float = clampf(size.x * solo_ratio, solo_min_width, solo_max_width)
+		solo_spot.custom_minimum_size = Vector2(solo_width, maxf((152.0 if is_compact else 176.0) * display_scale, size.y - 4.0))
+		solo_spot.size_flags_horizontal = 0
+		solo_spot.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		solo_spot.size_flags_stretch_ratio = 1.0
+		solo_spot.set_display_scale(clampf(display_scale * (0.88 if is_compact else 1.02), 0.74, 1.12))
+		return
+	_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	# Multi-customer mode keeps one focused customer wider than the supporting cast.
 	var available_width: float = maxf(420.0, size.x - float(gap * maxi(0, count - 1)))
 	var focus_ratio: float = 0.42
 	if count == 2:

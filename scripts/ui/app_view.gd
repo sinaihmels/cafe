@@ -38,7 +38,7 @@ signal table_item_requested(item_index: int)
 @onready var _shop_screen: ShopScreenView = $Margin/Root/ContentScroll/Content/ShopScreenView
 @onready var _boss_intro_screen: BossIntroScreenView = $Margin/Root/ContentScroll/Content/BossIntroScreenView
 @onready var _summary_screen: SummaryScreenView = $Margin/Root/ContentScroll/Content/SummaryScreenView
-@onready var _encounter_screen: EncounterScreenView = $Margin/EncounterScreenView
+@onready var _encounter_screen: EncounterScreenView = $EncounterScreenView
 
 func _ready() -> void:
 	_connect_signals()

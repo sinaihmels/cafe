@@ -15,6 +15,9 @@ and gives the player options to choose from and different options determine how 
 
 ## Pastry
 * Add models that get customized 
+	rolled buns for sweet dough
+	loafs with an ear for the sourdough dough
+	
 
 
 ## Cards

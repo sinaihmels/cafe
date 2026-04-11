@@ -113,6 +113,11 @@ layout_mode = 2
 visible = false
 layout_mode = 2
 
-[node name="EncounterScreenView" parent="Margin" unique_id=99057338 instance=ExtResource("12_encounter")]
+[node name="EncounterScreenView" parent="." unique_id=99057338 instance=ExtResource("12_encounter")]
 visible = false
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

@@ -98,6 +98,8 @@ func _clear_hovered_card(card_index: int) -> void:
 func _layout_cards() -> void:
 	if _cards_layer == null or _card_nodes.is_empty():
 		return
+	# Hand sizing comes from EncounterScreenView. This function should mainly solve
+	# spacing and safe vertical placement, not introduce a second independent scale system.
 	var hand_count: int = _card_nodes.size()
 	var available_width: float = maxf(180.0, size.x - 24.0)
 	# The cards themselves are authored scenes; this method only handles the fan positioning math.
@@ -114,6 +116,9 @@ func _layout_cards() -> void:
 		base_height *= width_scale
 	var total_span: float = spacing * float(maxi(0, hand_count - 1))
 	var start_x: float = (size.x - (base_width + total_span)) * 0.5
+	var max_curve_drop: float = curve_depth
+	var rotation_padding: float = base_width * sin(deg_to_rad(rotation_max_degrees)) * 0.16
+	var base_y: float = maxf(6.0, size.y - base_height - bottom_padding - max_curve_drop - rotation_padding)
 	for card_index in range(_card_nodes.size()):
 		var card_button: HandCardView = _card_nodes[card_index]
 		var normalized: float = 0.0
@@ -133,7 +138,7 @@ func _layout_cards() -> void:
 		elif is_hovered:
 			rotation_multiplier = 0.35
 		card_button.size = Vector2(base_width, base_height)
-		card_button.position = Vector2(start_x + spacing * float(card_index), maxf(6.0, size.y - base_height - bottom_padding + curve_drop - lift))
+		card_button.position = Vector2(start_x + spacing * float(card_index), base_y + curve_drop - lift)
 		card_button.pivot_offset = card_button.size * 0.5
 		card_button.rotation_degrees = normalized * rotation_max_degrees * rotation_multiplier
 		card_button.z_index = 100 + card_index
