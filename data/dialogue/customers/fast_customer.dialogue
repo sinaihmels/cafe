@@ -1,0 +1,244 @@
+{
+  "cues": {
+    "order_intro": {
+      "default_entry": "opening",
+      "nodes": [
+        {
+          "id": "opening",
+          "entry": true,
+          "speaker": "customer",
+          "text": "I need this quick. Warm and flaky is ideal, but speed matters first.",
+          "responses": [
+            {
+              "id": "fast",
+              "text": "Quick and warm. I’m on it.",
+              "actions": [
+                { "type": "remember_choice", "key": "promised_speed" },
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "fast_reply"
+            },
+            {
+              "id": "clarify",
+              "text": "If it’s warm and flaky, does that cover it?",
+              "actions": [
+                { "type": "remember_choice", "key": "clarified_order" }
+              ],
+              "next": "clarify_reply"
+            },
+            {
+              "id": "relax",
+              "text": "You’ll get it when you get it.",
+              "actions": [
+                { "type": "remember_choice", "key": "tested_patience" },
+                { "type": "apply_outcome", "outcome_id": "patience_minus_1" }
+              ],
+              "next": "relax_reply"
+            }
+          ]
+        },
+        {
+          "id": "fast_reply",
+          "speaker": "customer",
+          "text": "Good. That’s all I needed."
+        },
+        {
+          "id": "clarify_reply",
+          "speaker": "customer",
+          "text": "Yes. Just don’t let it drag."
+        },
+        {
+          "id": "relax_reply",
+          "speaker": "customer",
+          "text": "That’s not exactly reassuring."
+        }
+      ]
+    },
+    "interaction": {
+      "default_entry": "mini_cookies",
+      "nodes": [
+        {
+          "id": "small_talk_speed",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Talk’s fine as long as it comes with an actual update.",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" },
+            { "field": "dialogue_flags.promised_speed", "truthy": true }
+          ],
+          "responses": [
+            {
+              "id": "status",
+              "text": "You’re still on pace.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "status_reply"
+            },
+            {
+              "id": "warm_quick",
+              "text": "I’ll make sure it’s worth the extra minute.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "apply_warm_status" }
+              ],
+              "next": "warm_quick_reply"
+            }
+          ]
+        },
+        {
+          "id": "small_talk_tense",
+          "entry": true,
+          "speaker": "customer",
+          "text": "If this is where you tell me to relax again, skip it.",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" },
+            { "field": "dialogue_flags.tested_patience", "truthy": true }
+          ],
+          "responses": [
+            {
+              "id": "apologize",
+              "text": "Fair. I should’ve handled that better.",
+              "actions": [
+                { "type": "remember_choice", "key": "smoothed_things_over" },
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "apologize_reply"
+            },
+            {
+              "id": "push_back",
+              "text": "Waiting builds character.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "patience_minus_1" }
+              ],
+              "next": "push_back_reply"
+            }
+          ]
+        },
+        {
+          "id": "small_talk_default",
+          "entry": true,
+          "speaker": "customer",
+          "text": "I usually don’t have patience for chatter, but this helps a little.",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" }
+          ],
+          "responses": [
+            {
+              "id": "default_brisk",
+              "text": "Then I’ll keep it useful.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "default_brisk_reply"
+            },
+            {
+              "id": "default_tease",
+              "text": "I’ll make these ten seconds count.",
+              "next": "default_tease_reply"
+            }
+          ]
+        },
+        {
+          "id": "mini_cookies_speed",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Fine. That buys a little goodwill. Don’t let it buy delay.",
+          "conditions": [
+            { "field": "card_id", "equals": "mini_cookies" }
+          ]
+        },
+        {
+          "id": "mini_cookies",
+          "entry": true,
+          "speaker": "customer",
+          "text": "A snack while I wait? I’ll take it."
+        },
+        {
+          "id": "status_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Good. Keep that true."
+        },
+        {
+          "id": "warm_quick_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Worth the minute, then. Not worth five."
+        },
+        {
+          "id": "apologize_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Better."
+        },
+        {
+          "id": "push_back_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Not today."
+        },
+        {
+          "id": "default_brisk_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Appreciated."
+        },
+        {
+          "id": "default_tease_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "You have nine left."
+        }
+      ]
+    },
+    "leave": {
+      "default_entry": "patience_expired",
+      "nodes": [
+        {
+          "id": "happy_speed",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Fast, warm, and done. Perfect.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_happy" },
+            { "field": "dialogue_flags.promised_speed", "truthy": true }
+          ]
+        },
+        {
+          "id": "happy_default",
+          "entry": true,
+          "speaker": "customer",
+          "text": "That worked. Thanks.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_happy" }
+          ]
+        },
+        {
+          "id": "served_rejected",
+          "entry": true,
+          "speaker": "customer",
+          "text": "That cost more time than it saved.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_rejected" }
+          ]
+        },
+        {
+          "id": "patience_tested",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Told you I couldn’t linger.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "patience_expired" },
+            { "field": "dialogue_flags.tested_patience", "truthy": true }
+          ]
+        },
+        {
+          "id": "patience_expired",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Out of time. I’m leaving."
+        }
+      ]
+    }
+  }
+}

@@ -1,3 +1,4 @@
+@tool
 class_name CustomerStageSpotView
 extends PanelContainer
 
@@ -314,6 +315,9 @@ func _truncate(value: String, max_length: int) -> String:
 	if value.length() <= max_length:
 		return value
 	return "%s..." % value.substr(0, max_length - 3)
+
+func get_customer_index() -> int:
+	return _customer_index
 
 func _on_focus_pressed() -> void:
 	if _customer_index >= 0:

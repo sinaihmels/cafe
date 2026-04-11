@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/app/app_controller.gd" id="1_appcontroller"]
 [ext_resource type="Script" path="res://scripts/systems/save_service.gd" id="2_profileservice"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/systems/effect_queue_service.gd" id="4_effectqueue"]
 [ext_resource type="Script" path="res://scripts/systems/session_service.gd" id="5_sessionservice"]
 [ext_resource type="PackedScene" path="res://scenes/ui/app_view.tscn" id="6_appview"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_service.gd" id="7_dialogueservice"]
 
 [node name="App" type="Node"]
 
@@ -21,12 +22,16 @@ script = ExtResource("2_profileservice")
 [node name="SessionService" type="Node" parent="."]
 script = ExtResource("5_sessionservice")
 
+[node name="DialogueService" type="Node" parent="."]
+script = ExtResource("7_dialogueservice")
+
 [node name="AppController" type="Node" parent="."]
 script = ExtResource("1_appcontroller")
 session_service_path = NodePath("../SessionService")
 meta_profile_service_path = NodePath("../SaveService")
 event_bus_path = NodePath("../EventBus")
 effect_queue_path = NodePath("../EffectQueueService")
+dialogue_service_path = NodePath("../DialogueService")
 app_view_path = NodePath("../AppView")
 
 [node name="AppView" parent="." instance=ExtResource("6_appview")]

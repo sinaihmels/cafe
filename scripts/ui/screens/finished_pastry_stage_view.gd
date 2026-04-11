@@ -1,3 +1,4 @@
+@tool
 class_name FinishedPastryStageView
 extends KitchenStageAreaView
 
@@ -7,6 +8,9 @@ func _ready() -> void:
 	setup_stage()
 	var table_view: TableZoneView = _table_view()
 	assert(table_view != null, "FinishedPastryStageView.zone_scene must instantiate TableZoneView.")
+	if Engine.is_editor_hint():
+		render_editor_preview()
+		return
 	table_view.table_item_requested.connect(func(item_index: int) -> void:
 		table_item_requested.emit(item_index)
 	)
@@ -27,3 +31,10 @@ func get_pastry_card_control(item_index: int) -> Control:
 
 func _table_view() -> TableZoneView:
 	return get_zone_view() as TableZoneView
+
+func render_editor_preview() -> void:
+	if not Engine.is_editor_hint():
+		return
+	var preview_session: SessionService = EncounterEditorPreview.build_session()
+	var preview_interaction_state: EncounterInteractionState = EncounterEditorPreview.build_interaction_state(preview_session)
+	render(preview_session, preview_interaction_state)

@@ -1,3 +1,4 @@
+@tool
 class_name OvenStageView
 extends KitchenStageAreaView
 
@@ -7,6 +8,9 @@ func _ready() -> void:
 	setup_stage()
 	var oven_view: OvenZoneView = _oven_view()
 	assert(oven_view != null, "OvenStageView.zone_scene must instantiate OvenZoneView.")
+	if Engine.is_editor_hint():
+		render_editor_preview()
+		return
 	oven_view.oven_item_requested.connect(func(slot_index: int) -> void:
 		oven_item_requested.emit(slot_index)
 	)
@@ -27,3 +31,10 @@ func get_pastry_card_control(item_index: int) -> Control:
 
 func _oven_view() -> OvenZoneView:
 	return get_zone_view() as OvenZoneView
+
+func render_editor_preview() -> void:
+	if not Engine.is_editor_hint():
+		return
+	var preview_session: SessionService = EncounterEditorPreview.build_session()
+	var preview_interaction_state: EncounterInteractionState = EncounterEditorPreview.build_interaction_state(preview_session)
+	render(preview_session, preview_interaction_state)

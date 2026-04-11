@@ -32,6 +32,9 @@ var cafe_state: CafeState = CafeState.new()
 var deck_state: DeckState = DeckState.new()
 
 var _last_status_message: String = ""
+var _next_customer_runtime_id: int = 1
+var _awaiting_customer_turn_dialogue_resolution: bool = false
+var _pending_run_failure_message: String = ""
 
 func initialize(profile_service: MetaProfileService, event_bus_ref: EventBus) -> void:
 	meta_profile_service = profile_service
@@ -51,6 +54,9 @@ func _reset_runtime_state() -> void:
 	player_state.deck_state = deck_state
 	player_state.equipped_equipment_ids = PackedStringArray()
 	_last_status_message = ""
+	_next_customer_runtime_id = 1
+	_awaiting_customer_turn_dialogue_resolution = false
+	_pending_run_failure_message = ""
 
 func go_to_title() -> void:
 	run_state.screen = GameEnums.Screen.TITLE
@@ -249,6 +255,8 @@ func _enter_day(day_number: int) -> void:
 	combat_state.next_plated_pastry_duplications = 0
 	combat_state.skip_next_customer_patience_loss = false
 	combat_state.next_warm_serve_bonus = false
+	_awaiting_customer_turn_dialogue_resolution = false
+	_pending_run_failure_message = ""
 	_reset_cafe_pastry_state()
 	_rebuild_deck_from_master_ids()
 	if not _spawn_fresh_active_pastry():
@@ -259,6 +267,7 @@ func _enter_day(day_number: int) -> void:
 	if dough.requires_proofing:
 		opening_message = "Day %d begins with %s ready to shape. Proof it, bake it, plate it, and keep the line moving one pastry at a time." % [day_number, dough.display_name]
 	_set_status_message(opening_message)
+	request_customer_order_dialogue(0)
 
 func _build_day_customer_roster(day_number: int) -> Dictionary:
 	var customer_ids: PackedStringArray = _to_packed_strings(ENCOUNTER_CUSTOMERS.get(day_number, []))
@@ -338,6 +347,8 @@ func _create_customers(customer_ids: PackedStringArray, returning_customer_ids: 
 			continue
 		var customer: CustomerInstance = CustomerInstance.new()
 		customer.reset_from_def(customer_def)
+		customer.runtime_id = _next_customer_runtime_id
+		_next_customer_runtime_id += 1
 		if returning_customer_ids.has(customer_def.customer_id):
 			customer.mood_flags[&"returning_customer"] = true
 		for status_id in customer_def.starting_status_ids:
@@ -381,10 +392,15 @@ func end_player_turn() -> void:
 	if run_state.screen != GameEnums.Screen.ENCOUNTER:
 		return
 	if player_state.stress <= 0:
+		if _has_departing_customers():
+			_pending_run_failure_message = "The bakery became too stressful to continue."
+			return
 		_finish_run(false, "The bakery became too stressful to continue.")
 		return
-	combat_state.turn_number += 1
-	begin_player_turn()
+	if _has_departing_customers():
+		_awaiting_customer_turn_dialogue_resolution = true
+		return
+	_continue_after_customer_turn_dialogues()
 
 func can_play_card(card: CardInstance) -> bool:
 	if card == null:
@@ -493,14 +509,14 @@ func is_valid_target(card: CardInstance, zone: StringName, index: int) -> bool:
 	match card.card_def.targeting_rules:
 		"select_one_customer_and_one_plated_pastry":
 			if zone == &"customer":
-				return index >= 0 and index < combat_state.active_customers.size()
+				return is_customer_targetable(index)
 			if zone == &"table":
 				return index >= 0 and index < cafe_state.plated_pastries.size()
 			return false
 		"select_one_plated_pastry":
 			return zone == &"table" and index >= 0 and index < cafe_state.plated_pastries.size()
 		"select_one_customer":
-			return zone == &"customer" and index >= 0 and index < combat_state.active_customers.size()
+			return zone == &"customer" and is_customer_targetable(index)
 		_:
 			return false
 
@@ -825,6 +841,8 @@ func serve_item_to_customer(customer_index: int, item_index: int) -> bool:
 	if item_index < 0 or item_index >= cafe_state.plated_pastries.size():
 		return false
 	var customer: CustomerInstance = combat_state.active_customers[customer_index]
+	if customer == null or customer.is_departing():
+		return false
 	var pastry: PastryInstance = cafe_state.plated_pastries[item_index]
 	var outcome: Dictionary = _score_pastry_for_customer(pastry, customer)
 	cafe_state.plated_pastries.remove_at(item_index)
@@ -837,16 +855,14 @@ func serve_item_to_customer(customer_index: int, item_index: int) -> bool:
 		if customer.current_patience <= 0:
 			var stress_damage: int = customer.customer_def.stress_damage if customer.customer_def != null else 2
 			player_state.lose_stress(stress_damage)
-			combat_state.active_customers.remove_at(customer_index)
 			_set_status_message("%s They left upset. Stress -%d." % [failed_message, stress_damage])
+			begin_customer_departure(customer_index, &"served_rejected")
 			if player_state.stress <= 0:
-				_finish_run(false, "The bakery became too stressful to continue.")
+				_pending_run_failure_message = "The bakery became too stressful to continue."
 				return true
 		else:
 			_set_status_message(failed_message)
 		_clamp_focused_customer_index()
-		if combat_state.active_customers.is_empty():
-			_advance_after_encounter_clear()
 		return true
 
 	var matched_bonus_tags: int = int(outcome.get("matched_bonus_tags", 0))
@@ -879,7 +895,6 @@ func serve_item_to_customer(customer_index: int, item_index: int) -> bool:
 	customer.served = true
 	var scheduled_return_count: int = _schedule_customer_returns(customer)
 	var gifted_decoration_id: StringName = _maybe_grant_customer_decoration_gift(customer)
-	combat_state.active_customers.remove_at(customer_index)
 	_notify_customer_served(customer, pastry)
 	if scheduled_return_count == 1:
 		final_message += " They may come back on another day."
@@ -888,9 +903,8 @@ func serve_item_to_customer(customer_index: int, item_index: int) -> bool:
 	if gifted_decoration_id != &"":
 		final_message += " They gifted %s." % _get_decoration_display_name(gifted_decoration_id)
 	_set_status_message(final_message)
+	begin_customer_departure(customer_index, &"served_happy")
 	_clamp_focused_customer_index()
-	if combat_state.active_customers.is_empty():
-		_advance_after_encounter_clear()
 	return true
 
 func serve_targets(targets: Array[Dictionary]) -> bool:
@@ -907,6 +921,143 @@ func serve_targets(targets: Array[Dictionary]) -> bool:
 		_set_status_message("Serve needs 1 customer and 1 plated pastry.")
 		return false
 	return serve_item_to_customer(customer_index, pastry_index)
+
+func find_customer_index_by_runtime_id(runtime_id: int) -> int:
+	if runtime_id <= 0:
+		return -1
+	for customer_index in range(combat_state.active_customers.size()):
+		var customer: CustomerInstance = combat_state.active_customers[customer_index]
+		if customer != null and customer.runtime_id == runtime_id:
+			return customer_index
+	return -1
+
+func get_customer_by_runtime_id(runtime_id: int) -> CustomerInstance:
+	var customer_index: int = find_customer_index_by_runtime_id(runtime_id)
+	if customer_index == -1:
+		return null
+	return combat_state.active_customers[customer_index]
+
+func is_customer_targetable(customer_index: int) -> bool:
+	if customer_index < 0 or customer_index >= combat_state.active_customers.size():
+		return false
+	var customer: CustomerInstance = combat_state.active_customers[customer_index]
+	return customer != null and not customer.is_departing()
+
+func request_customer_order_dialogue(customer_index: int, force: bool = false) -> bool:
+	if event_bus == null or customer_index < 0 or customer_index >= combat_state.active_customers.size():
+		return false
+	var customer: CustomerInstance = combat_state.active_customers[customer_index]
+	if customer == null or customer.is_departing():
+		return false
+	if customer.has_seen_order_dialogue and not force:
+		return false
+	customer.has_seen_order_dialogue = true
+	event_bus.emit_dialogue_requested(_build_dialogue_request(customer, &"order_intro", &"", &"", true, true))
+	return true
+
+func begin_customer_departure(customer_index: int, leave_reason: StringName) -> bool:
+	if event_bus == null or customer_index < 0 or customer_index >= combat_state.active_customers.size():
+		return false
+	var customer: CustomerInstance = combat_state.active_customers[customer_index]
+	if customer == null or customer.is_departing():
+		return false
+	customer.departure_reason = leave_reason
+	customer.mood_flags[&"departing"] = true
+	event_bus.emit_dialogue_requested(_build_dialogue_request(customer, &"leave", &"", leave_reason, false, false))
+	return true
+
+func finalize_customer_departure(customer_runtime_id: int) -> void:
+	var customer_index: int = find_customer_index_by_runtime_id(customer_runtime_id)
+	if customer_index == -1:
+		if _awaiting_customer_turn_dialogue_resolution and not _has_departing_customers():
+			_continue_after_customer_turn_dialogues()
+		return
+	combat_state.active_customers.remove_at(customer_index)
+	_clamp_focused_customer_index()
+	if _pending_run_failure_message != "" and not _has_departing_customers():
+		var failure_message: String = _pending_run_failure_message
+		_pending_run_failure_message = ""
+		_finish_run(false, failure_message)
+		return
+	if combat_state.active_customers.is_empty():
+		_awaiting_customer_turn_dialogue_resolution = false
+		_advance_after_encounter_clear()
+		return
+	if _awaiting_customer_turn_dialogue_resolution and not _has_departing_customers():
+		_continue_after_customer_turn_dialogues()
+
+func apply_dialogue_outcome(outcome_id: StringName, customer_runtime_id: int) -> void:
+	if outcome_id == &"":
+		return
+	var outcome: DialogueOutcomeDef = content_library.get_dialogue_outcome(outcome_id)
+	if outcome == null:
+		return
+	var customer_index: int = find_customer_index_by_runtime_id(customer_runtime_id)
+	var targets: Array[Dictionary] = []
+	if customer_index != -1:
+		targets.append({
+			"zone": &"customer",
+			"index": customer_index,
+		})
+	var context: EffectContext = build_effect_context(null, targets)
+	for effect_value in outcome.effects:
+		var effect: BaseEffect = effect_value
+		if effect == null:
+			continue
+		effect.apply(context)
+		if event_bus != null:
+			event_bus.emit_effect_applied(effect, context)
+
+func _build_dialogue_request(
+	customer: CustomerInstance,
+	cue: StringName,
+	card_id: StringName = &"",
+	leave_reason: StringName = &"",
+	modal: bool = false,
+	allow_choices: bool = false
+) -> DialogueRequest:
+	var request: DialogueRequest = DialogueRequest.new()
+	if customer != null and customer.customer_def != null:
+		request.customer_runtime_id = customer.runtime_id
+		request.customer_id = customer.customer_def.customer_id
+		request.dialogue_path = customer.customer_def.dialogue_file_path
+	request.cue = cue
+	request.card_id = card_id
+	request.leave_reason = leave_reason
+	request.modal = modal
+	request.allow_choices = allow_choices
+	return request
+
+func _queue_interaction_dialogue(card: CardInstance, targets: Array) -> void:
+	if event_bus == null or card == null or card.card_def == null:
+		return
+	if card.card_def.card_type != CardDef.CardType.INTERACTION:
+		return
+	var customer_index: int = _resolve_interaction_customer_index(targets)
+	if not is_customer_targetable(customer_index):
+		return
+	var customer: CustomerInstance = combat_state.active_customers[customer_index]
+	var card_id: StringName = card.card_def.dialogue_event_id if card.card_def.dialogue_event_id != &"" else card.card_def.card_id
+	event_bus.emit_dialogue_requested(_build_dialogue_request(customer, &"interaction", card_id, &"", false, true))
+
+func _has_departing_customers() -> bool:
+	for customer_value in combat_state.active_customers:
+		var customer: CustomerInstance = customer_value
+		if customer != null and customer.is_departing():
+			return true
+	return false
+
+func _continue_after_customer_turn_dialogues() -> void:
+	_awaiting_customer_turn_dialogue_resolution = false
+	if run_state.screen != GameEnums.Screen.ENCOUNTER:
+		return
+	if _pending_run_failure_message != "":
+		var failure_message: String = _pending_run_failure_message
+		_pending_run_failure_message = ""
+		_finish_run(false, failure_message)
+		return
+	combat_state.turn_number += 1
+	begin_player_turn()
 
 func _calculate_pastry_satiation(pastry: PastryInstance) -> int:
 	if pastry == null:
@@ -1475,13 +1626,13 @@ func pop_status_message() -> String:
 func get_status_message() -> String:
 	return run_state.status_message
 func _process_customer_turn() -> void:
-	var remaining_customers: Array[CustomerInstance] = []
+	var departing_customer_indices: PackedInt32Array = PackedInt32Array()
 	var unhappy_departures: int = 0
 	var total_stress_loss: int = 0
 	var patience_loss_prevented: bool = combat_state.skip_next_customer_patience_loss
 	for customer_index in range(combat_state.active_customers.size()):
 		var customer: CustomerInstance = combat_state.active_customers[customer_index]
-		if customer == null:
+		if customer == null or customer.is_departing():
 			continue
 		_trigger_customer_modifier_hooks(customer_index, &"turn_end")
 		customer.turns_waited += 1
@@ -1492,19 +1643,24 @@ func _process_customer_turn() -> void:
 			player_state.lose_stress(stress_damage)
 			total_stress_loss += stress_damage
 			unhappy_departures += 1
+			departing_customer_indices.append(customer_index)
 			continue
-		remaining_customers.append(customer)
-	combat_state.active_customers = remaining_customers
 	combat_state.skip_next_customer_patience_loss = false
 	_clamp_focused_customer_index()
 	if patience_loss_prevented:
 		_set_status_message("Small Talk kept the whole line patient for a turn.")
 	if unhappy_departures > 0:
 		_set_status_message("%d customer(s) left upset. Stress -%d." % [unhappy_departures, total_stress_loss])
-	if player_state.stress <= 0:
-		_finish_run(false, "The bakery became too stressful to continue.")
+	for customer_index in departing_customer_indices:
+		begin_customer_departure(customer_index, &"patience_expired")
+	if player_state.stress <= 0 and unhappy_departures > 0:
+		_pending_run_failure_message = "The bakery became too stressful to continue."
+		if not _has_departing_customers():
+			var failure_message: String = _pending_run_failure_message
+			_pending_run_failure_message = ""
+			_finish_run(false, failure_message)
 		return
-	if combat_state.active_customers.is_empty():
+	if combat_state.active_customers.is_empty() and not _has_departing_customers():
 		_advance_after_encounter_clear()
 
 func _advance_after_encounter_clear() -> void:
@@ -1770,6 +1926,7 @@ func after_card_played(card: CardInstance, targets: Array = []) -> void:
 	_run_modifier_effects_from_collection(player_state.passive_modifiers, &"card_played")
 	_run_modifier_effects_from_collection(player_state.active_buffs, &"card_played")
 	_trigger_card_interaction_talents(card, targets)
+	_queue_interaction_dialogue(card, targets)
 
 func _trigger_card_interaction_talents(card: CardInstance, targets: Array) -> void:
 	if card == null or card.card_def == null or card.card_def.interaction_traits.is_empty():
@@ -1790,16 +1947,23 @@ func _trigger_card_interaction_talents(card: CardInstance, targets: Array) -> vo
 func _resolve_interaction_customer_index(targets: Array) -> int:
 	var customer_indices: Array = _collect_customer_indices(targets)
 	if not customer_indices.is_empty():
-		return int(customer_indices[0])
+		var targeted_index: int = int(customer_indices[0])
+		if is_customer_targetable(targeted_index):
+			return targeted_index
 	if combat_state.active_customers.is_empty():
 		return -1
-	return clampi(combat_state.focused_customer_index, 0, combat_state.active_customers.size() - 1)
+	if is_customer_targetable(combat_state.focused_customer_index):
+		return clampi(combat_state.focused_customer_index, 0, combat_state.active_customers.size() - 1)
+	for customer_index in range(combat_state.active_customers.size()):
+		if is_customer_targetable(customer_index):
+			return customer_index
+	return -1
 
 func _trigger_customer_talents(event_name: StringName, customer_index: int, source_card: CardInstance, targets: Array) -> void:
 	if event_name == &"" or customer_index < 0 or customer_index >= combat_state.active_customers.size():
 		return
 	var customer: CustomerInstance = combat_state.active_customers[customer_index]
-	if customer == null:
+	if customer == null or customer.is_departing():
 		return
 	for raw_talent_id in customer.get_talent_ids():
 		_apply_customer_talent(event_name, customer_index, StringName(raw_talent_id), source_card, targets)

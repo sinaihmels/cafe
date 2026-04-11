@@ -1,0 +1,298 @@
+{
+  "cues": {
+    "order_intro": {
+      "default_entry": "opening",
+      "nodes": [
+        {
+          "id": "returning",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Back again. Same mood as always: something warm, simple, and not burnt.",
+          "conditions": [
+            { "field": "is_returning_visit", "truthy": true }
+          ],
+          "responses": [
+            {
+              "id": "usual",
+              "text": "I remember. Warm and steady.",
+              "actions": [
+                { "type": "remember_choice", "key": "felt_seen" },
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "usual_reply"
+            },
+            {
+              "id": "ask_more_returning",
+              "text": "Anything special today besides warm?",
+              "actions": [
+                { "type": "remember_choice", "key": "asked_followup" }
+              ],
+              "next": "detail_reply"
+            },
+            {
+              "id": "curt_returning",
+              "text": "Join the line and wait.",
+              "actions": [
+                { "type": "remember_choice", "key": "rushed_order" },
+                { "type": "apply_outcome", "outcome_id": "patience_minus_1" }
+              ],
+              "next": "cold_reply"
+            }
+          ]
+        },
+        {
+          "id": "opening",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Morning. I’m after something warm and comforting. No burnt edges, no drama.",
+          "responses": [
+            {
+              "id": "usual_opening",
+              "text": "Warm and comforting. I’ve got you.",
+              "actions": [
+                { "type": "remember_choice", "key": "felt_seen" },
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "usual_reply"
+            },
+            {
+              "id": "ask_more",
+              "text": "Anything else would make it perfect?",
+              "actions": [
+                { "type": "remember_choice", "key": "asked_followup" }
+              ],
+              "next": "detail_reply"
+            },
+            {
+              "id": "curt",
+              "text": "Then wait quietly.",
+              "actions": [
+                { "type": "remember_choice", "key": "rushed_order" },
+                { "type": "apply_outcome", "outcome_id": "patience_minus_1" }
+              ],
+              "next": "cold_reply"
+            }
+          ]
+        },
+        {
+          "id": "usual_reply",
+          "speaker": "customer",
+          "text": "Perfect. That’s exactly the kind of answer I was hoping for."
+        },
+        {
+          "id": "detail_reply",
+          "speaker": "customer",
+          "text": "Just make it feel like a good start to the day. Warm helps more than fancy."
+        },
+        {
+          "id": "cold_reply",
+          "speaker": "customer",
+          "text": "Right. I’ll keep my expectations simple too."
+        }
+      ]
+    },
+    "interaction": {
+      "default_entry": "mini_cookies",
+      "nodes": [
+        {
+          "id": "small_talk_warm",
+          "entry": true,
+          "speaker": "customer",
+          "text": "You remembered the mood I was in. That goes a long way.",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" },
+            { "field": "dialogue_flags.felt_seen", "truthy": true }
+          ],
+          "responses": [
+            {
+              "id": "routine",
+              "text": "What makes a good bakery morning for you?",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "tips_plus_1" }
+              ],
+              "next": "routine_reply"
+            },
+            {
+              "id": "extra_warm",
+              "text": "Something extra warm would suit you, then.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "apply_warm_status" }
+              ],
+              "next": "warm_reply"
+            }
+          ]
+        },
+        {
+          "id": "small_talk_tense",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Trying to smooth over that greeting?",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" },
+            { "field": "dialogue_flags.rushed_order", "truthy": true }
+          ],
+          "responses": [
+            {
+              "id": "make_amends",
+              "text": "Yeah. You deserved better than that.",
+              "actions": [
+                { "type": "remember_choice", "key": "made_amends" },
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "amends_reply"
+            },
+            {
+              "id": "double_down",
+              "text": "I’m just keeping the line moving.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "patience_minus_1" }
+              ],
+              "next": "double_down_reply"
+            }
+          ]
+        },
+        {
+          "id": "small_talk_default",
+          "entry": true,
+          "speaker": "customer",
+          "text": "A little conversation does make the wait feel shorter.",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" }
+          ],
+          "responses": [
+            {
+              "id": "steady",
+              "text": "That’s the plan.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "steady_reply"
+            },
+            {
+              "id": "smile",
+              "text": "Then I picked the right card.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "tips_plus_1" }
+              ],
+              "next": "smile_reply"
+            }
+          ]
+        },
+        {
+          "id": "mini_cookies_seen",
+          "entry": true,
+          "speaker": "customer",
+          "text": "A cookie while I wait? That’s how you keep a regular happy.",
+          "conditions": [
+            { "field": "card_id", "equals": "mini_cookies" },
+            { "field": "dialogue_flags.felt_seen", "truthy": true }
+          ]
+        },
+        {
+          "id": "mini_cookies",
+          "entry": true,
+          "speaker": "customer",
+          "text": "That little cookie makes the wait a lot friendlier.",
+          "conditions": [
+            { "field": "card_id", "equals": "mini_cookies" }
+          ]
+        },
+        {
+          "id": "routine_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Honestly? A warm pastry and a place that remembers people."
+        },
+        {
+          "id": "warm_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Now that sounds like a morning worth waiting for."
+        },
+        {
+          "id": "amends_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "That helps. Thanks for saying it plainly."
+        },
+        {
+          "id": "double_down_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Good to know."
+        },
+        {
+          "id": "steady_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "It’s working."
+        },
+        {
+          "id": "smile_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Fair enough."
+        }
+      ]
+    },
+    "leave": {
+      "default_entry": "patience_expired",
+      "nodes": [
+        {
+          "id": "happy_amends",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Glad we turned that around. See you soon.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_happy" },
+            { "field": "dialogue_flags.made_amends", "truthy": true }
+          ]
+        },
+        {
+          "id": "happy_seen",
+          "entry": true,
+          "speaker": "customer",
+          "text": "That was exactly the kind of warm start I came in for.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_happy" },
+            { "field": "dialogue_flags.felt_seen", "truthy": true }
+          ]
+        },
+        {
+          "id": "happy_default",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Perfect. Thanks for that.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_happy" }
+          ]
+        },
+        {
+          "id": "served_rejected",
+          "entry": true,
+          "speaker": "customer",
+          "text": "That wasn’t what I asked for. I’ll head out.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_rejected" }
+          ]
+        },
+        {
+          "id": "patience_rushed",
+          "entry": true,
+          "speaker": "customer",
+          "text": "I should’ve trusted that first impression and kept walking.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "patience_expired" },
+            { "field": "dialogue_flags.rushed_order", "truthy": true }
+          ]
+        },
+        {
+          "id": "patience_expired",
+          "entry": true,
+          "speaker": "customer",
+          "text": "I’ve got to get moving. Maybe tomorrow."
+        }
+      ]
+    }
+  }
+}

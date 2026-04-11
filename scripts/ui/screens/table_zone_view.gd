@@ -1,3 +1,4 @@
+@tool
 class_name TableZoneView
 extends Control
 
@@ -10,6 +11,8 @@ signal table_item_requested(item_index: int)
 
 func _ready() -> void:
 	_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	if Engine.is_editor_hint():
+		render_editor_preview()
 	_apply_layout()
 
 func _notification(what: int) -> void:
@@ -96,3 +99,10 @@ func _apply_node_rect(control: Control, rect: Rect2) -> void:
 	control.offset_top = rect.position.y
 	control.offset_right = rect.position.x + rect.size.x
 	control.offset_bottom = rect.position.y + rect.size.y
+
+func render_editor_preview() -> void:
+	if not Engine.is_editor_hint():
+		return
+	var preview_session: SessionService = EncounterEditorPreview.build_session()
+	var preview_interaction_state: EncounterInteractionState = EncounterEditorPreview.build_interaction_state(preview_session)
+	render(preview_session, preview_interaction_state)

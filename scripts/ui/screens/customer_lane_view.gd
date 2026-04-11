@@ -1,3 +1,4 @@
+@tool
 class_name CustomerLaneView
 extends Control
 
@@ -11,6 +12,10 @@ signal customer_target_requested(customer_index: int)
 
 var _spot_nodes: Array[CustomerStageSpotView] = []
 var _focused_customer_index: int = -1
+
+func _ready() -> void:
+	if Engine.is_editor_hint():
+		render_editor_preview()
 
 func render(session_service: SessionService, interaction_state: EncounterInteractionState) -> void:
 	UiSceneUtils.clear_children(_row)
@@ -129,3 +134,16 @@ func _instantiate_spot() -> CustomerStageSpotView:
 	var spot: CustomerStageSpotView = node as CustomerStageSpotView
 	assert(spot != null, "CustomerLaneView.customer_spot_scene must instantiate CustomerStageSpotView.")
 	return spot
+
+func get_customer_spot_control(customer_index: int) -> Control:
+	for spot in _spot_nodes:
+		if spot != null and spot.get_customer_index() == customer_index:
+			return spot
+	return null
+
+func render_editor_preview() -> void:
+	if not Engine.is_editor_hint():
+		return
+	var preview_session: SessionService = EncounterEditorPreview.build_session()
+	var preview_interaction_state: EncounterInteractionState = EncounterEditorPreview.build_interaction_state(preview_session)
+	render(preview_session, preview_interaction_state)

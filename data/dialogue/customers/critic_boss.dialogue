@@ -1,0 +1,286 @@
+{
+  "cues": {
+    "order_intro": {
+      "default_entry": "opening",
+      "nodes": [
+        {
+          "id": "opening",
+          "entry": true,
+          "speaker": "customer",
+          "text": "I expect a decorated pastry with real intent behind it. If it is merely competent, I will know.",
+          "responses": [
+            {
+              "id": "invite_critique",
+              "text": "Then tell me what detail you notice first.",
+              "actions": [
+                { "type": "remember_choice", "key": "invited_critique" },
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "invite_critique_reply"
+            },
+            {
+              "id": "confident",
+              "text": "You’ll get precision, not excuses.",
+              "actions": [
+                { "type": "remember_choice", "key": "met_with_confidence" },
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "confident_reply"
+            },
+            {
+              "id": "antagonize",
+              "text": "You’ll get what everyone else gets.",
+              "actions": [
+                { "type": "remember_choice", "key": "antagonized_critic" },
+                { "type": "apply_outcome", "outcome_id": "patience_minus_1" }
+              ],
+              "next": "antagonize_reply"
+            }
+          ]
+        },
+        {
+          "id": "invite_critique_reply",
+          "speaker": "customer",
+          "text": "Structure. After that, restraint."
+        },
+        {
+          "id": "confident_reply",
+          "speaker": "customer",
+          "text": "Good. Confidence is only useful when it survives contact with reality."
+        },
+        {
+          "id": "antagonize_reply",
+          "speaker": "customer",
+          "text": "An unfortunate answer."
+        }
+      ]
+    },
+    "interaction": {
+      "default_entry": "mini_cookies",
+      "nodes": [
+        {
+          "id": "small_talk_hostile",
+          "entry": true,
+          "speaker": "customer",
+          "text": "If this is the part where you try to charm me after that remark, choose carefully.",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" },
+            { "field": "dialogue_flags.antagonized_critic", "truthy": true }
+          ],
+          "responses": [
+            {
+              "id": "reset",
+              "text": "Fair. Let me reset the tone.",
+              "actions": [
+                { "type": "remember_choice", "key": "reset_with_critic" },
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "reset_reply"
+            },
+            {
+              "id": "push",
+              "text": "I’d rather impress you than flatter you.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "patience_minus_1" }
+              ],
+              "next": "push_reply"
+            }
+          ]
+        },
+        {
+          "id": "small_talk_open",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Most bakers defend themselves before they’ve baked anything. You haven’t. Interesting.",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" },
+            { "field": "dialogue_flags.invited_critique", "truthy": true }
+          ],
+          "responses": [
+            {
+              "id": "detail",
+              "text": "What detail loses people first?",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "reputation_plus_1" }
+              ],
+              "next": "detail_reply"
+            },
+            {
+              "id": "results",
+              "text": "I’d rather let the pastry answer.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "results_reply"
+            }
+          ]
+        },
+        {
+          "id": "small_talk_confident",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Confidence is cheap. Calm confidence is rarer.",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" },
+            { "field": "dialogue_flags.met_with_confidence", "truthy": true }
+          ],
+          "responses": [
+            {
+              "id": "steady",
+              "text": "Then I’ll stay calm and precise.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "reputation_plus_1" }
+              ],
+              "next": "steady_reply"
+            },
+            {
+              "id": "warm",
+              "text": "Precision still has room for warmth.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "apply_warm_status" }
+              ],
+              "next": "warm_reply"
+            }
+          ]
+        },
+        {
+          "id": "small_talk_default",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Small talk is rarely useful. This, at least, is measured.",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" }
+          ],
+          "responses": [
+            {
+              "id": "default_measure",
+              "text": "Measured is what I’m aiming for.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "default_measure_reply"
+            },
+            {
+              "id": "default_direct",
+              "text": "Then I won’t waste either of our time.",
+              "next": "default_direct_reply"
+            }
+          ]
+        },
+        {
+          "id": "mini_cookies",
+          "entry": true,
+          "speaker": "customer",
+          "text": "A palate primer. Unexpected, but not unwelcome."
+        },
+        {
+          "id": "reset_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Good. Begin there."
+        },
+        {
+          "id": "push_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Then impress me."
+        },
+        {
+          "id": "detail_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Indecision. It shows everywhere."
+        },
+        {
+          "id": "results_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "An acceptable position."
+        },
+        {
+          "id": "steady_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "We’ll see."
+        },
+        {
+          "id": "warm_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "If you can manage both, you’ll have my attention."
+        },
+        {
+          "id": "default_measure_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Good."
+        },
+        {
+          "id": "default_direct_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Please don’t."
+        }
+      ]
+    },
+    "leave": {
+      "default_entry": "patience_expired",
+      "nodes": [
+        {
+          "id": "happy_listened",
+          "entry": true,
+          "speaker": "customer",
+          "text": "You listened. That mattered.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_happy" },
+            { "field": "dialogue_flags.invited_critique", "truthy": true }
+          ]
+        },
+        {
+          "id": "happy_confident",
+          "entry": true,
+          "speaker": "customer",
+          "text": "You met the standard.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_happy" },
+            { "field": "dialogue_flags.met_with_confidence", "truthy": true }
+          ]
+        },
+        {
+          "id": "happy_default",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Acceptable. More than acceptable, actually.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_happy" }
+          ]
+        },
+        {
+          "id": "served_rejected",
+          "entry": true,
+          "speaker": "customer",
+          "text": "That pastry argued with itself. I’m done here.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_rejected" }
+          ]
+        },
+        {
+          "id": "patience_antagonized",
+          "entry": true,
+          "speaker": "customer",
+          "text": "You lost the room before you ever reached the oven.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "patience_expired" },
+            { "field": "dialogue_flags.antagonized_critic", "truthy": true }
+          ]
+        },
+        {
+          "id": "patience_expired",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Time is part of the craft too."
+        }
+      ]
+    }
+  }
+}

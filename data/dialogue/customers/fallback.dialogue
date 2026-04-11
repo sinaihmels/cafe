@@ -1,0 +1,347 @@
+{
+  "cues": {
+    "order_intro": {
+      "default_entry": "regular_order",
+      "nodes": [
+        {
+          "id": "boss_order",
+          "entry": true,
+          "speaker": "customer",
+          "text": "I expect something deliberate and well-finished. Surprise me for the right reason.",
+          "conditions": [
+            { "field": "customer_type", "equals": "boss" }
+          ],
+          "responses": [
+            {
+              "id": "boss_confident",
+              "text": "I’ll make it worth the scrutiny.",
+              "actions": [
+                { "type": "remember_choice", "key": "met_with_confidence" },
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "boss_order_reply"
+            },
+            {
+              "id": "boss_flat",
+              "text": "Take a seat and see what happens.",
+              "actions": [
+                { "type": "remember_choice", "key": "came_off_flat" },
+                { "type": "apply_outcome", "outcome_id": "patience_minus_1" }
+              ],
+              "next": "boss_order_cold_reply"
+            }
+          ]
+        },
+        {
+          "id": "critic_order",
+          "entry": true,
+          "speaker": "customer",
+          "text": "I care more about the finish than the flourish. Make it feel intentional.",
+          "conditions": [
+            { "field": "customer_type", "equals": "critic" }
+          ],
+          "responses": [
+            {
+              "id": "critic_detail",
+              "text": "I’ll pay attention to the finish.",
+              "actions": [
+                { "type": "remember_choice", "key": "promised_quality" },
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "critic_order_reply"
+            },
+            {
+              "id": "critic_short",
+              "text": "It’ll be fine.",
+              "actions": [
+                { "type": "remember_choice", "key": "downplayed_quality" },
+                { "type": "apply_outcome", "outcome_id": "patience_minus_1" }
+              ],
+              "next": "critic_order_cold_reply"
+            }
+          ]
+        },
+        {
+          "id": "impatient_order",
+          "entry": true,
+          "speaker": "customer",
+          "text": "I don’t need a speech. Just make it quick, warm, and not burned.",
+          "conditions": [
+            { "field": "customer_type", "equals": "impatient" }
+          ],
+          "responses": [
+            {
+              "id": "impatient_fast",
+              "text": "Quick and warm. Understood.",
+              "actions": [
+                { "type": "remember_choice", "key": "promised_speed" },
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "impatient_order_reply"
+            },
+            {
+              "id": "impatient_rude",
+              "text": "You’ll wait like everyone else.",
+              "actions": [
+                { "type": "remember_choice", "key": "tested_patience" },
+                { "type": "apply_outcome", "outcome_id": "patience_minus_1" }
+              ],
+              "next": "impatient_order_cold_reply"
+            }
+          ]
+        },
+        {
+          "id": "regular_order",
+          "entry": true,
+          "speaker": "customer",
+          "text": "I’m looking for something that hits the spot. Warm is always a good start.",
+          "responses": [
+            {
+              "id": "regular_kind",
+              "text": "I’ve got you.",
+              "actions": [
+                { "type": "remember_choice", "key": "welcomed_kindly" },
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "regular_order_reply"
+            },
+            {
+              "id": "regular_flat",
+              "text": "Then wait over there.",
+              "actions": [
+                { "type": "remember_choice", "key": "came_off_flat" },
+                { "type": "apply_outcome", "outcome_id": "patience_minus_1" }
+              ],
+              "next": "regular_order_cold_reply"
+            }
+          ]
+        },
+        {
+          "id": "boss_order_reply",
+          "speaker": "customer",
+          "text": "Good. I prefer confidence backed by results."
+        },
+        {
+          "id": "boss_order_cold_reply",
+          "speaker": "customer",
+          "text": "Then I hope the pastry is warmer than the welcome."
+        },
+        {
+          "id": "critic_order_reply",
+          "speaker": "customer",
+          "text": "That answer helps. Care shows."
+        },
+        {
+          "id": "critic_order_cold_reply",
+          "speaker": "customer",
+          "text": "We’ll see whether 'fine' is enough."
+        },
+        {
+          "id": "impatient_order_reply",
+          "speaker": "customer",
+          "text": "Perfect. That’s all I needed to hear."
+        },
+        {
+          "id": "impatient_order_cold_reply",
+          "speaker": "customer",
+          "text": "That’s not encouraging."
+        },
+        {
+          "id": "regular_order_reply",
+          "speaker": "customer",
+          "text": "Appreciate it."
+        },
+        {
+          "id": "regular_order_cold_reply",
+          "speaker": "customer",
+          "text": "Right. I’ll keep it simple, then."
+        }
+      ]
+    },
+    "interaction": {
+      "default_entry": "generic_interaction",
+      "nodes": [
+        {
+          "id": "small_talk_warm",
+          "entry": true,
+          "speaker": "customer",
+          "text": "You seem like you’ve got this under control.",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" },
+            { "field": "dialogue_flags.welcomed_kindly", "truthy": true }
+          ],
+          "responses": [
+            {
+              "id": "small_talk_reassure",
+              "text": "I do. You’re in good hands.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "tips_plus_1" }
+              ],
+              "next": "small_talk_warm_reply"
+            },
+            {
+              "id": "small_talk_heat",
+              "text": "I’ll make sure it lands warm.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "apply_warm_status" }
+              ],
+              "next": "small_talk_heat_reply"
+            }
+          ]
+        },
+        {
+          "id": "small_talk_tense",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Trying to smooth things over?",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" },
+            { "field": "dialogue_flags.came_off_flat", "truthy": true }
+          ],
+          "responses": [
+            {
+              "id": "small_talk_apology",
+              "text": "Yeah. Let me reset that.",
+              "actions": [
+                { "type": "remember_choice", "key": "made_amends" },
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "small_talk_apology_reply"
+            },
+            {
+              "id": "small_talk_shrug",
+              "text": "Call it efficient.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "patience_minus_1" }
+              ],
+              "next": "small_talk_shrug_reply"
+            }
+          ]
+        },
+        {
+          "id": "small_talk_default",
+          "entry": true,
+          "speaker": "customer",
+          "text": "A little conversation does make the wait easier.",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" }
+          ],
+          "responses": [
+            {
+              "id": "small_talk_default_kind",
+              "text": "That’s the idea.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "small_talk_default_reply"
+            },
+            {
+              "id": "small_talk_default_quick",
+              "text": "Then let’s keep it moving.",
+              "next": "small_talk_default_quick_reply"
+            }
+          ]
+        },
+        {
+          "id": "mini_cookies",
+          "entry": true,
+          "speaker": "customer",
+          "text": "A tiny cookie? That does make the wait feel friendlier.",
+          "conditions": [
+            { "field": "card_id", "equals": "mini_cookies" }
+          ]
+        },
+        {
+          "id": "generic_interaction",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Thanks. I noticed the effort."
+        },
+        {
+          "id": "small_talk_warm_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "That kind of confidence makes a difference."
+        },
+        {
+          "id": "small_talk_heat_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Then I’m already looking forward to it."
+        },
+        {
+          "id": "small_talk_apology_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Fair enough. We can start over."
+        },
+        {
+          "id": "small_talk_shrug_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "That’s one word for it."
+        },
+        {
+          "id": "small_talk_default_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Then you picked the right card."
+        },
+        {
+          "id": "small_talk_default_quick_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Works for me."
+        }
+      ]
+    },
+    "leave": {
+      "default_entry": "leave_default",
+      "nodes": [
+        {
+          "id": "leave_happy_amends",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Glad we turned that around before I left.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_happy" },
+            { "field": "dialogue_flags.made_amends", "truthy": true }
+          ]
+        },
+        {
+          "id": "leave_happy",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Thanks. That landed exactly how I hoped.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_happy" }
+          ]
+        },
+        {
+          "id": "leave_rejected",
+          "entry": true,
+          "speaker": "customer",
+          "text": "That wasn’t the order I was waiting for.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_rejected" }
+          ]
+        },
+        {
+          "id": "leave_patience_expired",
+          "entry": true,
+          "speaker": "customer",
+          "text": "I can’t wait any longer. Maybe next time.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "patience_expired" }
+          ]
+        },
+        {
+          "id": "leave_default",
+          "entry": true,
+          "speaker": "customer",
+          "text": "See you around."
+        }
+      ]
+    }
+  }
+}

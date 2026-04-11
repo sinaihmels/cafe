@@ -5,12 +5,14 @@ extends Node
 @export_node_path("SaveService") var meta_profile_service_path: NodePath
 @export_node_path("EventBus") var event_bus_path: NodePath
 @export_node_path("EffectQueueService") var effect_queue_path: NodePath
+@export_node_path("DialogueService") var dialogue_service_path: NodePath
 @export_node_path("AppView") var app_view_path: NodePath
 
 @onready var _session_service: SessionService = get_node(session_service_path)
 @onready var _meta_profile_service: SaveService = get_node(meta_profile_service_path)
 @onready var _event_bus: EventBus = get_node(event_bus_path)
 @onready var _effect_queue: EffectQueueService = get_node(effect_queue_path)
+@onready var _dialogue_service: DialogueService = get_node(dialogue_service_path)
 @onready var _app_view: AppView = get_node(app_view_path)
 
 var _pending_card_index: int = -1
@@ -21,6 +23,8 @@ func _ready() -> void:
 	_effect_queue.configure(_event_bus)
 	_effect_queue.resolution_started.connect(_on_resolution_started)
 	_effect_queue.resolution_finished.connect(_on_resolution_finished)
+	_dialogue_service.configure(_session_service, _event_bus)
+	_dialogue_service.presentation_changed.connect(_refresh_view)
 	_connect_view()
 	_session_service.initialize(_meta_profile_service, _event_bus)
 	# AppView is a sibling scene, so its @onready node bindings are only valid after its own ready signal.
@@ -52,6 +56,8 @@ func _connect_view() -> void:
 	_app_view.prep_item_requested.connect(_on_prep_item_requested)
 	_app_view.oven_item_requested.connect(_on_oven_item_requested)
 	_app_view.table_item_requested.connect(_on_table_item_requested)
+	_app_view.dialogue_continue_requested.connect(_on_dialogue_continue_requested)
+	_app_view.dialogue_response_requested.connect(_on_dialogue_response_requested)
 
 func _on_continue_from_title_requested() -> void:
 	_session_service.continue_from_title()
@@ -121,11 +127,15 @@ func _on_start_boss_requested() -> void:
 	_refresh_view()
 
 func _on_end_turn_requested() -> void:
+	if _is_dialogue_blocking_input():
+		return
 	_clear_pending_selection()
 	_session_service.end_player_turn()
 	_refresh_view()
 
 func _on_play_card_requested(card_index: int) -> void:
+	if _is_dialogue_blocking_input():
+		return
 	if _session_service.run_state.screen != GameEnums.Screen.ENCOUNTER:
 		return
 	if card_index < 0 or card_index >= _session_service.deck_state.hand.size():
@@ -156,14 +166,20 @@ func _on_play_card_requested(card_index: int) -> void:
 	_refresh_view()
 
 func _on_prep_item_requested(item_index: int) -> void:
+	if _is_dialogue_blocking_input():
+		return
 	_handle_target_click(&"prep", item_index)
 
 func _on_customer_item_requested(customer_index: int) -> void:
+	if _is_dialogue_blocking_input():
+		return
 	_focused_customer_index = customer_index
 	_sync_focused_customer_index()
 	_handle_target_click(&"customer", customer_index)
 
 func _on_focus_customer_requested(customer_index: int) -> void:
+	if _is_dialogue_blocking_input():
+		return
 	if _session_service.run_state.screen != GameEnums.Screen.ENCOUNTER:
 		return
 	_focused_customer_index = customer_index
@@ -173,9 +189,12 @@ func _on_focus_customer_requested(customer_index: int) -> void:
 		if _session_service.is_valid_target(card, &"customer", customer_index):
 			_handle_target_click(&"customer", customer_index)
 			return
+	_session_service.request_customer_order_dialogue(customer_index)
 	_refresh_view()
 
 func _on_oven_item_requested(slot_index: int) -> void:
+	if _is_dialogue_blocking_input():
+		return
 	if _pending_card_index == -1:
 		if _session_service.collect_oven_item(slot_index):
 			_refresh_view()
@@ -183,7 +202,17 @@ func _on_oven_item_requested(slot_index: int) -> void:
 	_handle_target_click(&"oven", slot_index)
 
 func _on_table_item_requested(item_index: int) -> void:
+	if _is_dialogue_blocking_input():
+		return
 	_handle_target_click(&"table", item_index)
+
+func _on_dialogue_continue_requested() -> void:
+	_dialogue_service.advance_dialogue()
+	_refresh_view()
+
+func _on_dialogue_response_requested(response_index: int) -> void:
+	_dialogue_service.choose_response(response_index)
+	_refresh_view()
 
 func _handle_target_click(zone: StringName, index: int) -> void:
 	if _pending_card_index == -1:
@@ -278,12 +307,19 @@ func _on_resolution_started() -> void:
 
 func _on_resolution_finished() -> void:
 	if _session_service.run_state.screen == GameEnums.Screen.ENCOUNTER:
-		_session_service.combat_state.turn_state = GameEnums.TurnState.PLAYER_TURN
+		_session_service.combat_state.turn_state = (
+			GameEnums.TurnState.DIALOGUE
+			if _dialogue_service != null and _dialogue_service.has_active_dialogue()
+			else GameEnums.TurnState.PLAYER_TURN
+		)
 	_refresh_view()
 
 func _refresh_view() -> void:
 	_sync_focused_customer_index()
-	_app_view.render(_session_service, _build_interaction_state())
+	_app_view.render(_session_service, _build_interaction_state(), _dialogue_service.get_presentation_state())
+
+func _is_dialogue_blocking_input() -> bool:
+	return _dialogue_service != null and _dialogue_service.is_blocking_input()
 
 func _sync_focused_customer_index() -> void:
 	if _session_service.run_state.screen != GameEnums.Screen.ENCOUNTER or _session_service.combat_state.active_customers.is_empty():

@@ -8,6 +8,7 @@ script = ExtResource("1_sweettooth")
 customer_id = &"sweet_tooth_customer"
 display_name = "Sweet Tooth"
 portrait = ExtResource("2_portrait")
+dialogue_file_path = "res://data/dialogue/customers/sweet_tooth_customer.dialogue"
 order_id = &"sweet_request"
 preferences = PackedStringArray()
 required_tags = PackedStringArray()

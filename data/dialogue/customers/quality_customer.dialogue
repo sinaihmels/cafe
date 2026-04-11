@@ -1,0 +1,235 @@
+{
+  "cues": {
+    "order_intro": {
+      "default_entry": "opening",
+      "nodes": [
+        {
+          "id": "opening",
+          "entry": true,
+          "speaker": "customer",
+          "text": "I’m after something decorated and deliberate. If it feels careless, I’ll notice.",
+          "responses": [
+            {
+              "id": "promise_quality",
+              "text": "I’ll make it polished.",
+              "actions": [
+                { "type": "remember_choice", "key": "promised_quality" },
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "promise_quality_reply"
+            },
+            {
+              "id": "ask_finish",
+              "text": "Are you looking for elegance or comfort?",
+              "actions": [
+                { "type": "remember_choice", "key": "asked_for_finish" }
+              ],
+              "next": "ask_finish_reply"
+            },
+            {
+              "id": "good_enough",
+              "text": "It’ll be good enough.",
+              "actions": [
+                { "type": "remember_choice", "key": "downplayed_quality" },
+                { "type": "apply_outcome", "outcome_id": "patience_minus_1" }
+              ],
+              "next": "good_enough_reply"
+            }
+          ]
+        },
+        {
+          "id": "promise_quality_reply",
+          "speaker": "customer",
+          "text": "Good. Precision matters."
+        },
+        {
+          "id": "ask_finish_reply",
+          "speaker": "customer",
+          "text": "Elegance first, comfort second. Ideally both."
+        },
+        {
+          "id": "good_enough_reply",
+          "speaker": "customer",
+          "text": "That phrase rarely inspires confidence."
+        }
+      ]
+    },
+    "interaction": {
+      "default_entry": "mini_cookies",
+      "nodes": [
+        {
+          "id": "small_talk_quality",
+          "entry": true,
+          "speaker": "customer",
+          "text": "The small touches are usually what separate a good pastry from a memorable one.",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" },
+            { "field": "dialogue_flags.promised_quality", "truthy": true }
+          ],
+          "responses": [
+            {
+              "id": "finish",
+              "text": "Then I’m paying attention to every finish.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "reputation_plus_1" }
+              ],
+              "next": "finish_reply"
+            },
+            {
+              "id": "texture",
+              "text": "Texture matters just as much as decoration.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "tips_plus_1" }
+              ],
+              "next": "texture_reply"
+            }
+          ]
+        },
+        {
+          "id": "small_talk_tense",
+          "entry": true,
+          "speaker": "customer",
+          "text": "If this is the part where you tell me 'good enough' again, spare me.",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" },
+            { "field": "dialogue_flags.downplayed_quality", "truthy": true }
+          ],
+          "responses": [
+            {
+              "id": "course_correct",
+              "text": "No. I’ll give it proper care.",
+              "actions": [
+                { "type": "remember_choice", "key": "course_corrected" },
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "course_correct_reply"
+            },
+            {
+              "id": "double_down",
+              "text": "Perfection isn’t the point.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "patience_minus_1" }
+              ],
+              "next": "double_down_reply"
+            }
+          ]
+        },
+        {
+          "id": "small_talk_default",
+          "entry": true,
+          "speaker": "customer",
+          "text": "I appreciate a baker who takes their work seriously.",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" }
+          ],
+          "responses": [
+            {
+              "id": "default_pride",
+              "text": "That matters to me too.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "reputation_plus_1" }
+              ],
+              "next": "default_pride_reply"
+            },
+            {
+              "id": "default_focus",
+              "text": "Then I’ll let the pastry answer for me.",
+              "next": "default_focus_reply"
+            }
+          ]
+        },
+        {
+          "id": "mini_cookies",
+          "entry": true,
+          "speaker": "customer",
+          "text": "A restrained little bite. Thoughtful."
+        },
+        {
+          "id": "finish_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Good. Details are where care becomes visible."
+        },
+        {
+          "id": "texture_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Exactly."
+        },
+        {
+          "id": "course_correct_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "That’s better."
+        },
+        {
+          "id": "double_down_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "For you, perhaps."
+        },
+        {
+          "id": "default_pride_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "It shows."
+        },
+        {
+          "id": "default_focus_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "That would be ideal."
+        }
+      ]
+    },
+    "leave": {
+      "default_entry": "patience_expired",
+      "nodes": [
+        {
+          "id": "happy_quality",
+          "entry": true,
+          "speaker": "customer",
+          "text": "That had the care I was looking for.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_happy" },
+            { "field": "dialogue_flags.promised_quality", "truthy": true }
+          ]
+        },
+        {
+          "id": "happy_default",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Well judged. Thank you.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_happy" }
+          ]
+        },
+        {
+          "id": "served_rejected",
+          "entry": true,
+          "speaker": "customer",
+          "text": "That lacked the finish I asked for.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_rejected" }
+          ]
+        },
+        {
+          "id": "patience_downplayed",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Carelessness always takes longer than care would have.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "patience_expired" },
+            { "field": "dialogue_flags.downplayed_quality", "truthy": true }
+          ]
+        },
+        {
+          "id": "patience_expired",
+          "entry": true,
+          "speaker": "customer",
+          "text": "I’ve waited long enough."
+        }
+      ]
+    }
+  }
+}

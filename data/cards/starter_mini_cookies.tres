@@ -15,6 +15,7 @@ display_name = "Mini Cookies"
 art = ExtResource("3_art")
 energy_cost = 0
 card_type = 3
+dialogue_event_id = &"mini_cookies"
 targeting_rules = "none"
 effects = [SubResource("Resource_mini_cookies")]
 preview_text = "Give out mini cookies. Increase all customer patience by 1."

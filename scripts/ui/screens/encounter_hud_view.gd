@@ -1,3 +1,4 @@
+@tool
 class_name EncounterHudView
 extends Control
 
@@ -5,6 +6,10 @@ extends Control
 
 @onready var _meta_flow: HFlowContainer = $MetaFlow
 @onready var _buff_flow: HFlowContainer = $BuffFlow
+
+func _ready() -> void:
+	if Engine.is_editor_hint():
+		render_editor_preview()
 
 func render(session_service: SessionService) -> void:
 	UiSceneUtils.clear_children(_meta_flow)
@@ -49,3 +54,9 @@ func _instantiate_indicator() -> CompactIndicatorView:
 	var indicator: CompactIndicatorView = node as CompactIndicatorView
 	assert(indicator != null, "EncounterHudView.indicator_scene must instantiate CompactIndicatorView.")
 	return indicator
+
+func render_editor_preview() -> void:
+	if not Engine.is_editor_hint():
+		return
+	var preview_session: SessionService = EncounterEditorPreview.build_session()
+	render(preview_session)

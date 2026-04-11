@@ -23,6 +23,8 @@ signal customer_item_requested(customer_index: int)
 signal prep_item_requested(item_index: int)
 signal oven_item_requested(slot_index: int)
 signal table_item_requested(item_index: int)
+signal dialogue_continue_requested()
+signal dialogue_response_requested(response_index: int)
 
 @onready var _root: VBoxContainer = $Margin/Root
 @onready var _title_label: Label = $Margin/Root/TitleLabel
@@ -48,12 +50,16 @@ func _ready() -> void:
 func configure(event_bus: EventBus) -> void:
 	_encounter_screen.configure_event_bus(event_bus)
 
-func render(session_service: SessionService, interaction_state: EncounterInteractionState) -> void:
+func render(
+	session_service: SessionService,
+	interaction_state: EncounterInteractionState,
+	dialogue_state: DialoguePresentationState = null
+) -> void:
 	# Encounter owns a completely different authored layout, so the root shell acts as a simple screen router.
 	if session_service.run_state.screen == GameEnums.Screen.ENCOUNTER:
 		_root.visible = false
 		_encounter_screen.visible = true
-		_encounter_screen.render(session_service, interaction_state)
+		_encounter_screen.render(session_service, interaction_state, dialogue_state)
 		return
 	_root.visible = true
 	_encounter_screen.visible = false
@@ -151,3 +157,7 @@ func _connect_signals() -> void:
 	_encounter_screen.prep_item_requested.connect(func(item_index: int) -> void: prep_item_requested.emit(item_index))
 	_encounter_screen.oven_item_requested.connect(func(slot_index: int) -> void: oven_item_requested.emit(slot_index))
 	_encounter_screen.table_item_requested.connect(func(item_index: int) -> void: table_item_requested.emit(item_index))
+	_encounter_screen.dialogue_continue_requested.connect(func() -> void: dialogue_continue_requested.emit())
+	_encounter_screen.dialogue_response_requested.connect(func(response_index: int) -> void:
+		dialogue_response_requested.emit(response_index)
+	)

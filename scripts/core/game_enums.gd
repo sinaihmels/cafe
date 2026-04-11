@@ -27,6 +27,7 @@ enum RunPhase {
 enum TurnState {
 	IDLE,
 	PLAYER_TURN,
+	DIALOGUE,
 	RESOLVING_EFFECTS,
 	CUSTOMER_TURN,
 	CHECK_END,

@@ -1,0 +1,248 @@
+{
+  "cues": {
+    "order_intro": {
+      "default_entry": "opening",
+      "nodes": [
+        {
+          "id": "opening",
+          "entry": true,
+          "speaker": "customer",
+          "text": "I want something sweet enough to feel like a reward. Fruity or chocolaty is even better.",
+          "responses": [
+            {
+              "id": "lean_in",
+              "text": "You came to the right counter for that.",
+              "actions": [
+                { "type": "remember_choice", "key": "shared_sweet_tooth" },
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "lean_in_reply"
+            },
+            {
+              "id": "ask_flavor",
+              "text": "More fruit-forward or more chocolate today?",
+              "actions": [
+                { "type": "remember_choice", "key": "asked_flavor" }
+              ],
+              "next": "ask_flavor_reply"
+            },
+            {
+              "id": "dismissive",
+              "text": "Sweet is sweet. You’ll get what’s ready.",
+              "actions": [
+                { "type": "remember_choice", "key": "dismissed_craving" },
+                { "type": "apply_outcome", "outcome_id": "patience_minus_1" }
+              ],
+              "next": "dismissive_reply"
+            }
+          ]
+        },
+        {
+          "id": "lean_in_reply",
+          "speaker": "customer",
+          "text": "That’s the spirit. I already feel better."
+        },
+        {
+          "id": "ask_flavor_reply",
+          "speaker": "customer",
+          "text": "Either works, honestly. I just want it to feel like a treat."
+        },
+        {
+          "id": "dismissive_reply",
+          "speaker": "customer",
+          "text": "That’s... less magical than I was hoping for."
+        }
+      ]
+    },
+    "interaction": {
+      "default_entry": "mini_cookies",
+      "nodes": [
+        {
+          "id": "small_talk_sweet",
+          "entry": true,
+          "speaker": "customer",
+          "text": "You get it. Sometimes a pastry really is the bright spot of the day.",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" },
+            { "field": "dialogue_flags.shared_sweet_tooth", "truthy": true }
+          ],
+          "responses": [
+            {
+              "id": "surprise",
+              "text": "Then I should sneak a little surprise into it.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "tips_plus_1" }
+              ],
+              "next": "surprise_reply"
+            },
+            {
+              "id": "pretty",
+              "text": "A treat should look the part too.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "reputation_plus_1" }
+              ],
+              "next": "pretty_reply"
+            }
+          ]
+        },
+        {
+          "id": "small_talk_tense",
+          "entry": true,
+          "speaker": "customer",
+          "text": "If you’re going to joke, at least make it sweeter than that greeting was.",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" },
+            { "field": "dialogue_flags.dismissed_craving", "truthy": true }
+          ],
+          "responses": [
+            {
+              "id": "recover",
+              "text": "Fair. Let me make it up to you.",
+              "actions": [
+                { "type": "remember_choice", "key": "recovered_tone" },
+                { "type": "apply_outcome", "outcome_id": "patience_plus_1" }
+              ],
+              "next": "recover_reply"
+            },
+            {
+              "id": "stay_blunt",
+              "text": "I’m here to bake, not charm.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "patience_minus_1" }
+              ],
+              "next": "stay_blunt_reply"
+            }
+          ]
+        },
+        {
+          "id": "small_talk_default",
+          "entry": true,
+          "speaker": "customer",
+          "text": "This line would be unbearable without a little charm.",
+          "conditions": [
+            { "field": "card_id", "equals": "small_talk" }
+          ],
+          "responses": [
+            {
+              "id": "default_kind",
+              "text": "A bakery should feel a little indulgent.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "tips_plus_1" }
+              ],
+              "next": "default_kind_reply"
+            },
+            {
+              "id": "default_warm",
+              "text": "Then let’s sweeten the wait.",
+              "actions": [
+                { "type": "apply_outcome", "outcome_id": "apply_warm_status" }
+              ],
+              "next": "default_warm_reply"
+            }
+          ]
+        },
+        {
+          "id": "mini_cookies_shared",
+          "entry": true,
+          "speaker": "customer",
+          "text": "A mini cookie absolutely counts as emotional support.",
+          "conditions": [
+            { "field": "card_id", "equals": "mini_cookies" },
+            { "field": "dialogue_flags.shared_sweet_tooth", "truthy": true }
+          ]
+        },
+        {
+          "id": "mini_cookies",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Tiny cookie, big improvement to the wait."
+        },
+        {
+          "id": "surprise_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Now you’re speaking my language."
+        },
+        {
+          "id": "pretty_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Exactly. Dessert should arrive with some flair."
+        },
+        {
+          "id": "recover_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "Good answer."
+        },
+        {
+          "id": "stay_blunt_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "That much is clear."
+        },
+        {
+          "id": "default_kind_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "That’s why I’m here."
+        },
+        {
+          "id": "default_warm_reply",
+          "speaker": "customer",
+          "modal": true,
+          "text": "I can work with that."
+        }
+      ]
+    },
+    "leave": {
+      "default_entry": "patience_expired",
+      "nodes": [
+        {
+          "id": "happy_shared",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Worth every crumb. You understood the assignment.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_happy" },
+            { "field": "dialogue_flags.shared_sweet_tooth", "truthy": true }
+          ]
+        },
+        {
+          "id": "happy_default",
+          "entry": true,
+          "speaker": "customer",
+          "text": "That was absolutely the treat I needed.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_happy" }
+          ]
+        },
+        {
+          "id": "served_rejected",
+          "entry": true,
+          "speaker": "customer",
+          "text": "That didn’t feel like much of a treat after all.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "served_rejected" }
+          ]
+        },
+        {
+          "id": "patience_dismissed",
+          "entry": true,
+          "speaker": "customer",
+          "text": "Guess I’ll find my sugar rush somewhere friendlier.",
+          "conditions": [
+            { "field": "leave_reason", "equals": "patience_expired" },
+            { "field": "dialogue_flags.dismissed_craving", "truthy": true }
+          ]
+        },
+        {
+          "id": "patience_expired",
+          "entry": true,
+          "speaker": "customer",
+          "text": "I can’t wait forever. Maybe next time."
+        }
+      ]
+    }
+  }
+}

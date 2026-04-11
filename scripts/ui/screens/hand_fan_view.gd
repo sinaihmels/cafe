@@ -1,3 +1,4 @@
+@tool
 class_name HandFanView
 extends Control
 
@@ -19,6 +20,10 @@ signal play_card_requested(card_index: int)
 var _card_nodes: Array[HandCardView] = []
 var _hovered_card_index: int = -1
 var _selected_card_index: int = -1
+
+func _ready() -> void:
+	if Engine.is_editor_hint():
+		render_editor_preview()
 
 func configure_layout_metrics(
 	new_card_width: float,
@@ -152,3 +157,10 @@ func _instantiate_hand_card() -> HandCardView:
 	var hand_card: HandCardView = node as HandCardView
 	assert(hand_card != null, "HandFanView.hand_card_scene must instantiate HandCardView.")
 	return hand_card
+
+func render_editor_preview() -> void:
+	if not Engine.is_editor_hint():
+		return
+	var preview_session: SessionService = EncounterEditorPreview.build_session()
+	var preview_interaction_state: EncounterInteractionState = EncounterEditorPreview.build_interaction_state(preview_session)
+	render(preview_session, preview_interaction_state)

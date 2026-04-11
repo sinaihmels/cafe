@@ -9,6 +9,7 @@ signal turn_ended(turn_number: int)
 signal effect_applied(effect: BaseEffect, context: EffectContext)
 signal pastry_feedback_requested(feedback: PastryFeedbackEvent)
 signal energy_changed(new_energy: int, delta: int)
+signal dialogue_requested(request: DialogueRequest)
 
 func emit_card_played(card: CardInstance) -> void:
 	card_played.emit(card)
@@ -33,3 +34,6 @@ func emit_pastry_feedback_requested(feedback: PastryFeedbackEvent) -> void:
 
 func emit_energy_changed(new_energy: int, delta: int) -> void:
 	energy_changed.emit(new_energy, delta)
+
+func emit_dialogue_requested(request: DialogueRequest) -> void:
+	dialogue_requested.emit(request)

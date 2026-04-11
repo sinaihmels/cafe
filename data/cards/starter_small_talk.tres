@@ -16,6 +16,7 @@ display_name = "Small Talk"
 art = ExtResource("3_art")
 energy_cost = 2
 card_type = 3
+dialogue_event_id = &"small_talk"
 interaction_traits = PackedStringArray("talk")
 targeting_rules = "none"
 effects = [SubResource("Resource_small_talk")]

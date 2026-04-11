@@ -132,6 +132,14 @@ const OFFER_PATHS: Array[String] = [
 	"res://data/offers/offer_second_wind_buff.tres",
 ]
 
+const DIALOGUE_OUTCOME_PATHS: Array[String] = [
+	"res://data/dialogue_outcomes/patience_plus_1.tres",
+	"res://data/dialogue_outcomes/patience_minus_1.tres",
+	"res://data/dialogue_outcomes/tips_plus_1.tres",
+	"res://data/dialogue_outcomes/reputation_plus_1.tres",
+	"res://data/dialogue_outcomes/apply_warm_status.tres",
+]
+
 var doughs: Dictionary[StringName, DoughDef] = {}
 var cards: Dictionary[StringName, CardDef] = {}
 var customers: Dictionary[StringName, CustomerDef] = {}
@@ -144,6 +152,7 @@ var buffs: Dictionary[StringName, BuffDef] = {}
 var statuses: Dictionary[StringName, StatusDef] = {}
 var rewards: Dictionary[StringName, RewardDef] = {}
 var offers: Dictionary[StringName, CardOfferDef] = {}
+var dialogue_outcomes: Dictionary[StringName, DialogueOutcomeDef] = {}
 
 func load_all() -> void:
 	_populate_index(doughs, DOUGH_PATHS, &"dough_id")
@@ -158,6 +167,7 @@ func load_all() -> void:
 	_populate_index(statuses, STATUS_PATHS, &"modifier_id")
 	_populate_index(rewards, REWARD_PATHS, &"reward_id")
 	_populate_index(offers, OFFER_PATHS, &"offer_id")
+	_populate_index(dialogue_outcomes, DIALOGUE_OUTCOME_PATHS, &"outcome_id")
 
 func get_dough(dough_id: StringName) -> DoughDef:
 	return doughs.get(dough_id) as DoughDef
@@ -194,6 +204,9 @@ func get_reward(reward_id: StringName) -> RewardDef:
 
 func get_offer(offer_id: StringName) -> CardOfferDef:
 	return offers.get(offer_id) as CardOfferDef
+
+func get_dialogue_outcome(outcome_id: StringName) -> DialogueOutcomeDef:
+	return dialogue_outcomes.get(outcome_id) as DialogueOutcomeDef
 
 func get_modifier(modifier_id: StringName) -> ModifierDef:
 	if buffs.has(modifier_id):

@@ -1,3 +1,4 @@
+@tool
 class_name EncounterScreenView
 extends Control
 
@@ -8,6 +9,8 @@ signal customer_item_requested(customer_index: int)
 signal prep_item_requested(item_index: int)
 signal oven_item_requested(slot_index: int)
 signal table_item_requested(item_index: int)
+signal dialogue_continue_requested()
+signal dialogue_response_requested(response_index: int)
 
 @onready var _background_art: TextureRect = $BackgroundArt
 @onready var _backdrop_tint: ColorRect = $BackdropTint
@@ -30,12 +33,24 @@ signal table_item_requested(item_index: int)
 @onready var _hand_fan: HandFanView = $HandFanView
 @onready var _end_turn_button: Button = $EndTurnButton
 @onready var _effect_overlay: EncounterEffectOverlayView = $EncounterEffectOverlayView
+@onready var _dialogue_overlay: EncounterDialogueOverlayView = $EncounterDialogueOverlayView
 
 var _layout_profile: Dictionary = {}
 
 func _ready() -> void:
 	_background_art.texture = UiTextureLibrary.background_texture()
+	if Engine.is_editor_hint():
+		_render_editor_preview()
+		call_deferred("_layout_stage")
+		return
 	_effect_overlay.set_anchor_provider(Callable(self, "_anchor_rect_for_feedback"))
+	_dialogue_overlay.set_anchor_provider(Callable(self, "_anchor_rect_for_dialogue"))
+	_dialogue_overlay.continue_requested.connect(func() -> void:
+		dialogue_continue_requested.emit()
+	)
+	_dialogue_overlay.response_requested.connect(func(response_index: int) -> void:
+		dialogue_response_requested.emit(response_index)
+	)
 	_end_turn_button.pressed.connect(func() -> void: end_turn_requested.emit())
 	_customer_lane.focus_customer_requested.connect(func(customer_index: int) -> void:
 		focus_customer_requested.emit(customer_index)
@@ -66,8 +81,13 @@ func _notification(what: int) -> void:
 func configure_event_bus(event_bus: EventBus) -> void:
 	_effect_overlay.configure(event_bus)
 
-func render(session_service: SessionService, interaction_state: EncounterInteractionState) -> void:
+func render(
+	session_service: SessionService,
+	interaction_state: EncounterInteractionState,
+	dialogue_state: DialoguePresentationState = null
+) -> void:
 	_layout_stage()
+	var resolved_dialogue_state: DialoguePresentationState = dialogue_state if dialogue_state != null else DialoguePresentationState.new()
 	_prompt_view.render(interaction_state.pending_prompt)
 	_hud_view.render(session_service)
 	_customer_lane.render(session_service, interaction_state)
@@ -79,6 +99,13 @@ func render(session_service: SessionService, interaction_state: EncounterInterac
 	_resources_view.render(session_service)
 	_apply_hand_metrics()
 	_hand_fan.render(session_service, interaction_state)
+	if Engine.is_editor_hint():
+		_dialogue_overlay.visible = false
+	else:
+		_dialogue_overlay.render(resolved_dialogue_state)
+
+func render_editor_preview() -> void:
+	_render_editor_preview()
 
 func _layout_stage() -> void:
 	if not is_node_ready():
@@ -385,8 +412,14 @@ func _build_layout_profile(viewport_size: Vector2) -> Dictionary:
 	return profile
 
 func _apply_rect(control: Control, rect: Rect2) -> void:
-	control.position = rect.position
-	control.size = rect.size
+	control.anchor_left = 0.0
+	control.anchor_top = 0.0
+	control.anchor_right = 0.0
+	control.anchor_bottom = 0.0
+	control.offset_left = rect.position.x
+	control.offset_top = rect.position.y
+	control.offset_right = rect.position.x + rect.size.x
+	control.offset_bottom = rect.position.y + rect.size.y
 
 func _anchor_rect_for_feedback(feedback: PastryFeedbackEvent) -> Rect2:
 	if feedback == null:
@@ -404,3 +437,17 @@ func _anchor_rect_for_feedback(feedback: PastryFeedbackEvent) -> Rect2:
 	if card_control == null:
 		return Rect2()
 	return Rect2(card_control.global_position - global_position, card_control.size)
+
+func _anchor_rect_for_dialogue(customer_index: int) -> Rect2:
+	var customer_control: Control = _customer_lane.get_customer_spot_control(customer_index)
+	if customer_control == null:
+		return Rect2()
+	return Rect2(customer_control.global_position - global_position, customer_control.size)
+
+func _render_editor_preview() -> void:
+	if not Engine.is_editor_hint():
+		return
+	var preview_session: SessionService = EncounterEditorPreview.build_session()
+	var preview_interaction_state: EncounterInteractionState = EncounterEditorPreview.build_interaction_state(preview_session)
+	var preview_dialogue_state: DialoguePresentationState = EncounterEditorPreview.build_dialogue_state()
+	render(preview_session, preview_interaction_state, preview_dialogue_state)

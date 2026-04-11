@@ -9,6 +9,7 @@ Current smoke targets:
 - `test_modifier_flow.gd`
 - `test_pastry_refactor.gd`
 - `test_pastry_tag_ui_and_feedback.gd`
+- `test_dialogue_flow.gd`
 - `test_proofing_flow.gd`
 - `test_serve_flow.gd`
 - `test_tag_demand_flow.gd`
@@ -20,6 +21,7 @@ These scripts cover the single-project runtime foundation:
 - run buffs plus persistent upgrade ownership
 - pastry-seed encounter flow, proofing, baking, plating, and serving
 - pastry tag chip extraction, manual tag palette coverage, and pastry feedback overlay wiring
+- custom branching customer dialogue, encounter choice memory, and anchored leave-card UI smoke coverage
 - card taxonomy migration plus interaction/technique smoke coverage
 - state-aware customer demand scoring
 

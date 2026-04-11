@@ -1,3 +1,4 @@
+@tool
 class_name KitchenStageAreaView
 extends Control
 
@@ -147,13 +148,20 @@ func _layout_stage_art() -> void:
 		)
 
 func _instantiate_zone_view() -> void:
-	UiSceneUtils.clear_children(_content_anchor)
 	_zone_view = null
-	if zone_scene == null:
-		return
-	var node: Node = UiSceneUtils.instantiate_required(zone_scene, "%s.zone_scene" % name)
-	_content_anchor.add_child(node)
-	_zone_view = node as Control
+	for child in _content_anchor.get_children():
+		var existing_control: Control = child as Control
+		if existing_control == null:
+			continue
+		_zone_view = existing_control
+		break
+	if _zone_view == null:
+		UiSceneUtils.clear_children(_content_anchor)
+		if zone_scene == null:
+			return
+		var node: Node = UiSceneUtils.instantiate_required(zone_scene, "%s.zone_scene" % name)
+		_content_anchor.add_child(node)
+		_zone_view = node as Control
 	assert(_zone_view != null, "%s.zone_scene must instantiate a Control." % name)
 	_zone_view.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_zone_view.offset_left = 0.0

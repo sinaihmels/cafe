@@ -62,6 +62,10 @@ static func _append_modifier_line(
 	lines.append(line)
 
 static func describe_customer_request(customer: CustomerInstance) -> String:
+	if customer == null:
+		return "Request: none"
+	if customer.is_departing():
+		return "Request: leaving the counter"
 	var required_text: String = join_packed(customer.get_preferences())
 	var details: Array[String] = []
 	if required_text != "none":

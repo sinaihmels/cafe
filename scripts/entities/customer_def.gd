@@ -4,6 +4,7 @@ extends Resource
 @export var customer_id: StringName
 @export var display_name: String = ""
 @export var portrait: Texture2D
+@export_file("*.dialogue") var dialogue_file_path: String = ""
 @export var order_id: StringName
 @export var preferences: PackedStringArray = []
 @export var required_tags: PackedStringArray = []

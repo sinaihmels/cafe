@@ -8,6 +8,7 @@ script = ExtResource("1_fast")
 customer_id = &"fast_customer"
 display_name = "In A Hurry"
 portrait = ExtResource("2_portrait")
+dialogue_file_path = "res://data/dialogue/customers/fast_customer.dialogue"
 order_id = &"fast_request"
 preferences = PackedStringArray()
 required_tags = PackedStringArray()

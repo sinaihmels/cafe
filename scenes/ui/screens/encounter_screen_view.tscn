@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/screens/encounter_screen_view.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_hud_view.tscn" id="2_hud"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/hand_fan_view.tscn" id="8_hand"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_effect_overlay_view.tscn" id="9_overlay"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_resources_view.tscn" id="10_resources"]
+[ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_dialogue_overlay_view.tscn" id="11_dialogue_overlay"]
 
 [sub_resource type="StyleBoxFlat" id="1_counter_surface_style"]
 bg_color = Color(0.31, 0.23, 0.17, 0.96)
@@ -214,6 +215,14 @@ theme_override_styles/focus = SubResource("5_end_turn_hover")
 text = "End Turn"
 
 [node name="EncounterEffectOverlayView" parent="." instance=ExtResource("9_overlay")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="EncounterDialogueOverlayView" parent="." instance=ExtResource("11_dialogue_overlay")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

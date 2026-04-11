@@ -8,6 +8,7 @@ script = ExtResource("1_quality")
 customer_id = &"quality_customer"
 display_name = "Quality Seeker"
 portrait = ExtResource("2_portrait")
+dialogue_file_path = "res://data/dialogue/customers/quality_customer.dialogue"
 order_id = &"quality_request"
 preferences = PackedStringArray()
 required_tags = PackedStringArray("decorated")

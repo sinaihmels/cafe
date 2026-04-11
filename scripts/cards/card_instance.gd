@@ -27,21 +27,25 @@ func get_preview_text() -> String:
 func get_art_texture() -> Texture2D:
 	if card_def == null:
 		return null
-	return card_def.get_art_texture()
+	return card_def.art
 
 func get_background_texture() -> Texture2D:
 	if card_def == null:
 		return CardDef.background_texture_for_type(CardDef.CardType.INGREDIENT)
-	return card_def.get_background_texture()
+	return CardDef.background_texture_for_type(card_def.card_type)
 
 func get_pastry_tags_added() -> PackedStringArray:
 	if card_def == null:
+		return PackedStringArray()
+	if Engine.is_editor_hint():
 		return PackedStringArray()
 	return card_def.get_pastry_tags_added()
 
 func get_pastry_tag_previews() -> Array[PastryTagPreview]:
 	var previews: Array[PastryTagPreview] = []
 	if card_def == null:
+		return previews
+	if Engine.is_editor_hint():
 		return previews
 	return card_def.get_pastry_tag_previews()
 
@@ -53,7 +57,17 @@ func get_card_type() -> int:
 func get_card_type_label() -> StringName:
 	if card_def == null:
 		return &"unknown"
-	return card_def.get_card_type_label()
+	match card_def.card_type:
+		CardDef.CardType.INGREDIENT:
+			return &"ingredient"
+		CardDef.CardType.PROCESS:
+			return &"process"
+		CardDef.CardType.TECHNIQUE:
+			return &"technique"
+		CardDef.CardType.INTERACTION:
+			return &"interaction"
+		_:
+			return &"unknown"
 
 func get_all_tags() -> PackedStringArray:
 	var merged: PackedStringArray = PackedStringArray()

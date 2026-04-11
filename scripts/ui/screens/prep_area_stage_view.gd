@@ -1,3 +1,4 @@
+@tool
 class_name PrepAreaStageView
 extends KitchenStageAreaView
 
@@ -7,6 +8,9 @@ func _ready() -> void:
 	setup_stage()
 	var prep_view: PrepZoneView = _prep_view()
 	assert(prep_view != null, "PrepAreaStageView.zone_scene must instantiate PrepZoneView.")
+	if Engine.is_editor_hint():
+		render_editor_preview()
+		return
 	prep_view.prep_item_requested.connect(func(item_index: int) -> void:
 		prep_item_requested.emit(item_index)
 	)
@@ -27,3 +31,10 @@ func get_pastry_card_control(item_index: int) -> Control:
 
 func _prep_view() -> PrepZoneView:
 	return get_zone_view() as PrepZoneView
+
+func render_editor_preview() -> void:
+	if not Engine.is_editor_hint():
+		return
+	var preview_session: SessionService = EncounterEditorPreview.build_session()
+	var preview_interaction_state: EncounterInteractionState = EncounterEditorPreview.build_interaction_state(preview_session)
+	render(preview_session, preview_interaction_state)

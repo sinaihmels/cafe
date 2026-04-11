@@ -8,6 +8,7 @@ script = ExtResource("1_criticboss")
 customer_id = &"critic_boss"
 display_name = "The Final Critic"
 portrait = ExtResource("2_portrait")
+dialogue_file_path = "res://data/dialogue/customers/critic_boss.dialogue"
 order_id = &"sweet_decorated_request"
 preferences = PackedStringArray()
 required_tags = PackedStringArray("decorated")

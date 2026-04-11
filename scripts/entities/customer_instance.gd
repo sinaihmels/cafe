@@ -5,27 +5,35 @@ const SATISFIED_THRESHOLD: int = 4
 const VERY_SATISFIED_THRESHOLD: int = 6
 const EXTREMELY_SATISFIED_THRESHOLD: int = 8
 
+@export var runtime_id: int = 0
 @export var customer_def: CustomerDef
 @export var current_patience: int = 3
 @export var mood_flags: Dictionary = {}
+@export var dialogue_flags: Dictionary = {}
+@export var has_seen_order_dialogue: bool = false
 @export var turns_waited: int = 0
 @export var served: bool = false
 @export var remaining_hunger: int = 1
 @export var satisfaction_score: int = 0
 @export var pending_tip_bonus: int = 0
 @export var has_return_scheduled: bool = false
+@export var departure_reason: StringName = &""
 @export var active_statuses: Array[ModifierInstance] = []
 
 func reset_from_def(definition: CustomerDef) -> void:
+	runtime_id = 0
 	customer_def = definition
 	current_patience = definition.patience if definition != null else 0
 	mood_flags.clear()
+	dialogue_flags.clear()
+	has_seen_order_dialogue = false
 	turns_waited = 0
 	served = false
 	remaining_hunger = maxi(1, definition.hunger if definition != null else 1)
 	satisfaction_score = 0
 	pending_tip_bonus = 0
 	has_return_scheduled = false
+	departure_reason = &""
 	active_statuses.clear()
 
 func get_display_name() -> String:
@@ -126,6 +134,9 @@ func is_still_hungry() -> bool:
 
 func is_returning_visit() -> bool:
 	return bool(mood_flags.get(&"returning_customer", false))
+
+func is_departing() -> bool:
+	return departure_reason != &"" or bool(mood_flags.get(&"departing", false))
 
 func get_customer_type() -> int:
 	if customer_def == null:

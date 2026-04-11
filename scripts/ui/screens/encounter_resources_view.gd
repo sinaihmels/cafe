@@ -1,3 +1,4 @@
+@tool
 class_name EncounterResourcesView
 extends PanelContainer
 
@@ -7,6 +8,10 @@ extends PanelContainer
 @onready var _meter_fill: ColorRect = $Padding/Body/StressMeter/MeterFill
 
 var _stress_fraction: float = 0.0
+
+func _ready() -> void:
+	if Engine.is_editor_hint():
+		render_editor_preview()
 
 func render(session_service: SessionService) -> void:
 	_mana_value.text = str(session_service.player_state.energy)
@@ -33,3 +38,9 @@ func _apply_meter() -> void:
 		maxf(6.0, meter_width * _stress_fraction),
 		maxf(4.0, _stress_meter.size.y - 4.0)
 	)
+
+func render_editor_preview() -> void:
+	if not Engine.is_editor_hint():
+		return
+	var preview_session: SessionService = EncounterEditorPreview.build_session()
+	render(preview_session)
