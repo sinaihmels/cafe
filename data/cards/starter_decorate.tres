@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="CardDef" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="CardDef" format=3 uid="uid://c3wxyacjkurv4"]
 
-[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_card"]
-[ext_resource type="Script" path="res://scripts/effects/add_pastry_states_effect.gd" id="2_states"]
-[ext_resource type="Texture2D" path="res://assets/demo/cards/base_card.png" id="3_art"]
+[ext_resource type="Script" uid="uid://dhty0lqgs7il6" path="res://scripts/cards/card_def.gd" id="1_card"]
+[ext_resource type="Script" uid="uid://cb67becit5ngv" path="res://scripts/effects/base_effect.gd" id="2_ld4ys"]
+[ext_resource type="Script" uid="uid://brcka383pov4l" path="res://scripts/effects/add_pastry_states_effect.gd" id="2_states"]
+[ext_resource type="Texture2D" uid="uid://cw5wox7dt3kxa" path="res://assets/demo/cards/base_card.png" id="3_art"]
 
 [sub_resource type="Resource" id="Resource_decorate"]
 script = ExtResource("2_states")
-states_to_add = PackedStringArray("decorated")
 quality_delta = 1
 
 [resource]
@@ -17,5 +17,5 @@ art = ExtResource("3_art")
 energy_cost = 2
 card_type = 1
 targeting_rules = "select_one_plated_pastry"
-effects = [SubResource("Resource_decorate")]
+effects = Array[ExtResource("2_ld4ys")]([SubResource("Resource_decorate")])
 preview_text = "Decorate a plated pastry and give it +1 quality."

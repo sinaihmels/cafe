@@ -1,14 +1,15 @@
-[gd_resource type="Resource" script_class="DialogueOutcomeDef" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="DialogueOutcomeDef" format=3 uid="uid://cne0q77v225pi"]
 
-[ext_resource type="Script" path="res://scripts/dialogue/dialogue_outcome_def.gd" id="1_outcome"]
-[ext_resource type="Script" path="res://scripts/effects/change_patience_effect.gd" id="2_effect"]
+[ext_resource type="Script" uid="uid://cb67becit5ngv" path="res://scripts/effects/base_effect.gd" id="1_hihso"]
+[ext_resource type="Script" uid="uid://c1mndgudqn7vu" path="res://scripts/dialogue/dialogue_outcome_def.gd" id="1_outcome"]
+[ext_resource type="Script" uid="uid://bgm4dh55qj0ut" path="res://scripts/effects/change_patience_effect.gd" id="2_effect"]
 
 [sub_resource type="Resource" id="Resource_patience_minus_1"]
 script = ExtResource("2_effect")
-effect_id = &"dialogue_patience_minus_1"
 amount = -1
+effect_id = &"dialogue_patience_minus_1"
 
 [resource]
 script = ExtResource("1_outcome")
 outcome_id = &"patience_minus_1"
-effects = [SubResource("Resource_patience_minus_1")]
+effects = Array[ExtResource("1_hihso")]([SubResource("Resource_patience_minus_1")])

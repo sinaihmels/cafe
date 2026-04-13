@@ -1,30 +1,27 @@
-[gd_resource type="Resource" script_class="CardDef" load_steps=7 format=3]
+[gd_resource type="Resource" script_class="CardDef" format=3 uid="uid://dej7elg6dm8o8"]
 
-[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_card"]
-[ext_resource type="Script" path="res://scripts/effects/add_pastry_tags_effect.gd" id="2_tags"]
-[ext_resource type="Script" path="res://scripts/effects/conditional_pastry_effect.gd" id="3_cond"]
-[ext_resource type="Texture2D" path="res://assets/demo/cards/base_card.png" id="4_art"]
+[ext_resource type="Script" uid="uid://dhty0lqgs7il6" path="res://scripts/cards/card_def.gd" id="1_card"]
+[ext_resource type="Script" uid="uid://cb67becit5ngv" path="res://scripts/effects/base_effect.gd" id="2_6x3ia"]
+[ext_resource type="Script" uid="uid://nwgo0wxwgcfe" path="res://scripts/effects/add_pastry_tags_effect.gd" id="2_tags"]
+[ext_resource type="Script" uid="uid://d1tn4iovdn577" path="res://scripts/effects/conditional_pastry_effect.gd" id="3_cond"]
+[ext_resource type="Texture2D" uid="uid://cw5wox7dt3kxa" path="res://assets/demo/cards/base_card.png" id="4_art"]
 
 [sub_resource type="Resource" id="Resource_egg_shiny"]
 script = ExtResource("2_tags")
-tags_to_add = PackedStringArray("shiny")
 
 [sub_resource type="Resource" id="Resource_egg_pretty"]
 script = ExtResource("2_tags")
-tags_to_add = PackedStringArray("pretty")
 
 [sub_resource type="Resource" id="Resource_egg_cond"]
 script = ExtResource("3_cond")
-required_pastry_states = PackedStringArray("warm")
-success_effects = [SubResource("Resource_egg_pretty")]
+success_effects = Array[ExtResource("2_6x3ia")]([SubResource("Resource_egg_pretty")])
 
 [resource]
 script = ExtResource("1_card")
 card_id = &"starter_egg_wash"
 display_name = "Egg Wash"
 art = ExtResource("4_art")
-energy_cost = 1
 card_type = 1
 targeting_rules = "select_one_plated_pastry"
-effects = [SubResource("Resource_egg_shiny"), SubResource("Resource_egg_cond")]
+effects = Array[ExtResource("2_6x3ia")]([SubResource("Resource_egg_shiny"), SubResource("Resource_egg_cond")])
 preview_text = "Brush your pastry for a glossy finish."

@@ -1,13 +1,13 @@
-[gd_resource type="Resource" script_class="CardDef" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="CardDef" format=3 uid="uid://b7odm8fgr8dd0"]
 
-[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_card"]
-[ext_resource type="Script" path="res://scripts/effects/set_encounter_flag_effect.gd" id="2_flag"]
-[ext_resource type="Texture2D" path="res://assets/demo/cards/card_tell_joke.png" id="3_art"]
+[ext_resource type="Script" uid="uid://dhty0lqgs7il6" path="res://scripts/cards/card_def.gd" id="1_card"]
+[ext_resource type="Script" uid="uid://cb67becit5ngv" path="res://scripts/effects/base_effect.gd" id="2_0sda5"]
+[ext_resource type="Script" uid="uid://qk33wb10r3u7" path="res://scripts/effects/set_encounter_flag_effect.gd" id="2_flag"]
+[ext_resource type="Texture2D" uid="uid://di0x8cv3ikxkq" path="res://assets/demo/cards/card_tell_joke.png" id="3_art"]
 
 [sub_resource type="Resource" id="Resource_small_talk"]
 script = ExtResource("2_flag")
 flag_name = &"skip_next_customer_patience_loss"
-amount = 1
 
 [resource]
 script = ExtResource("1_card")
@@ -17,7 +17,5 @@ art = ExtResource("3_art")
 energy_cost = 2
 card_type = 3
 dialogue_event_id = &"small_talk"
-interaction_traits = PackedStringArray("talk")
-targeting_rules = "none"
-effects = [SubResource("Resource_small_talk")]
+effects = Array[ExtResource("2_0sda5")]([SubResource("Resource_small_talk")])
 preview_text = "Buy a little more time and prevent patience loss this turn."

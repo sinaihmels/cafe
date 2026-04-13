@@ -1,21 +1,19 @@
-[gd_resource type="Resource" script_class="CardDef" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="CardDef" format=3 uid="uid://bx1663lx0adum"]
 
-[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_amvjr"]
-[ext_resource type="Script" path="res://scripts/effects/draw_cards_effect.gd" id="2_yl8i2"]
-[ext_resource type="Texture2D" path="res://assets/demo/cards/card_focus.png" id="3_art"]
+[ext_resource type="Script" uid="uid://dhty0lqgs7il6" path="res://scripts/cards/card_def.gd" id="1_amvjr"]
+[ext_resource type="Script" uid="uid://cb67becit5ngv" path="res://scripts/effects/base_effect.gd" id="2_euncw"]
+[ext_resource type="Script" uid="uid://s0ybu6vvpklj" path="res://scripts/effects/draw_cards_effect.gd" id="2_yl8i2"]
+[ext_resource type="Texture2D" uid="uid://cc5tgnw5ta7ma" path="res://assets/demo/cards/card_focus.png" id="3_art"]
 
 [sub_resource type="Resource" id="Resource_1x2aq"]
 script = ExtResource("2_yl8i2")
 effect_id = &"draw_cards"
-amount = 1
 
 [resource]
 script = ExtResource("1_amvjr")
 card_id = &"starter_focus"
 display_name = "Focus"
 art = ExtResource("3_art")
-energy_cost = 1
 card_type = 2
-targeting_rules = "none"
-effects = [SubResource("Resource_1x2aq")]
+effects = Array[ExtResource("2_euncw")]([SubResource("Resource_1x2aq")])
 preview_text = "Draw 1 card."

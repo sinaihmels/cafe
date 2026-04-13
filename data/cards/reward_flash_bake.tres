@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="CardDef" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="CardDef" format=3 uid="uid://bxskj1sg6013t"]
 
-[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_card"]
-[ext_resource type="Script" path="res://scripts/effects/flash_bake_pastry_effect.gd" id="2_flash"]
-[ext_resource type="Texture2D" path="res://assets/demo/cards/card_flash_bake.png" id="3_art"]
+[ext_resource type="Script" uid="uid://dhty0lqgs7il6" path="res://scripts/cards/card_def.gd" id="1_card"]
+[ext_resource type="Script" uid="uid://b0tuun7qhf74d" path="res://scripts/effects/flash_bake_pastry_effect.gd" id="2_flash"]
+[ext_resource type="Script" uid="uid://cb67becit5ngv" path="res://scripts/effects/base_effect.gd" id="2_gw3ui"]
+[ext_resource type="Texture2D" uid="uid://b0w16eh7ss0vf" path="res://assets/demo/cards/card_flash_bake.png" id="3_art"]
 
 [sub_resource type="Resource" id="Resource_flash"]
 script = ExtResource("2_flash")
-burn_chance = 0.5
 
 [resource]
 script = ExtResource("1_card")
@@ -15,6 +15,5 @@ display_name = "Flash Bake"
 art = ExtResource("3_art")
 energy_cost = 0
 card_type = 1
-targeting_rules = "none"
-effects = [SubResource("Resource_flash")]
+effects = Array[ExtResource("2_gw3ui")]([SubResource("Resource_flash")])
 preview_text = "50% chance to bake the pastry instantly. 50% chance to burn it."

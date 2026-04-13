@@ -1,13 +1,13 @@
-[gd_resource type="Resource" script_class="CardDef" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="CardDef" format=3 uid="uid://cqg32rx14feoc"]
 
-[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_card"]
-[ext_resource type="Script" path="res://scripts/effects/add_pastry_tags_effect.gd" id="2_tags"]
-[ext_resource type="Script" path="res://scripts/effects/change_pastry_quality_effect.gd" id="3_quality"]
-[ext_resource type="Texture2D" path="res://assets/demo/cards/card_coffee.png" id="4_art"]
+[ext_resource type="Script" uid="uid://dhty0lqgs7il6" path="res://scripts/cards/card_def.gd" id="1_card"]
+[ext_resource type="Script" uid="uid://cb67becit5ngv" path="res://scripts/effects/base_effect.gd" id="2_074xf"]
+[ext_resource type="Script" uid="uid://nwgo0wxwgcfe" path="res://scripts/effects/add_pastry_tags_effect.gd" id="2_tags"]
+[ext_resource type="Script" uid="uid://bmp0qsuvlq0qt" path="res://scripts/effects/change_pastry_quality_effect.gd" id="3_quality"]
+[ext_resource type="Texture2D" uid="uid://c3s3f44dgnckx" path="res://assets/demo/cards/card_coffee.png" id="4_art"]
 
 [sub_resource type="Resource" id="Resource_culture_tags"]
 script = ExtResource("2_tags")
-tags_to_add = PackedStringArray("tangy")
 
 [sub_resource type="Resource" id="Resource_culture_quality"]
 script = ExtResource("3_quality")
@@ -18,8 +18,5 @@ script = ExtResource("1_card")
 card_id = &"starter_culture"
 display_name = "Feed Starter"
 art = ExtResource("4_art")
-energy_cost = 1
-card_type = 0
-targeting_rules = "none"
-effects = [SubResource("Resource_culture_tags"), SubResource("Resource_culture_quality")]
+effects = Array[ExtResource("2_074xf")]([SubResource("Resource_culture_tags"), SubResource("Resource_culture_quality")])
 preview_text = "Feed the starter to deepen tangy flavor and improve quality."

@@ -1,13 +1,13 @@
-[gd_resource type="Resource" script_class="CardDef" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="CardDef" format=3 uid="uid://c2ahi0bc77pxd"]
 
-[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_card"]
-[ext_resource type="Script" path="res://scripts/effects/set_encounter_flag_effect.gd" id="2_flag"]
-[ext_resource type="Texture2D" path="res://assets/demo/cards/card_mix.png" id="3_art"]
+[ext_resource type="Script" uid="uid://dhty0lqgs7il6" path="res://scripts/cards/card_def.gd" id="1_card"]
+[ext_resource type="Script" uid="uid://qk33wb10r3u7" path="res://scripts/effects/set_encounter_flag_effect.gd" id="2_flag"]
+[ext_resource type="Script" uid="uid://cb67becit5ngv" path="res://scripts/effects/base_effect.gd" id="2_g6ygr"]
+[ext_resource type="Texture2D" uid="uid://dnl6twbtjyldj" path="res://assets/demo/cards/card_mix.png" id="3_art"]
 
 [sub_resource type="Resource" id="Resource_double_batch"]
 script = ExtResource("2_flag")
 flag_name = &"next_plated_pastry_duplications"
-amount = 1
 
 [resource]
 script = ExtResource("1_card")
@@ -16,6 +16,5 @@ display_name = "Double Batch"
 art = ExtResource("3_art")
 energy_cost = 3
 card_type = 2
-targeting_rules = "none"
-effects = [SubResource("Resource_double_batch")]
+effects = Array[ExtResource("2_g6ygr")]([SubResource("Resource_double_batch")])
 preview_text = "Create 2x more pastries this round."

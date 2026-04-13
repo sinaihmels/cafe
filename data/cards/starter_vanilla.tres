@@ -1,20 +1,17 @@
-[gd_resource type="Resource" script_class="CardDef" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="CardDef" format=3 uid="uid://cidl5ln4cavkk"]
 
-[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_card"]
-[ext_resource type="Script" path="res://scripts/effects/add_pastry_tags_effect.gd" id="2_tags"]
-[ext_resource type="Texture2D" path="res://assets/demo/cards/card_focus.png" id="3_art"]
+[ext_resource type="Script" uid="uid://dhty0lqgs7il6" path="res://scripts/cards/card_def.gd" id="1_card"]
+[ext_resource type="Script" uid="uid://cb67becit5ngv" path="res://scripts/effects/base_effect.gd" id="2_3c22y"]
+[ext_resource type="Script" uid="uid://nwgo0wxwgcfe" path="res://scripts/effects/add_pastry_tags_effect.gd" id="2_tags"]
+[ext_resource type="Texture2D" uid="uid://cc5tgnw5ta7ma" path="res://assets/demo/cards/card_focus.png" id="3_art"]
 
 [sub_resource type="Resource" id="Resource_vanilla"]
 script = ExtResource("2_tags")
-tags_to_add = PackedStringArray("sweet")
 
 [resource]
 script = ExtResource("1_card")
 card_id = &"starter_vanilla"
 display_name = "Vanilla"
 art = ExtResource("3_art")
-energy_cost = 1
-card_type = 0
-targeting_rules = "none"
-effects = [SubResource("Resource_vanilla")]
+effects = Array[ExtResource("2_3c22y")]([SubResource("Resource_vanilla")])
 preview_text = "Add vanilla to the active pastry."

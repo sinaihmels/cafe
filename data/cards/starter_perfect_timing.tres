@@ -1,21 +1,19 @@
-[gd_resource type="Resource" script_class="CardDef" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="CardDef" format=3 uid="uid://c3pxq75xtfamh"]
 
-[ext_resource type="Script" path="res://scripts/cards/card_def.gd" id="1_card"]
-[ext_resource type="Script" path="res://scripts/effects/set_encounter_flag_effect.gd" id="2_flag"]
-[ext_resource type="Texture2D" path="res://assets/demo/cards/card_focus.png" id="3_art"]
+[ext_resource type="Script" uid="uid://dhty0lqgs7il6" path="res://scripts/cards/card_def.gd" id="1_card"]
+[ext_resource type="Script" uid="uid://qk33wb10r3u7" path="res://scripts/effects/set_encounter_flag_effect.gd" id="2_flag"]
+[ext_resource type="Script" uid="uid://cb67becit5ngv" path="res://scripts/effects/base_effect.gd" id="2_tf15u"]
+[ext_resource type="Texture2D" uid="uid://cc5tgnw5ta7ma" path="res://assets/demo/cards/card_focus.png" id="3_art"]
 
 [sub_resource type="Resource" id="Resource_perfect_timing"]
 script = ExtResource("2_flag")
 flag_name = &"next_warm_serve_bonus"
-amount = 1
 
 [resource]
 script = ExtResource("1_card")
 card_id = &"starter_perfect_timing"
 display_name = "Perfect Timing"
 art = ExtResource("3_art")
-energy_cost = 1
 card_type = 2
-targeting_rules = "none"
-effects = [SubResource("Resource_perfect_timing")]
+effects = Array[ExtResource("2_tf15u")]([SubResource("Resource_perfect_timing")])
 preview_text = "Your next warm pastry gets bonus appeal."
