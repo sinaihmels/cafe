@@ -39,9 +39,8 @@ expand_mode = 1
 stretch_mode = 6
 
 [node name="FallbackFront" type="PanelContainer" parent="." unique_id=65619830]
-visible = false
 layout_mode = 0
-offset_top = 99.0
+offset_top = 89.424
 offset_right = 1152.0
 offset_bottom = 648.0
 mouse_filter = 2
@@ -49,9 +48,8 @@ theme_override_styles/panel = SubResource("1_counter_front_style")
 
 [node name="FallbackSurface" type="PanelContainer" parent="." unique_id=556147332]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+offset_right = 1152.0
+offset_bottom = 98.496
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2

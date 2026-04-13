@@ -1,9 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://ddfgu5xnc6ij7"]
 
-[ext_resource type="Script" path="res://scripts/ui/screens/encounter_resources_view.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://dqelq3kmbyi1f" path="res://scripts/ui/screens/encounter_resources_view.gd" id="1_script"]
 
 [sub_resource type="StyleBoxFlat" id="1_panel_style"]
-bg_color = Color(0.20, 0.16, 0.19, 0.88)
+bg_color = Color(0, 0, 0, 0)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -14,47 +14,39 @@ corner_radius_top_right = 14
 corner_radius_bottom_right = 14
 corner_radius_bottom_left = 14
 
-[node name="EncounterResourcesView" type="PanelContainer"]
+[node name="EncounterResourcesView" type="PanelContainer" unique_id=1776486544]
 custom_minimum_size = Vector2(132, 132)
 theme_override_styles/panel = SubResource("1_panel_style")
 script = ExtResource("1_script")
 
-[node name="Padding" type="MarginContainer" parent="."]
+[node name="Padding" type="MarginContainer" parent="." unique_id=228629870]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 10
 
-[node name="Body" type="VBoxContainer" parent="Padding"]
+[node name="Body" type="VBoxContainer" parent="Padding" unique_id=1430353479]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="ManaLabel" type="Label" parent="Padding/Body"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "Mana"
-
-[node name="ManaValue" type="Label" parent="Padding/Body"]
+[node name="ManaValue" type="Label" parent="Padding/Body" unique_id=744940898]
 layout_mode = 2
 theme_override_font_sizes/font_size = 38
-text = "0"
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="StressLabel" type="Label" parent="Padding/Body"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "Stress"
-
-[node name="StressValue" type="Label" parent="Padding/Body"]
+[node name="StressValue" type="Label" parent="Padding/Body" unique_id=831824466]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-text = "0/0"
+text = "6/16"
 
-[node name="StressMeter" type="Control" parent="Padding/Body"]
-layout_mode = 2
+[node name="StressMeter" type="Control" parent="Padding/Body" unique_id=325627226]
 custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
 
-[node name="MeterBackground" type="ColorRect" parent="Padding/Body/StressMeter"]
+[node name="MeterBackground" type="ColorRect" parent="Padding/Body/StressMeter" unique_id=245229482]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -63,12 +55,17 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.12, 0.11, 0.14, 0.96)
 
-[node name="MeterFill" type="ColorRect" parent="Padding/Body/StressMeter"]
+[node name="MeterFill" type="ColorRect" parent="Padding/Body/StressMeter" unique_id=1592048981]
 layout_mode = 1
 anchors_preset = 3
-offset_left = 2.0
-offset_top = 2.0
-offset_right = 2.0
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -102.0
+offset_top = -12.0
+offset_right = -64.5
 offset_bottom = -2.0
+grow_horizontal = 0
 grow_vertical = 2
 color = Color(0.78, 0.34, 0.31, 0.98)

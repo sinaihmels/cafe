@@ -26,20 +26,20 @@ signal table_item_requested(item_index: int)
 signal dialogue_continue_requested()
 signal dialogue_response_requested(response_index: int)
 
-@onready var _root: VBoxContainer = $Margin/Root
-@onready var _title_label: Label = $Margin/Root/TitleLabel
-@onready var _status_label: Label = $Margin/Root/StatusLabel
-@onready var _meta_label: Label = $Margin/Root/MetaLabel
-@onready var _hero_strip: HeroStripView = $Margin/Root/HeroStripView
+@onready var _root: VBoxContainer = $Root
+@onready var _title_label: Label = $Root/TitleLabel
+@onready var _status_label: Label = $Root/StatusLabel
+@onready var _meta_label: Label = $Root/MetaLabel
+@onready var _hero_strip: HeroStripView = $Root/HeroStripView
 
-@onready var _title_screen: TitleScreenView = $Margin/Root/ContentScroll/Content/TitleScreenView
-@onready var _hub_screen: HubScreenView = $Margin/Root/ContentScroll/Content/HubScreenView
-@onready var _decoration_screen: DecorationScreenView = $Margin/Root/ContentScroll/Content/DecorationScreenView
-@onready var _dough_select_screen: DoughSelectScreenView = $Margin/Root/ContentScroll/Content/DoughSelectScreenView
-@onready var _reward_screen: RewardScreenView = $Margin/Root/ContentScroll/Content/RewardScreenView
-@onready var _shop_screen: ShopScreenView = $Margin/Root/ContentScroll/Content/ShopScreenView
-@onready var _boss_intro_screen: BossIntroScreenView = $Margin/Root/ContentScroll/Content/BossIntroScreenView
-@onready var _summary_screen: SummaryScreenView = $Margin/Root/ContentScroll/Content/SummaryScreenView
+@onready var _title_screen: TitleScreenView = $Root/ContentScroll/Content/TitleScreenView
+@onready var _hub_screen: HubScreenView = $Root/ContentScroll/Content/HubScreenView
+@onready var _decoration_screen: DecorationScreenView = $Root/ContentScroll/Content/DecorationScreenView
+@onready var _dough_select_screen: DoughSelectScreenView = $Root/ContentScroll/Content/DoughSelectScreenView
+@onready var _reward_screen: RewardScreenView = $Root/ContentScroll/Content/RewardScreenView
+@onready var _shop_screen: ShopScreenView = $Root/ContentScroll/Content/ShopScreenView
+@onready var _boss_intro_screen: BossIntroScreenView = $Root/ContentScroll/Content/BossIntroScreenView
+@onready var _summary_screen: SummaryScreenView = $Root/ContentScroll/Content/SummaryScreenView
 @onready var _encounter_screen: EncounterScreenView = $EncounterScreenView
 
 func _ready() -> void:

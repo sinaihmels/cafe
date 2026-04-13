@@ -13,7 +13,6 @@ signal dialogue_continue_requested()
 signal dialogue_response_requested(response_index: int)
 
 @onready var _background_art: TextureRect = $BackgroundArt
-@onready var _backdrop_tint: ColorRect = $BackdropTint
 @onready var _counter_view: EncounterCounterView = $CounterView
 @onready var _hud_view: EncounterHudView = $SupportHudView
 @onready var _customer_lane: CustomerLaneView = $CustomerLaneView
@@ -43,6 +42,7 @@ var _base_hand_metrics: Dictionary = {}
 var _editor_refresh_signature: Array = []
 
 func _ready() -> void:
+	_pin_overlay_layers()
 	if _background_art.texture == null:
 		_background_art.texture = UiTextureLibrary.background_texture()
 	if Engine.is_editor_hint():
@@ -79,6 +79,11 @@ func _ready() -> void:
 		play_card_requested.emit(card_index)
 	)
 	call_deferred("_layout_stage")
+
+func _pin_overlay_layers() -> void:
+	# Keep transient overlays as the final siblings so they win both draw order and UI hit testing.
+	move_child(_effect_overlay, get_child_count() - 1)
+	move_child(_dialogue_overlay, get_child_count() - 1)
 
 func _notification(what: int) -> void:
 	if not is_node_ready():
@@ -134,7 +139,6 @@ func _layout_stage() -> void:
 		return
 	_layout_profile = _build_layout_profile(size if size != Vector2.ZERO else get_viewport_rect().size)
 	_apply_rect(_background_art, _layout_profile["customer_backdrop_rect"])
-	_apply_rect(_backdrop_tint, _layout_profile["customer_backdrop_rect"])
 	_apply_rect(_counter_view, _layout_profile["counter_rect"])
 	_apply_rect(_hud_view, _layout_profile["support_hud_rect"])
 	_apply_rect(_customer_lane, _layout_profile["customer_lane_rect"])
@@ -212,17 +216,16 @@ func _capture_editor_layout() -> void:
 		"end_turn_rect": _end_turn_button,
 	}
 	_base_rects.clear()
-	_layout_reference_size = Vector2.ZERO
+	var authored_reference_size: Vector2 = fallback_reference_size
+	_layout_reference_size = authored_reference_size
 	for key in rect_sources.keys():
 		var control: Control = rect_sources[key] as Control
 		if control == null:
 			continue
-		var rect: Rect2 = Rect2(control.position, control.size)
+		var rect: Rect2 = _authored_rect_for(control, authored_reference_size)
 		_base_rects[key] = rect
 		_layout_reference_size.x = maxf(_layout_reference_size.x, rect.position.x + rect.size.x)
 		_layout_reference_size.y = maxf(_layout_reference_size.y, rect.position.y + rect.size.y)
-	if _layout_reference_size == Vector2.ZERO:
-		_layout_reference_size = fallback_reference_size
 	_base_hand_metrics = {
 		"card_width": _hand_fan.card_width,
 		"card_height": _hand_fan.card_height,
@@ -234,6 +237,13 @@ func _capture_editor_layout() -> void:
 		"hover_lift": _hand_fan.hover_lift,
 		"bottom_padding": _hand_fan.bottom_padding,
 	}
+
+func _authored_rect_for(control: Control, reference_size: Vector2) -> Rect2:
+	var left: float = reference_size.x * control.anchor_left + control.offset_left
+	var top: float = reference_size.y * control.anchor_top + control.offset_top
+	var right: float = reference_size.x * control.anchor_right + control.offset_right
+	var bottom: float = reference_size.y * control.anchor_bottom + control.offset_bottom
+	return Rect2(Vector2(left, top), Vector2(right - left, bottom - top))
 
 func _make_editor_refresh_signature() -> Array:
 	return [

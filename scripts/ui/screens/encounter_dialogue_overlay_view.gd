@@ -27,6 +27,10 @@ signal response_requested(response_index: int)
 var _anchor_provider: Callable
 
 func _ready() -> void:
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_modal_backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_modal_panel.mouse_filter = Control.MOUSE_FILTER_PASS
+	_bubble_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_apply_dialogue_theme()
 	_continue_button.pressed.connect(func() -> void:
 		continue_requested.emit()
@@ -40,8 +44,8 @@ func render(state: DialoguePresentationState) -> void:
 	visible = is_visible
 	if not is_visible:
 		return
-	mouse_filter = Control.MOUSE_FILTER_STOP if state.modal else Control.MOUSE_FILTER_IGNORE
 	_modal_backdrop.visible = state.modal
+	_modal_backdrop.mouse_filter = Control.MOUSE_FILTER_STOP if state.modal else Control.MOUSE_FILTER_IGNORE
 	_bubble_panel.visible = not state.modal
 	if state.modal:
 		_render_modal(state)

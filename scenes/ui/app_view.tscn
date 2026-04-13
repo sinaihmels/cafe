@@ -10,7 +10,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/shop_screen_view.tscn" id="9_shop"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/boss_intro_screen_view.tscn" id="10_boss"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/summary_screen_view.tscn" id="11_summary"]
-[ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_screen_view.tscn" id="12_encounter"]
+[ext_resource type="PackedScene" uid="uid://wadjyymgmkcv" path="res://scenes/ui/screens/encounter_screen_view.tscn" id="12_encounter"]
 
 [sub_resource type="CanvasTexture" id="CanvasTexture_xysd6"]
 specular_color = Color(0.19506672, 0.19506672, 0.19506669, 1)
@@ -35,84 +35,6 @@ texture = SubResource("CanvasTexture_xysd6")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Margin" type="MarginContainer" parent="." unique_id=1027091818]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 24
-
-[node name="Root" type="VBoxContainer" parent="Margin" unique_id=953727018]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 12
-
-[node name="TitleLabel" type="Label" parent="Margin/Root" unique_id=787537753]
-layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "Cafe"
-
-[node name="StatusLabel" type="Label" parent="Margin/Root" unique_id=1980532613]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-text = "Status"
-autowrap_mode = 3
-
-[node name="MetaLabel" type="Label" parent="Margin/Root" unique_id=654639877]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-text = "Meta"
-autowrap_mode = 3
-
-[node name="HeroStripView" parent="Margin/Root" unique_id=342678668 instance=ExtResource("3_hero_strip")]
-layout_mode = 2
-
-[node name="ContentScroll" type="ScrollContainer" parent="Margin/Root" unique_id=827205300]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="Content" type="VBoxContainer" parent="Margin/Root/ContentScroll" unique_id=1496926953]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 12
-
-[node name="TitleScreenView" parent="Margin/Root/ContentScroll/Content" unique_id=708692693 instance=ExtResource("4_title")]
-visible = false
-layout_mode = 2
-
-[node name="HubScreenView" parent="Margin/Root/ContentScroll/Content" unique_id=802662782 instance=ExtResource("5_hub")]
-visible = false
-layout_mode = 2
-
-[node name="DecorationScreenView" parent="Margin/Root/ContentScroll/Content" unique_id=1076703650 instance=ExtResource("6_decoration")]
-visible = false
-layout_mode = 2
-
-[node name="DoughSelectScreenView" parent="Margin/Root/ContentScroll/Content" unique_id=895996984 instance=ExtResource("7_dough")]
-visible = false
-layout_mode = 2
-
-[node name="RewardScreenView" parent="Margin/Root/ContentScroll/Content" unique_id=1551036900 instance=ExtResource("8_reward")]
-visible = false
-layout_mode = 2
-
-[node name="ShopScreenView" parent="Margin/Root/ContentScroll/Content" unique_id=1389652838 instance=ExtResource("9_shop")]
-visible = false
-layout_mode = 2
-
-[node name="BossIntroScreenView" parent="Margin/Root/ContentScroll/Content" unique_id=2039867961 instance=ExtResource("10_boss")]
-visible = false
-layout_mode = 2
-
-[node name="SummaryScreenView" parent="Margin/Root/ContentScroll/Content" unique_id=2081956428 instance=ExtResource("11_summary")]
-visible = false
-layout_mode = 2
-
 [node name="EncounterScreenView" parent="." unique_id=99057338 instance=ExtResource("12_encounter")]
 visible = false
 layout_mode = 1
@@ -121,3 +43,74 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Root" type="VBoxContainer" parent="." unique_id=953727018]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="Root" unique_id=787537753]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Cafe"
+
+[node name="StatusLabel" type="Label" parent="Root" unique_id=1980532613]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+text = "Status"
+autowrap_mode = 3
+
+[node name="MetaLabel" type="Label" parent="Root" unique_id=654639877]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+text = "Meta"
+autowrap_mode = 3
+
+[node name="HeroStripView" parent="Root" unique_id=342678668 instance=ExtResource("3_hero_strip")]
+layout_mode = 2
+
+[node name="ContentScroll" type="ScrollContainer" parent="Root" unique_id=827205300]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Content" type="VBoxContainer" parent="Root/ContentScroll" unique_id=1496926953]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="TitleScreenView" parent="Root/ContentScroll/Content" unique_id=708692693 instance=ExtResource("4_title")]
+visible = false
+layout_mode = 2
+
+[node name="HubScreenView" parent="Root/ContentScroll/Content" unique_id=802662782 instance=ExtResource("5_hub")]
+visible = false
+layout_mode = 2
+
+[node name="DecorationScreenView" parent="Root/ContentScroll/Content" unique_id=1076703650 instance=ExtResource("6_decoration")]
+visible = false
+layout_mode = 2
+
+[node name="DoughSelectScreenView" parent="Root/ContentScroll/Content" unique_id=895996984 instance=ExtResource("7_dough")]
+visible = false
+layout_mode = 2
+
+[node name="RewardScreenView" parent="Root/ContentScroll/Content" unique_id=1551036900 instance=ExtResource("8_reward")]
+visible = false
+layout_mode = 2
+
+[node name="ShopScreenView" parent="Root/ContentScroll/Content" unique_id=1389652838 instance=ExtResource("9_shop")]
+visible = false
+layout_mode = 2
+
+[node name="BossIntroScreenView" parent="Root/ContentScroll/Content" unique_id=2039867961 instance=ExtResource("10_boss")]
+visible = false
+layout_mode = 2
+
+[node name="SummaryScreenView" parent="Root/ContentScroll/Content" unique_id=2081956428 instance=ExtResource("11_summary")]
+visible = false
+layout_mode = 2
