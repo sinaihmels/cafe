@@ -5,12 +5,32 @@ extends Control
 signal prep_item_requested(item_index: int)
 
 @export var item_card_scene: PackedScene
+@export_group("Layout")
+@export var layout_min_size: Vector2 = Vector2(140.0, 160.0)
+@export_range(0.1, 1.0, 0.01) var grid_width_ratio: float = 0.58
+@export var grid_width_min: float = 148.0
+@export var grid_width_max: float = 208.0
+@export_range(0.1, 1.0, 0.01) var grid_height_ratio: float = 0.86
+@export var grid_height_min: float = 160.0
+@export var grid_bottom_padding: float = 6.0
+@export_range(0.0, 1.0, 0.01) var grid_vertical_bias: float = 0.35
+@export_range(0.1, 1.0, 0.01) var card_width_ratio: float = 0.36
+@export var card_width_min: float = 118.0
+@export var card_width_max: float = 172.0
+@export_range(0.1, 1.0, 0.01) var card_height_ratio: float = 0.66
+@export var card_height_min: float = 140.0
+@export var card_height_max: float = 214.0
+@export_group("Empty State")
+@export var empty_label_size: Vector2 = Vector2(180.0, 26.0)
 
 @onready var _grid: GridContainer = $PrepGrid
 @onready var _empty_label: Label = $PrepEmptyLabel
+var _editor_refresh_signature: Array = []
 
 func _ready() -> void:
 	if Engine.is_editor_hint():
+		_editor_refresh_signature = _make_editor_refresh_signature()
+		set_process(true)
 		render_editor_preview()
 	_apply_layout()
 
@@ -19,6 +39,15 @@ func _notification(what: int) -> void:
 		return
 	if what == NOTIFICATION_RESIZED:
 		call_deferred("_apply_layout")
+
+func _process(_delta: float) -> void:
+	if not Engine.is_editor_hint() or not is_node_ready():
+		return
+	var signature: Array = _make_editor_refresh_signature()
+	if signature == _editor_refresh_signature:
+		return
+	_editor_refresh_signature = signature
+	_refresh_editor_preview()
 
 func render(session_service: SessionService, interaction_state: EncounterInteractionState) -> void:
 	UiSceneUtils.clear_children(_grid)
@@ -57,12 +86,19 @@ func get_pastry_card_control(item_index: int) -> Control:
 func _apply_layout() -> void:
 	if _grid == null or _empty_label == null:
 		return
-	var resolved_size: Vector2 = Vector2(maxf(140.0, size.x), maxf(160.0, size.y))
-	var compactness: float = clampf(maxf((230.0 - resolved_size.x) / 90.0, (220.0 - resolved_size.y) / 80.0), 0.0, 1.0)
-	var grid_width: float = clampf(resolved_size.x * lerpf(0.50, 0.68, compactness), 148.0, minf(resolved_size.x - 8.0, 220.0))
-	var grid_height: float = clampf(resolved_size.y * lerpf(0.82, 0.9, compactness), 176.0, resolved_size.y - 6.0)
-	var card_width: float = clampf(resolved_size.x * lerpf(0.44, 0.34, compactness), 126.0, 228.0)
-	var card_height: float = clampf(resolved_size.y * lerpf(0.76, 0.58, compactness), 148.0, 286.0)
+	var resolved_size: Vector2 = Vector2(maxf(layout_min_size.x, size.x), maxf(layout_min_size.y, size.y))
+	var grid_width: float = clampf(
+		resolved_size.x * grid_width_ratio,
+		grid_width_min,
+		minf(resolved_size.x - 8.0, grid_width_max)
+	)
+	var grid_height: float = clampf(
+		resolved_size.y * grid_height_ratio,
+		grid_height_min,
+		resolved_size.y - grid_bottom_padding
+	)
+	var card_width: float = clampf(resolved_size.x * card_width_ratio, card_width_min, card_width_max)
+	var card_height: float = clampf(resolved_size.y * card_height_ratio, card_height_min, card_height_max)
 	for child in _grid.get_children():
 		var card: ZoneItemCardView = child as ZoneItemCardView
 		if card != null:
@@ -70,15 +106,18 @@ func _apply_layout() -> void:
 	_apply_node_rect(
 		_grid,
 		Rect2(
-			Vector2((resolved_size.x - grid_width) * 0.5, maxf(0.0, (resolved_size.y - grid_height) * 0.38)),
+			Vector2((resolved_size.x - grid_width) * 0.5, maxf(0.0, (resolved_size.y - grid_height) * grid_vertical_bias)),
 			Vector2(grid_width, grid_height)
 		)
 	)
 	_apply_node_rect(
 		_empty_label,
 		Rect2(
-			Vector2(maxf(0.0, (resolved_size.x - 180.0) * 0.5), maxf(0.0, (resolved_size.y - 26.0) * 0.5)),
-			Vector2(minf(180.0, resolved_size.x), 26.0)
+			Vector2(
+				maxf(0.0, (resolved_size.x - empty_label_size.x) * 0.5),
+				maxf(0.0, (resolved_size.y - empty_label_size.y) * 0.5)
+			),
+			Vector2(minf(empty_label_size.x, resolved_size.x), empty_label_size.y)
 		)
 	)
 
@@ -98,3 +137,26 @@ func render_editor_preview() -> void:
 	var preview_session: SessionService = EncounterEditorPreview.build_session()
 	var preview_interaction_state: EncounterInteractionState = EncounterEditorPreview.build_interaction_state(preview_session)
 	render(preview_session, preview_interaction_state)
+
+func _make_editor_refresh_signature() -> Array:
+	return [
+		item_card_scene,
+		layout_min_size,
+		grid_width_ratio,
+		grid_width_min,
+		grid_width_max,
+		grid_height_ratio,
+		grid_height_min,
+		grid_bottom_padding,
+		grid_vertical_bias,
+		card_width_ratio,
+		card_width_min,
+		card_width_max,
+		card_height_ratio,
+		card_height_min,
+		card_height_max,
+		empty_label_size,
+	]
+
+func _refresh_editor_preview() -> void:
+	render_editor_preview()

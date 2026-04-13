@@ -12,8 +12,8 @@ signal hover_ended()
 @export var disabled_modulate: Color = Color(0.78, 0.78, 0.78, 0.82)
 @export var hide_art_when_matching_background: bool = true
 @export var pastry_tag_chip_scene: PackedScene
-
-const DESIGN_SIZE: Vector2 = Vector2(154, 214)
+@export_group("Layout")
+@export var design_size: Vector2 = Vector2(154.0, 214.0)
 
 @onready var _content_root: Control = $CardContent
 @onready var _background: TextureRect = $CardContent/CardBackground
@@ -28,10 +28,14 @@ var _is_selected: bool = false
 var _is_hovered: bool = false
 var _configured_card: CardInstance
 var _configured_playable: bool = false
+var _editor_refresh_signature: Array = []
 
 func _ready() -> void:
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
+	if Engine.is_editor_hint():
+		_editor_refresh_signature = _make_editor_refresh_signature()
+		set_process(true)
 	_layout_content_root()
 	_apply_configuration()
 
@@ -65,6 +69,15 @@ func _notification(what: int) -> void:
 		_layout_content_root()
 		_layout_card_art()
 
+func _process(_delta: float) -> void:
+	if not Engine.is_editor_hint() or not is_node_ready():
+		return
+	var signature: Array = _make_editor_refresh_signature()
+	if signature == _editor_refresh_signature:
+		return
+	_editor_refresh_signature = signature
+	_refresh_editor_preview()
+
 func _apply_configuration() -> void:
 	_background.texture = CardDef.background_texture_for_type(CardDef.CardType.INGREDIENT)
 	_cost_label.text = ""
@@ -87,8 +100,8 @@ func _apply_configuration() -> void:
 func _layout_content_root() -> void:
 	if _content_root == null:
 		return
-	var width_scale: float = size.x / DESIGN_SIZE.x if DESIGN_SIZE.x > 0.0 else 1.0
-	var height_scale: float = size.y / DESIGN_SIZE.y if DESIGN_SIZE.y > 0.0 else 1.0
+	var width_scale: float = size.x / design_size.x if design_size.x > 0.0 else 1.0
+	var height_scale: float = size.y / design_size.y if design_size.y > 0.0 else 1.0
 	_content_root.scale = Vector2(width_scale, height_scale)
 
 func _apply_card_art() -> void:
@@ -164,3 +177,18 @@ func _on_mouse_entered() -> void:
 
 func _on_mouse_exited() -> void:
 	hover_ended.emit()
+
+func _make_editor_refresh_signature() -> Array:
+	return [
+		normal_modulate,
+		hover_modulate,
+		selected_modulate,
+		disabled_modulate,
+		hide_art_when_matching_background,
+		pastry_tag_chip_scene,
+		design_size,
+	]
+
+func _refresh_editor_preview() -> void:
+	_layout_content_root()
+	_apply_configuration()

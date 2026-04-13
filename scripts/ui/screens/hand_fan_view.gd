@@ -20,9 +20,12 @@ signal play_card_requested(card_index: int)
 var _card_nodes: Array[HandCardView] = []
 var _hovered_card_index: int = -1
 var _selected_card_index: int = -1
+var _editor_refresh_signature: Array = []
 
 func _ready() -> void:
 	if Engine.is_editor_hint():
+		_editor_refresh_signature = _make_editor_refresh_signature()
+		set_process(true)
 		render_editor_preview()
 
 func configure_layout_metrics(
@@ -81,6 +84,15 @@ func _notification(what: int) -> void:
 		return
 	if what == NOTIFICATION_RESIZED:
 		call_deferred("_layout_cards")
+
+func _process(_delta: float) -> void:
+	if not Engine.is_editor_hint() or not is_node_ready():
+		return
+	var signature: Array = _make_editor_refresh_signature()
+	if signature == _editor_refresh_signature:
+		return
+	_editor_refresh_signature = signature
+	_refresh_editor_preview()
 
 func _set_hovered_card(card_index: int) -> void:
 	if _hovered_card_index == card_index:
@@ -164,3 +176,20 @@ func render_editor_preview() -> void:
 	var preview_session: SessionService = EncounterEditorPreview.build_session()
 	var preview_interaction_state: EncounterInteractionState = EncounterEditorPreview.build_interaction_state(preview_session)
 	render(preview_session, preview_interaction_state)
+
+func _make_editor_refresh_signature() -> Array:
+	return [
+		hand_card_scene,
+		card_width,
+		card_height,
+		min_spacing,
+		ideal_spacing,
+		curve_depth,
+		rotation_max_degrees,
+		selected_lift,
+		hover_lift,
+		bottom_padding,
+	]
+
+func _refresh_editor_preview() -> void:
+	render_editor_preview()

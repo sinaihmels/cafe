@@ -19,6 +19,45 @@ extends Control
 @export_range(0.05, 0.3, 0.005) var title_height_ratio: float = 0.14
 @export_range(0.1, 0.5, 0.01) var decoration_width_ratio: float = 0.28
 @export_range(0.1, 0.5, 0.01) var decoration_height_ratio: float = 0.34
+@export_group("Layout Bounds")
+@export var layout_min_size: Vector2 = Vector2(220.0, 180.0)
+@export var shell_top_min: float = 4.0
+@export var shell_top_max: float = 26.0
+@export var shell_bottom_min: float = 8.0
+@export var shell_bottom_max: float = 24.0
+@export var shell_height_min: float = 110.0
+@export var title_top_min: float = 10.0
+@export var title_top_max: float = 22.0
+@export var title_height_min: float = 28.0
+@export var title_height_max: float = 48.0
+@export var title_width_min: float = 120.0
+@export var title_side_padding: float = 18.0
+@export var inset_side_min: float = 12.0
+@export var inset_side_max: float = 34.0
+@export_range(0.0, 0.2, 0.005) var title_gap_ratio: float = 0.03
+@export var title_gap_min: float = 8.0
+@export var title_gap_max: float = 18.0
+@export var inset_top_min: float = 22.0
+@export var inset_top_max: float = 64.0
+@export var inset_bottom_min: float = 10.0
+@export var inset_bottom_max: float = 24.0
+@export var inset_width_min: float = 88.0
+@export var inset_height_min: float = 92.0
+@export var content_side_extra_min: float = 6.0
+@export var content_side_extra_max: float = 40.0
+@export_range(0.0, 0.2, 0.005) var content_gap_ratio: float = 0.03
+@export var content_gap_min: float = 8.0
+@export var content_gap_max: float = 18.0
+@export var content_bottom_min: float = 10.0
+@export var content_bottom_max: float = 28.0
+@export var content_width_min: float = 72.0
+@export var content_height_min: float = 80.0
+@export var decoration_width_min: float = 78.0
+@export var decoration_width_max: float = 148.0
+@export var decoration_height_min: float = 78.0
+@export var decoration_height_max: float = 148.0
+@export var decoration_side_padding_min: float = 12.0
+@export var decoration_top_offset: float = 4.0
 
 @onready var _background: TextureRect = $Background
 @onready var _overlay: TextureRect = $Overlay
@@ -31,6 +70,7 @@ extends Control
 var _resolved_base_texture: Texture2D
 var _resolved_overlay_texture: Texture2D
 var _zone_view: Control
+var _editor_refresh_signature: Array = []
 
 func setup_stage() -> void:
 	_resolved_base_texture = base_texture
@@ -38,12 +78,24 @@ func setup_stage() -> void:
 	_apply_visuals()
 	_instantiate_zone_view()
 	_layout_stage_art()
+	if Engine.is_editor_hint():
+		_editor_refresh_signature = _make_editor_refresh_signature()
+		set_process(true)
 
 func _notification(what: int) -> void:
 	if not is_node_ready():
 		return
 	if what == NOTIFICATION_RESIZED:
 		call_deferred("_layout_stage_art")
+
+func _process(_delta: float) -> void:
+	if not Engine.is_editor_hint() or not is_node_ready():
+		return
+	var signature: Array = _make_editor_refresh_signature()
+	if signature == _editor_refresh_signature:
+		return
+	_editor_refresh_signature = signature
+	_refresh_editor_preview()
 
 func set_runtime_textures(stage_base_texture: Texture2D, stage_overlay_texture: Texture2D = null) -> void:
 	_resolved_base_texture = stage_base_texture
@@ -67,25 +119,23 @@ func _apply_visuals() -> void:
 func _layout_stage_art() -> void:
 	if _station_shell == null or _station_inset == null or _title_label == null or _content_anchor == null:
 		return
-	# Stage shells are driven from ratios so each station keeps the same visual structure
-	# across desktop and handheld-sized windows.
-	var resolved_size: Vector2 = Vector2(maxf(220.0, size.x), maxf(180.0, size.y))
-	var compactness: float = clampf(
-		maxf((440.0 - resolved_size.x) / 180.0, (320.0 - resolved_size.y) / 120.0),
-		0.0,
-		1.0
-	)
-	var shell_top: float = clampf(resolved_size.y * lerpf(shell_top_ratio, shell_top_ratio * 0.72, compactness), 4.0, 26.0)
-	var shell_bottom: float = clampf(resolved_size.y * lerpf(shell_bottom_ratio, shell_bottom_ratio * 0.8, compactness), 8.0, 24.0)
+	# Stage shells use one consistent ratio-based composition for the fixed demo layout.
+	var resolved_size: Vector2 = Vector2(maxf(layout_min_size.x, size.x), maxf(layout_min_size.y, size.y))
+	var shell_top: float = clampf(resolved_size.y * shell_top_ratio, shell_top_min, shell_top_max)
+	var shell_bottom: float = clampf(resolved_size.y * shell_bottom_ratio, shell_bottom_min, shell_bottom_max)
 	var shell_rect: Rect2 = Rect2(
 		Vector2.ZERO,
-		Vector2(resolved_size.x, maxf(110.0, resolved_size.y - shell_top - shell_bottom))
+		Vector2(resolved_size.x, maxf(shell_height_min, resolved_size.y - shell_top - shell_bottom))
 	)
 	shell_rect.position.y = shell_top
 	_apply_node_rect(_station_shell, shell_rect)
-	var title_top: float = clampf(resolved_size.y * title_top_ratio, 10.0, 22.0)
-	var title_height: float = clampf(resolved_size.y * title_height_ratio, 28.0, 48.0)
-	var title_width: float = clampf(resolved_size.x * title_width_ratio, 120.0, resolved_size.x - 18.0)
+	var title_top: float = clampf(resolved_size.y * title_top_ratio, title_top_min, title_top_max)
+	var title_height: float = clampf(resolved_size.y * title_height_ratio, title_height_min, title_height_max)
+	var title_width: float = clampf(
+		resolved_size.x * title_width_ratio,
+		title_width_min,
+		resolved_size.x - title_side_padding
+	)
 	_apply_node_rect(
 		_title_label,
 		Rect2(
@@ -93,55 +143,55 @@ func _layout_stage_art() -> void:
 			Vector2(title_width, title_height)
 		)
 	)
-	var inset_side: float = clampf(resolved_size.x * lerpf(inset_side_ratio, inset_side_ratio * 0.85, compactness), 12.0, 34.0)
+	var inset_side: float = clampf(resolved_size.x * inset_side_ratio, inset_side_min, inset_side_max)
 	var inset_top: float = maxf(
-		title_top + title_height + clampf(resolved_size.y * 0.03, 8.0, 18.0),
-		shell_top + clampf(resolved_size.y * lerpf(inset_top_ratio, inset_top_ratio * 0.88, compactness), 22.0, 64.0)
+		title_top + title_height + clampf(resolved_size.y * title_gap_ratio, title_gap_min, title_gap_max),
+		shell_top + clampf(resolved_size.y * inset_top_ratio, inset_top_min, inset_top_max)
 	)
-	var inset_bottom: float = clampf(resolved_size.y * lerpf(inset_bottom_ratio, inset_bottom_ratio * 0.85, compactness), 10.0, 24.0)
+	var inset_bottom: float = clampf(resolved_size.y * inset_bottom_ratio, inset_bottom_min, inset_bottom_max)
 	_apply_node_rect(
 		_station_inset,
 		Rect2(
 			Vector2(inset_side, inset_top),
 			Vector2(
-				maxf(88.0, resolved_size.x - inset_side * 2.0),
-				maxf(92.0, resolved_size.y - inset_top - inset_bottom)
+				maxf(inset_width_min, resolved_size.x - inset_side * 2.0),
+				maxf(inset_height_min, resolved_size.y - inset_top - inset_bottom)
 			)
 		)
 	)
 	var content_side: float = clampf(
-		resolved_size.x * lerpf(content_side_ratio, content_side_ratio * 0.85, compactness),
-		inset_side + 6.0,
-		inset_side + 40.0
+		resolved_size.x * content_side_ratio,
+		inset_side + content_side_extra_min,
+		inset_side + content_side_extra_max
 	)
 	var content_top: float = maxf(
-		inset_top + clampf(resolved_size.y * 0.03, 8.0, 18.0),
-		resolved_size.y * lerpf(content_top_ratio, content_top_ratio * 0.88, compactness)
+		inset_top + clampf(resolved_size.y * content_gap_ratio, content_gap_min, content_gap_max),
+		resolved_size.y * content_top_ratio
 	)
 	var content_bottom: float = clampf(
-		resolved_size.y * lerpf(content_bottom_ratio, content_bottom_ratio * 0.85, compactness),
-		10.0,
-		28.0
+		resolved_size.y * content_bottom_ratio,
+		content_bottom_min,
+		content_bottom_max
 	)
 	_apply_node_rect(
 		_content_anchor,
 		Rect2(
 			Vector2(content_side, content_top),
 			Vector2(
-				maxf(72.0, resolved_size.x - content_side * 2.0),
-				maxf(80.0, resolved_size.y - content_top - content_bottom)
+				maxf(content_width_min, resolved_size.x - content_side * 2.0),
+				maxf(content_height_min, resolved_size.y - content_top - content_bottom)
 			)
 		)
 	)
 	if _decoration_anchor != null:
-		var decoration_width: float = clampf(resolved_size.x * decoration_width_ratio, 78.0, 148.0)
-		var decoration_height: float = clampf(resolved_size.y * decoration_height_ratio, 78.0, 148.0)
+		var decoration_width: float = clampf(resolved_size.x * decoration_width_ratio, decoration_width_min, decoration_width_max)
+		var decoration_height: float = clampf(resolved_size.y * decoration_height_ratio, decoration_height_min, decoration_height_max)
 		_apply_node_rect(
 			_decoration_anchor,
 			Rect2(
 				Vector2(
-					resolved_size.x - decoration_width - maxf(12.0, inset_side * 0.8),
-					title_top + 4.0
+					resolved_size.x - decoration_width - maxf(decoration_side_padding_min, inset_side * 0.8),
+					title_top + decoration_top_offset
 				),
 				Vector2(decoration_width, decoration_height)
 			)
@@ -168,6 +218,75 @@ func _instantiate_zone_view() -> void:
 	_zone_view.offset_top = 0.0
 	_zone_view.offset_right = 0.0
 	_zone_view.offset_bottom = 0.0
+
+func _make_editor_refresh_signature() -> Array:
+	return [
+		base_texture,
+		overlay_texture,
+		zone_scene,
+		title_text,
+		shell_top_ratio,
+		shell_bottom_ratio,
+		inset_side_ratio,
+		inset_top_ratio,
+		inset_bottom_ratio,
+		content_side_ratio,
+		content_top_ratio,
+		content_bottom_ratio,
+		title_top_ratio,
+		title_width_ratio,
+		title_height_ratio,
+		decoration_width_ratio,
+		decoration_height_ratio,
+		layout_min_size,
+		shell_top_min,
+		shell_top_max,
+		shell_bottom_min,
+		shell_bottom_max,
+		shell_height_min,
+		title_top_min,
+		title_top_max,
+		title_height_min,
+		title_height_max,
+		title_width_min,
+		title_side_padding,
+		inset_side_min,
+		inset_side_max,
+		title_gap_ratio,
+		title_gap_min,
+		title_gap_max,
+		inset_top_min,
+		inset_top_max,
+		inset_bottom_min,
+		inset_bottom_max,
+		inset_width_min,
+		inset_height_min,
+		content_side_extra_min,
+		content_side_extra_max,
+		content_gap_ratio,
+		content_gap_min,
+		content_gap_max,
+		content_bottom_min,
+		content_bottom_max,
+		content_width_min,
+		content_height_min,
+		decoration_width_min,
+		decoration_width_max,
+		decoration_height_min,
+		decoration_height_max,
+		decoration_side_padding_min,
+		decoration_top_offset,
+	]
+
+func _refresh_editor_preview() -> void:
+	_resolved_base_texture = base_texture
+	_resolved_overlay_texture = overlay_texture
+	_instantiate_zone_view()
+	_layout_stage_art()
+	if has_method("render_editor_preview"):
+		call_deferred("render_editor_preview")
+	else:
+		_apply_visuals()
 
 func _apply_node_rect(control: Control, rect: Rect2) -> void:
 	control.anchor_left = 0.0

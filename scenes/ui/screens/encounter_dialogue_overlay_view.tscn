@@ -1,56 +1,8 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/screens/encounter_dialogue_overlay_view.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/components/dialogue_response_option_view.tscn" id="2_response_option"]
-
-[sub_resource type="StyleBoxFlat" id="1_modal_style"]
-bg_color = Color(0.96, 0.93, 0.88, 0.98)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.47, 0.31, 0.20, 0.98)
-corner_radius_top_left = 24
-corner_radius_top_right = 24
-corner_radius_bottom_right = 24
-corner_radius_bottom_left = 24
-shadow_color = Color(0.14, 0.09, 0.06, 0.66)
-shadow_size = 12
-shadow_offset = Vector2(0, 3)
-
-[sub_resource type="StyleBoxFlat" id="2_portrait_style"]
-bg_color = Color(0.85, 0.76, 0.66, 0.98)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="3_continue_style"]
-bg_color = Color(0.56, 0.35, 0.23, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.95, 0.88, 0.80, 1)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="4_bubble_style"]
-bg_color = Color(0.98, 0.95, 0.91, 0.98)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.45, 0.30, 0.20, 0.98)
-corner_radius_top_left = 22
-corner_radius_top_right = 22
-corner_radius_bottom_right = 22
-corner_radius_bottom_left = 22
-shadow_color = Color(0.14, 0.09, 0.06, 0.44)
-shadow_size = 10
-shadow_offset = Vector2(0, 2)
+[ext_resource type="Resource" path="res://themes/dialogue_theme.tres" id="3_dialogue_theme"]
 
 [node name="EncounterDialogueOverlayView" type="Control"]
 anchors_preset = 15
@@ -59,9 +11,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-z_index = 40
+z_index = 500
 script = ExtResource("1_script")
 response_option_scene = ExtResource("2_response_option")
+dialogue_theme = ExtResource("3_dialogue_theme")
 
 [node name="ModalBackdrop" type="ColorRect" parent="."]
 visible = false
@@ -79,27 +32,21 @@ custom_minimum_size = Vector2(520, 280)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
-anchor_top = 0.5
+anchor_top = 0.35
 anchor_right = 0.5
-anchor_bottom = 0.5
+anchor_bottom = 0.35
 offset_left = -260.0
 offset_top = -150.0
 offset_right = 260.0
 offset_bottom = 150.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("1_modal_style")
 
 [node name="ModalMargin" type="MarginContainer" parent="ModalBackdrop/ModalPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 18
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 18
 
 [node name="Content" type="VBoxContainer" parent="ModalBackdrop/ModalPanel/ModalMargin"]
 layout_mode = 2
-theme_override_constants/separation = 16
 
 [node name="TopRow" type="HBoxContainer" parent="ModalBackdrop/ModalPanel/ModalMargin/Content"]
 layout_mode = 2
@@ -108,7 +55,6 @@ theme_override_constants/separation = 14
 [node name="PortraitShell" type="PanelContainer" parent="ModalBackdrop/ModalPanel/ModalMargin/Content/TopRow"]
 custom_minimum_size = Vector2(92, 92)
 layout_mode = 2
-theme_override_styles/panel = SubResource("2_portrait_style")
 
 [node name="Portrait" type="TextureRect" parent="ModalBackdrop/ModalPanel/ModalMargin/Content/TopRow/PortraitShell"]
 layout_mode = 2
@@ -122,53 +68,37 @@ size_flags_horizontal = 3
 
 [node name="SpeakerLabel" type="Label" parent="ModalBackdrop/ModalPanel/ModalMargin/Content/TopRow/SpeakerColumn"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
 text = "Customer"
 
 [node name="TextLabel" type="Label" parent="ModalBackdrop/ModalPanel/ModalMargin/Content"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
 autowrap_mode = 3
 text = "Dialogue text."
 
 [node name="ResponsesColumn" type="VBoxContainer" parent="ModalBackdrop/ModalPanel/ModalMargin/Content"]
 layout_mode = 2
-theme_override_constants/separation = 10
 
 [node name="ContinueButton" type="Button" parent="ModalBackdrop/ModalPanel/ModalMargin/Content"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 46)
-theme_override_font_sizes/font_size = 20
-theme_override_styles/normal = SubResource("3_continue_style")
-theme_override_styles/hover = SubResource("3_continue_style")
-theme_override_styles/pressed = SubResource("3_continue_style")
-theme_override_styles/focus = SubResource("3_continue_style")
 text = "Continue"
 
 [node name="BubblePanel" type="PanelContainer" parent="."]
 visible = false
 layout_mode = 0
 custom_minimum_size = Vector2(240, 84)
-theme_override_styles/panel = SubResource("4_bubble_style")
 
 [node name="BubbleMargin" type="MarginContainer" parent="BubblePanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 14
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 14
-theme_override_constants/margin_bottom = 10
 
 [node name="BubbleColumn" type="VBoxContainer" parent="BubblePanel/BubbleMargin"]
 layout_mode = 2
-theme_override_constants/separation = 4
 
 [node name="BubbleNameLabel" type="Label" parent="BubblePanel/BubbleMargin/BubbleColumn"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
 text = "Customer"
 
 [node name="BubbleTextLabel" type="Label" parent="BubblePanel/BubbleMargin/BubbleColumn"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 17
 autowrap_mode = 3
 text = "One-line dialogue."

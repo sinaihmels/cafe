@@ -5,12 +5,35 @@ extends Control
 signal oven_item_requested(slot_index: int)
 
 @export var item_card_scene: PackedScene
+@export_group("Layout")
+@export var layout_min_size: Vector2 = Vector2(180.0, 180.0)
+@export_range(0.0, 0.5, 0.01) var side_padding_ratio: float = 0.10
+@export var side_padding_min: float = 10.0
+@export var side_padding_max: float = 28.0
+@export_range(0.0, 0.5, 0.01) var top_padding_ratio: float = 0.09
+@export var top_padding_min: float = 10.0
+@export var top_padding_max: float = 22.0
+@export_range(0.0, 0.5, 0.01) var bottom_padding_ratio: float = 0.08
+@export var bottom_padding_min: float = 8.0
+@export var bottom_padding_max: float = 20.0
+@export_range(0.0, 1.0, 0.01) var card_width_ratio_from_width: float = 0.32
+@export_range(0.0, 1.0, 0.01) var card_width_ratio_from_height: float = 0.34
+@export var card_width_min: float = 128.0
+@export var card_width_max: float = 176.0
+@export_range(0.0, 1.0, 0.01) var card_height_ratio: float = 0.60
+@export var card_height_min: float = 148.0
+@export var card_height_max: float = 224.0
+@export var row_width_min: float = 120.0
+@export var row_height_min: float = 140.0
 
 @onready var _row: HBoxContainer = $OvenRow
+var _editor_refresh_signature: Array = []
 
 func _ready() -> void:
 	_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	if Engine.is_editor_hint():
+		_editor_refresh_signature = _make_editor_refresh_signature()
+		set_process(true)
 		render_editor_preview()
 	_apply_layout()
 
@@ -19,6 +42,15 @@ func _notification(what: int) -> void:
 		return
 	if what == NOTIFICATION_RESIZED:
 		call_deferred("_apply_layout")
+
+func _process(_delta: float) -> void:
+	if not Engine.is_editor_hint() or not is_node_ready():
+		return
+	var signature: Array = _make_editor_refresh_signature()
+	if signature == _editor_refresh_signature:
+		return
+	_editor_refresh_signature = signature
+	_refresh_editor_preview()
 
 func render(session_service: SessionService, interaction_state: EncounterInteractionState) -> void:
 	UiSceneUtils.clear_children(_row)
@@ -74,13 +106,16 @@ func get_pastry_card_control(item_index: int) -> Control:
 func _apply_layout() -> void:
 	if _row == null:
 		return
-	var resolved_size: Vector2 = Vector2(maxf(180.0, size.x), maxf(180.0, size.y))
-	var compactness: float = clampf(maxf((300.0 - resolved_size.x) / 120.0, (240.0 - resolved_size.y) / 90.0), 0.0, 1.0)
-	var side_padding: float = clampf(resolved_size.x * lerpf(0.12, 0.08, compactness), 10.0, 34.0)
-	var top_padding: float = clampf(resolved_size.y * lerpf(0.10, 0.08, compactness), 10.0, 28.0)
-	var bottom_padding: float = clampf(resolved_size.y * 0.08, 8.0, 22.0)
-	var card_width: float = clampf(minf(resolved_size.x * lerpf(0.36, 0.28, compactness), resolved_size.y * lerpf(0.52, 0.38, compactness)), 132.0, 236.0)
-	var card_height: float = clampf(resolved_size.y * lerpf(0.74, 0.58, compactness), 156.0, 292.0)
+	var resolved_size: Vector2 = Vector2(maxf(layout_min_size.x, size.x), maxf(layout_min_size.y, size.y))
+	var side_padding: float = clampf(resolved_size.x * side_padding_ratio, side_padding_min, side_padding_max)
+	var top_padding: float = clampf(resolved_size.y * top_padding_ratio, top_padding_min, top_padding_max)
+	var bottom_padding: float = clampf(resolved_size.y * bottom_padding_ratio, bottom_padding_min, bottom_padding_max)
+	var card_width: float = clampf(
+		minf(resolved_size.x * card_width_ratio_from_width, resolved_size.y * card_width_ratio_from_height),
+		card_width_min,
+		card_width_max
+	)
+	var card_height: float = clampf(resolved_size.y * card_height_ratio, card_height_min, card_height_max)
 	for child in _row.get_children():
 		var card: ZoneItemCardView = child as ZoneItemCardView
 		if card != null:
@@ -90,8 +125,8 @@ func _apply_layout() -> void:
 		Rect2(
 			Vector2(side_padding, top_padding),
 			Vector2(
-				maxf(120.0, resolved_size.x - side_padding * 2.0),
-				maxf(140.0, resolved_size.y - top_padding - bottom_padding)
+				maxf(row_width_min, resolved_size.x - side_padding * 2.0),
+				maxf(row_height_min, resolved_size.y - top_padding - bottom_padding)
 			)
 		)
 	)
@@ -112,3 +147,30 @@ func render_editor_preview() -> void:
 	var preview_session: SessionService = EncounterEditorPreview.build_session()
 	var preview_interaction_state: EncounterInteractionState = EncounterEditorPreview.build_interaction_state(preview_session)
 	render(preview_session, preview_interaction_state)
+
+func _make_editor_refresh_signature() -> Array:
+	return [
+		item_card_scene,
+		layout_min_size,
+		side_padding_ratio,
+		side_padding_min,
+		side_padding_max,
+		top_padding_ratio,
+		top_padding_min,
+		top_padding_max,
+		bottom_padding_ratio,
+		bottom_padding_min,
+		bottom_padding_max,
+		card_width_ratio_from_width,
+		card_width_ratio_from_height,
+		card_width_min,
+		card_width_max,
+		card_height_ratio,
+		card_height_min,
+		card_height_max,
+		row_width_min,
+		row_height_min,
+	]
+
+func _refresh_editor_preview() -> void:
+	render_editor_preview()

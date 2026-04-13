@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://db4mu56ifwbil"]
+
+[ext_resource type="Script" uid="uid://d0hci7yoe2nyx" path="res://scripts/ui/screens/encounter_counter_view.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="1_counter_front_style"]
+bg_color = Color(0.4, 0.22, 0.18, 0.98)
+border_width_top = 4
+border_color = Color(0.63, 0.47, 0.36, 0.96)
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="2_counter_surface_style"]
+bg_color = Color(0.31, 0.23, 0.17, 0.96)
+border_width_top = 3
+border_width_bottom = 2
+border_color = Color(0.54, 0.43, 0.31, 0.96)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+
+[node name="EncounterCounterView" type="Control" unique_id=2059178601]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="CounterTexture" type="TextureRect" parent="." unique_id=1019593675]
+visible = false
+layout_mode = 1
+offset_right = 1152.0
+offset_bottom = 648.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="FallbackFront" type="PanelContainer" parent="." unique_id=65619830]
+visible = false
+layout_mode = 0
+offset_top = 99.0
+offset_right = 1152.0
+offset_bottom = 648.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("1_counter_front_style")
+
+[node name="FallbackSurface" type="PanelContainer" parent="." unique_id=556147332]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("2_counter_surface_style")

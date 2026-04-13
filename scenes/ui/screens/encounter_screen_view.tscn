@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://wadjyymgmkcv"]
 
 [ext_resource type="Script" uid="uid://bgyp7vgaqc5oq" path="res://scripts/ui/screens/encounter_screen_view.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://db4mu56ifwbil" path="res://scenes/ui/screens/encounter_counter_view.tscn" id="2_counter"]
 [ext_resource type="Texture2D" uid="uid://djqbyghlwpi4j" path="res://assets/demo/ui/demo_background.png" id="2_fn1rc"]
 [ext_resource type="PackedScene" uid="uid://bcgamgyb3y663" path="res://scenes/ui/screens/encounter_hud_view.tscn" id="2_hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/customer_lane_view.tscn" id="3_customer_lane"]
@@ -12,21 +13,6 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_effect_overlay_view.tscn" id="9_overlay"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_resources_view.tscn" id="10_resources"]
 [ext_resource type="PackedScene" path="res://scenes/ui/screens/encounter_dialogue_overlay_view.tscn" id="11_dialogue_overlay"]
-
-[sub_resource type="StyleBoxFlat" id="2_counter_front_style"]
-bg_color = Color(0.4, 0.22, 0.18, 0.98)
-border_width_top = 4
-border_color = Color(0.63, 0.47, 0.36, 0.96)
-corner_radius_bottom_right = 24
-corner_radius_bottom_left = 24
-
-[sub_resource type="StyleBoxFlat" id="1_counter_surface_style"]
-bg_color = Color(0.31, 0.23, 0.17, 0.96)
-border_width_top = 3
-border_width_bottom = 2
-border_color = Color(0.54, 0.43, 0.31, 0.96)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
 
 [sub_resource type="StyleBoxFlat" id="3_pile_style"]
 bg_color = Color(0.24, 0.21, 0.25, 0.88)
@@ -81,6 +67,8 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = -253.0
+offset_bottom = -179.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
@@ -89,7 +77,7 @@ script = ExtResource("1_script")
 modulate = Color(0.5, 0.58, 0.46, 1)
 layout_mode = 1
 offset_right = 1152.0
-offset_bottom = 648.0
+offset_bottom = 230.8
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -100,56 +88,23 @@ stretch_mode = 6
 [node name="BackdropTint" type="ColorRect" parent="." unique_id=1199262422]
 layout_mode = 1
 offset_right = 1152.0
-offset_bottom = 648.0
+offset_bottom = 230.8
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(0.11, 0.1, 0.09, 0.44)
 
-[node name="CounterFront" type="PanelContainer" parent="." unique_id=1657283987]
+[node name="CounterView" parent="." unique_id=1661648605 instance=ExtResource("2_counter")]
 layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
 offset_left = 12.0
-offset_top = 284.8
+offset_top = 226.8
 offset_right = 1140.0
 offset_bottom = 648.0
-mouse_filter = 2
-theme_override_styles/panel = SubResource("2_counter_front_style")
-
-[node name="CounterSurface" type="PanelContainer" parent="." unique_id=492290291]
-layout_mode = 0
-offset_left = 12.0
-offset_top = 226.8
-offset_right = 1140.0
-offset_bottom = 290.8
-mouse_filter = 2
-theme_override_styles/panel = SubResource("1_counter_surface_style")
-
-[node name="CounterLine" type="ColorRect" parent="." unique_id=328534815]
-layout_mode = 0
-offset_left = 12.0
-offset_top = 226.8
-offset_right = 1140.0
-offset_bottom = 230.8
-mouse_filter = 2
-color = Color(0.73, 0.6, 0.46, 0.88)
-
-[node name="TableCounterVertical" type="ColorRect" parent="." unique_id=500296842]
-layout_mode = 0
-offset_left = 383.12
-offset_top = 242.8
-offset_right = 387.12
-offset_bottom = 393.66528
-mouse_filter = 2
-color = Color(0.52, 0.39, 0.29, 0.86)
-
-[node name="TableCounterBottom" type="ColorRect" parent="." unique_id=1345846328]
-layout_mode = 0
-offset_left = 768.48
-offset_top = 242.8
-offset_right = 772.48
-offset_bottom = 393.66528
-mouse_filter = 2
-color = Color(0.52, 0.39, 0.29, 0.86)
+grow_horizontal = 1
+grow_vertical = 1
 
 [node name="SupportHudView" parent="." unique_id=1672170525 instance=ExtResource("2_hud")]
 layout_mode = 0
@@ -317,5 +272,4 @@ text = "End Turn"
 layout_mode = 1
 
 [node name="EncounterDialogueOverlayView" parent="." unique_id=816020731 instance=ExtResource("11_dialogue_overlay")]
-visible = false
 layout_mode = 1

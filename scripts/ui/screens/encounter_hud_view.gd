@@ -5,7 +5,7 @@ extends Control
 @export var indicator_scene: PackedScene
 
 @onready var _meta_flow: VBoxContainer = $MetaFlow
-@onready var _buff_flow: HFlowContainer = $BuffFlow
+@onready var _buff_flow: HBoxContainer = $BuffFlow
 
 func _ready() -> void:
 	if Engine.is_editor_hint():

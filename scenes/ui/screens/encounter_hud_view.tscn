@@ -14,22 +14,22 @@ script = ExtResource("1_script")
 indicator_scene = ExtResource("2_indicator")
 
 [node name="MetaFlow" type="VBoxContainer" parent="." unique_id=418747505]
+custom_minimum_size = Vector2(20, 20)
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
 anchor_right = 1.0
 offset_right = 2.0
-offset_bottom = 34.0
+offset_bottom = 107.0
 grow_horizontal = 2
 
-[node name="BuffFlow" type="HFlowContainer" parent="." unique_id=237653704]
+[node name="BuffFlow" type="HBoxContainer" parent="." unique_id=2049378798]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 42.0
+offset_top = 109.0
+offset_bottom = -503.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/h_separation = 6
-theme_override_constants/v_separation = 6
