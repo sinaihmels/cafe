@@ -1,9 +1,10 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://bcgamgyb3y663"]
 
-[ext_resource type="Script" path="res://scripts/ui/screens/encounter_hud_view.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://drikregxft3bg" path="res://scripts/ui/screens/encounter_hud_view.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/components/compact_indicator_view.tscn" id="2_indicator"]
 
-[node name="HudView" type="Control"]
+[node name="HudView" type="Control" unique_id=1023843979]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -12,21 +13,19 @@ grow_vertical = 2
 script = ExtResource("1_script")
 indicator_scene = ExtResource("2_indicator")
 
-[node name="MetaFlow" type="HFlowContainer" parent="."]
+[node name="MetaFlow" type="VBoxContainer" parent="." unique_id=418747505]
 layout_mode = 1
-anchors_preset = 5
+anchors_preset = -1
+anchor_left = 0.5
 anchor_right = 1.0
-anchor_bottom = 0.0
-offset_right = 0.0
+offset_right = 2.0
 offset_bottom = 34.0
 grow_horizontal = 2
-theme_override_constants/h_separation = 6
-theme_override_constants/v_separation = 6
 
-[node name="BuffFlow" type="HFlowContainer" parent="."]
+[node name="BuffFlow" type="HFlowContainer" parent="." unique_id=237653704]
 layout_mode = 1
-anchors_preset = 13
-anchor_top = 0.0
+anchors_preset = -1
+anchor_left = 0.5
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = 42.0

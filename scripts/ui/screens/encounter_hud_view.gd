@@ -4,7 +4,7 @@ extends Control
 
 @export var indicator_scene: PackedScene
 
-@onready var _meta_flow: HFlowContainer = $MetaFlow
+@onready var _meta_flow: VBoxContainer = $MetaFlow
 @onready var _buff_flow: HFlowContainer = $BuffFlow
 
 func _ready() -> void:
